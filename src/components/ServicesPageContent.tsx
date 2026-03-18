@@ -5,6 +5,7 @@ import { useEffect, useRef } from "react";
 import type { ComponentType } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import SplitType from "split-type";
 import {
   ArrowUpRight,
   Bot,
@@ -14,6 +15,11 @@ import {
   Sparkles,
   Video,
 } from "lucide-react";
+
+// Register outside to ensure it's done once and early
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 type ServiceItem = {
   title: string;
@@ -91,38 +97,43 @@ export default function ServicesPageContent() {
   const rootRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    gsap.registerPlugin(ScrollTrigger);
     const cleanupFns: Array<() => void> = [];
+    const splits: SplitType[] = [];
 
     const ctx = gsap.context(() => {
-      const introTl = gsap.timeline({ defaults: { ease: "power3.out" } });
+      // Split text for cinematic entry
+      const mainTitle = new SplitType(".svc-title-split", { types: "chars" });
+      splits.push(mainTitle);
+
+      const introTl = gsap.timeline({ defaults: { ease: "expo.out" } });
 
       introTl
         .fromTo(
           ".svc-kicker",
           { y: 24, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.6 },
+          { y: 0, opacity: 1, duration: 1.2, delay: 0.2 },
         )
         .fromTo(
-          ".svc-title-line",
-          { yPercent: 120 },
+          mainTitle.chars,
+          { yPercent: 120, backdropFilter: "blur(10px)" },
           {
             yPercent: 0,
-            duration: 1,
-            stagger: 0.08,
+            duration: 1.5,
+            stagger: 0.015,
             ease: "expo.out",
           },
-          "-=0.15",
+          "-=1.1",
         )
         .fromTo(
           ".svc-lead",
-          { y: 28, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.75 },
-          "-=0.65",
+          { y: 30, opacity: 0 },
+          { y: 0, opacity: 1, duration: 1.2 },
+          "-=1.2",
         );
 
+      // Parallax hero section
       gsap.to(".svc-hero", {
-        yPercent: -12,
+        yPercent: -20,
         ease: "none",
         scrollTrigger: {
           trigger: rootRef.current,
@@ -132,55 +143,58 @@ export default function ServicesPageContent() {
         },
       });
 
+      // Staggered card entry
       gsap.fromTo(
         ".svc-card",
-        { y: 64, opacity: 0, scale: 0.98 },
+        { y: 100, opacity: 0, rotateX: 10 },
         {
           y: 0,
           opacity: 1,
-          scale: 1,
-          duration: 0.9,
-          ease: "power3.out",
-          stagger: 0.08,
+          rotateX: 0,
+          duration: 1.4,
+          ease: "expo.out",
+          stagger: 0.1,
           scrollTrigger: {
             trigger: ".svc-card-grid",
-            start: "top 78%",
+            start: "top 85%",
           },
         },
       );
 
+      // Process and CTA entry
       gsap.fromTo(
-        ".svc-process, .svc-cta",
-        { y: 56, opacity: 0 },
+        ".svc-process-reveal, .svc-cta-reveal",
+        { y: 60, opacity: 0 },
         {
           y: 0,
           opacity: 1,
-          duration: 0.9,
-          stagger: 0.16,
-          ease: "power3.out",
+          duration: 1.2,
+          stagger: 0.2,
+          ease: "expo.out",
           scrollTrigger: {
             trigger: ".svc-process",
-            start: "top 82%",
+            start: "top 80%",
           },
         },
       );
 
+      // Interactive magnetic tilt for cards
       const cards = gsap.utils.toArray<HTMLElement>(".svc-card");
       cards.forEach((card) => {
-        const toRX = gsap.quickTo(card, "rotationX", { duration: 0.28, ease: "power2.out" });
-        const toRY = gsap.quickTo(card, "rotationY", { duration: 0.28, ease: "power2.out" });
-        const toY = gsap.quickTo(card, "y", { duration: 0.28, ease: "power2.out" });
+        const toRX = gsap.quickTo(card, "rotationX", { duration: 0.5, ease: "power3.out" });
+        const toRY = gsap.quickTo(card, "rotationY", { duration: 0.5, ease: "power3.out" });
+        const toY = gsap.quickTo(card, "y", { duration: 0.5, ease: "power3.out" });
 
-        gsap.set(card, { transformPerspective: 900, transformOrigin: "center" });
+        gsap.set(card, { transformPerspective: 1200, transformOrigin: "center" });
 
         const onMove = (event: MouseEvent) => {
           const rect = card.getBoundingClientRect();
           const px = (event.clientX - rect.left) / rect.width;
           const py = (event.clientY - rect.top) / rect.height;
 
-          toRX((py - 0.5) * -8);
-          toRY((px - 0.5) * 10);
-          toY(-6);
+          toRX((py - 0.5) * -12);
+          toRY((px - 0.5) * 12);
+          toY(-10);
         };
 
         const onLeave = () => {
@@ -201,6 +215,7 @@ export default function ServicesPageContent() {
 
     return () => {
       cleanupFns.forEach((fn) => fn());
+      splits.forEach((s) => s.revert());
       ctx.revert();
     };
   }, []);
@@ -212,124 +227,127 @@ export default function ServicesPageContent() {
       aria-label="Services overview"
     >
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute left-[-12rem] top-28 h-80 w-80 rounded-full bg-accent/15 blur-3xl" />
-        <div className="absolute bottom-[-8rem] right-[-8rem] h-96 w-96 rounded-full bg-secondary/15 blur-3xl" />
+        <div className="absolute left-[-12rem] top-28 h-[40rem] w-[40rem] rounded-full bg-accent/10 blur-[120px]" />
+        <div className="absolute bottom-[-8rem] right-[-8rem] h-[50rem] w-[50rem] rounded-full bg-secondary/10 blur-[150px]" />
       </div>
 
       <div className="_container relative z-10">
-        <div className="svc-hero mb-20 md:mb-24">
+        <div className="svc-hero mb-24 md:mb-32">
           <p className="svc-kicker mb-6 text-[11px] font-black uppercase tracking-[0.5em] text-accent">
-            Services
+            Expertise / Solutions
           </p>
-          <h1 className="max-w-5xl text-[13vw] font-black uppercase leading-[0.85] tracking-tighter md:text-[6.2vw]">
+          <h1 className="max-w-5xl text-[13vw] font-black uppercase leading-[0.82] tracking-tighter md:text-[7vw]">
             <span className="block overflow-hidden">
-              <span className="svc-title-line block">Crafted To</span>
+              <span className="svc-title-split block">Crafted To</span>
             </span>
             <span className="block overflow-hidden">
-              <span className="svc-title-line ml-2 block text-white/20 italic">Scale</span>
+              <span className="svc-title-split ml-4 block text-white/10 italic">Scale</span>
             </span>
             <span className="block overflow-hidden">
-              <span className="svc-title-line block">Modern Brands</span>
+              <span className="svc-title-split block">Modern Brands</span>
             </span>
           </h1>
-          <p className="svc-lead mt-10 max-w-2xl text-base leading-relaxed text-white/60 md:text-lg">
-            Wincore combines strategy, production, and AI-enhanced execution to deliver bold
+          <p className="svc-lead mt-12 max-w-2xl text-base leading-relaxed text-white/50 md:text-xl font-light">
+            Wincore combines human strategy, cinematic production, and AI-enhanced execution to deliver bold
             digital outcomes. Every service is built as a growth layer, not a one-off task.
           </p>
         </div>
 
-        <div className="svc-card-grid mb-24 grid grid-cols-1 gap-5 md:mb-28 md:grid-cols-2 xl:grid-cols-3">
+        <div className="svc-card-grid mb-24 grid grid-cols-1 gap-6 md:mb-32 md:grid-cols-2 xl:grid-cols-3">
           {SERVICES.map((service, index) => {
             const Icon = service.icon;
 
             return (
               <article
                 key={service.title}
-                className="svc-card group relative overflow-hidden rounded-[1.75rem] border border-white/10 bg-white/[0.03] p-7 transition-all duration-500 hover:-translate-y-1.5 hover:border-accent/60 hover:bg-white/[0.05] md:p-8"
+                className="svc-card group relative overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.02] p-8 md:p-10 transition-colors duration-500 hover:border-accent/30"
               >
-                <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent/80 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-
-                <div className="mb-8 flex items-center justify-between">
-                  <span className="text-[10px] font-black uppercase tracking-[0.35em] text-white/35">
-                    0{index + 1}
-                  </span>
-                  <div className="rounded-full border border-white/15 bg-white/5 p-3 text-accent transition-colors group-hover:border-accent/40">
-                    <Icon size={18} />
+                <div className="absolute inset-0 bg-gradient-to-br from-white/[0.03] to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+                
+                <div className="relative z-10">
+                  <div className="mb-10 flex items-center justify-between">
+                    <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20">
+                      Phase 0{index + 1}
+                    </span>
+                    <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-accent transition-all duration-500 group-hover:scale-110 group-hover:border-accent/40 group-hover:bg-accent/10">
+                      <Icon size={24} />
+                    </div>
                   </div>
+
+                  <h2 className="mb-5 text-2xl font-black leading-[1.1] md:text-[1.85rem]">
+                    {service.title}
+                  </h2>
+                  <p className="mb-8 text-sm leading-relaxed text-white/50 md:text-base font-light">{service.summary}</p>
+
+                  <ul className="mb-10 space-y-3">
+                    {service.outcomes.map((outcome) => (
+                      <li key={outcome} className="flex items-center gap-3 text-sm text-white/70">
+                        <span className="h-1 w-1 rounded-full bg-accent/60" aria-hidden="true" />
+                        <span className="font-medium tracking-tight">{outcome}</span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  {service.link ? (
+                    <a
+                      href={service.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.4em] text-accent transition-all duration-300 group-hover:gap-5"
+                    >
+                      Experience Platform
+                      <ArrowUpRight size={14} />
+                    </a>
+                  ) : (
+                    <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/30 italic">
+                      Strategy First
+                    </p>
+                  )}
                 </div>
-
-                <h2 className="mb-4 text-2xl font-black leading-tight md:text-[1.75rem]">
-                  {service.title}
-                </h2>
-                <p className="mb-6 text-sm leading-relaxed text-white/60 md:text-base">{service.summary}</p>
-
-                <ul className="mb-8 space-y-2 text-sm text-white/70">
-                  {service.outcomes.map((outcome) => (
-                    <li key={outcome} className="flex items-center gap-2">
-                      <span className="h-1.5 w-1.5 rounded-full bg-accent" aria-hidden="true" />
-                      <span>{outcome}</span>
-                    </li>
-                  ))}
-                </ul>
-
-                {service.link ? (
-                  <a
-                    href={service.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.3em] text-accent transition-transform duration-300 group-hover:translate-x-1"
-                  >
-                    Open WinPro AI
-                    <ArrowUpRight size={14} />
-                  </a>
-                ) : (
-                  <p className="text-[11px] font-black uppercase tracking-[0.3em] text-white/35">
-                    Tailored Scope
-                  </p>
-                )}
               </article>
             );
           })}
         </div>
 
-        <div className="svc-process mb-24 rounded-[2rem] border border-white/10 bg-muted/30 p-7 md:mb-28 md:p-10">
-          <div className="mb-8 flex items-center justify-between gap-6">
-            <h3 className="text-3xl font-black uppercase tracking-tight md:text-5xl">How We Work</h3>
-            <span className="hidden text-[10px] font-black uppercase tracking-[0.4em] text-white/35 md:block">
-              Strategy to execution
+        <div className="svc-process svc-process-reveal mb-24 rounded-[3rem] border border-white/5 bg-white/[0.01] p-8 md:mb-32 md:p-16 backdrop-blur-sm">
+          <div className="mb-12 flex flex-col md:flex-row items-start md:items-end justify-between gap-6">
+            <h3 className="text-4xl font-black uppercase tracking-tight md:text-6xl leading-none">The <span className="text-white/20 italic">Wincore</span> Way</h3>
+            <span className="text-[10px] font-black uppercase tracking-[0.5em] text-white/20 translate-y-[-10px]">
+              Agile / Creative / Data-Driven
             </span>
           </div>
 
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
             {PROCESS.map((phase) => (
               <article
                 key={phase.step}
-                className="rounded-2xl border border-white/10 bg-black/20 p-6"
+                className="group relative"
               >
-                <p className="mb-4 text-[10px] font-black uppercase tracking-[0.35em] text-accent">
-                  {phase.step}
+                <p className="mb-6 text-[11px] font-black uppercase tracking-[0.4em] text-accent/60">
+                  Step {phase.step}
                 </p>
-                <h4 className="mb-3 text-2xl font-black">{phase.title}</h4>
-                <p className="text-white/60">{phase.text}</p>
+                <h4 className="mb-4 text-2xl font-black tracking-tight">{phase.title}</h4>
+                <div className="w-12 h-[1px] bg-white/10 mb-6 transition-all duration-500 group-hover:w-full group-hover:bg-accent/30" />
+                <p className="text-white/40 leading-relaxed font-light">{phase.text}</p>
               </article>
             ))}
           </div>
         </div>
 
-        <div className="svc-cta mb-20 flex flex-col items-start justify-between gap-8 rounded-[2rem] border border-accent/40 bg-accent/10 p-8 md:mb-28 md:flex-row md:items-center md:p-10">
-          <div>
-            <p className="mb-2 text-[10px] font-black uppercase tracking-[0.4em] text-accent">Start a project</p>
-            <p className="max-w-xl text-2xl font-black leading-tight md:text-4xl">
-              Ready to turn your brand into a high-performing digital experience?
-            </p>
+        <div className="svc-cta svc-cta-reveal mb-24 flex flex-col items-start justify-between gap-12 rounded-[3rem] border border-accent/20 bg-gradient-to-br from-accent/[0.08] to-transparent p-10 md:mb-40 md:flex-row md:items-center md:p-20">
+          <div className="max-w-2xl">
+            <p className="mb-4 text-[11px] font-black uppercase tracking-[0.5em] text-accent">Co-create with us</p>
+            <h2 className="text-3xl font-black leading-[0.9] md:text-6xl tracking-tighter uppercase">
+              Ready to <span className="text-white/10 italic">evolve</span> your brand?
+            </h2>
           </div>
 
           <Link
             href="/contact"
-            className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-6 py-3 text-[11px] font-black uppercase tracking-[0.32em] text-white transition-all duration-300 hover:border-accent hover:bg-accent hover:text-black"
+            className="group relative inline-flex items-center gap-4 rounded-full bg-white px-10 py-5 text-[11px] font-black uppercase tracking-[0.35em] text-black transition-all duration-500 hover:bg-accent hover:px-14 shadow-2xl shadow-accent/20"
           >
-            Contact Wincore
-            <ArrowUpRight size={14} />
+            Start Project
+            <ArrowUpRight size={16} className="transition-transform duration-300 group-hover:rotate-45" />
           </Link>
         </div>
       </div>

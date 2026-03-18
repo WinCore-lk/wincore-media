@@ -1,29 +1,43 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import Image from "next/image";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import SplitType from "split-type";
 
 const stats = [
   {
     value: 12,
-    label: "Local & International Awards",
     suffix: "+",
+    label: "Awards Won",
+    desc: "Local and international creative excellence recognised across categories.",
+    accent: "from-accent/[0.08] to-transparent",
+    image: "https://images.unsplash.com/photo-1549417229-aa67d3263c09?auto=format&fit=crop&q=80&w=800",
   },
   {
     value: 95,
-    label: "Client Retention Rate",
     suffix: "%",
+    label: "Client Retention",
+    desc: "Clients stay because results compound and trust is earned, not assumed.",
+    accent: "from-secondary/[0.07] to-transparent",
+    image: "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&q=80&w=800",
   },
   {
     value: 200,
-    label: "Campaigns Delivered",
     suffix: "+",
+    label: "Campaigns Delivered",
+    desc: "Full-funnel campaigns across every vertical — built to perform.",
+    accent: "from-white/[0.05] to-transparent",
+    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=800",
   },
   {
     value: 10,
-    label: "Years of Digital Excellence",
     suffix: "y",
+    label: "Years in the Game",
+    desc: "A decade of digital authority, craft, and measurable outcomes.",
+    accent: "from-accent/[0.05] to-secondary/[0.03]",
+    image: "https://images.unsplash.com/photo-1508919895503-4244ae99f946?auto=format&fit=crop&q=80&w=800",
   },
 ];
 
@@ -32,124 +46,214 @@ export default function AwardsStats() {
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
+    const splits: SplitType[] = [];
 
     const ctx = gsap.context(() => {
-      const numbers = gsap.utils.toArray<HTMLElement>(".stat-number");
-      
-      numbers.forEach((num) => {
-        const targetValue = parseInt(num.getAttribute("data-target") || "0");
-        
-        gsap.to(num, {
-          textContent: targetValue,
-          duration: 2.5,
+      // ── Heading char reveal ──
+      const headingEl = sectionRef.current?.querySelector(".aw-heading") as HTMLElement | null;
+      if (headingEl) {
+        const split = new SplitType(headingEl, { types: "chars" });
+        splits.push(split);
+        if (split.chars) {
+          gsap.fromTo(
+            split.chars,
+            { yPercent: 110, opacity: 0 },
+            {
+              yPercent: 0,
+              opacity: 1,
+              duration: 1,
+              stagger: 0.018,
+              ease: "expo.out",
+              clearProps: "transform,opacity",
+              scrollTrigger: { trigger: headingEl, start: "top 85%", once: true },
+            }
+          );
+        }
+      }
+
+      gsap.fromTo(
+        ".aw-kicker",
+        { y: 20, opacity: 0 },
+        {
+          y: 0, opacity: 1, duration: 0.8, ease: "expo.out", clearProps: "transform,opacity",
+          scrollTrigger: { trigger: ".aw-kicker", start: "top 90%", once: true },
+        }
+      );
+      gsap.fromTo(
+        ".aw-body",
+        { y: 22, opacity: 0 },
+        {
+          y: 0, opacity: 1, duration: 1, ease: "expo.out", clearProps: "transform,opacity",
+          scrollTrigger: { trigger: ".aw-body", start: "top 90%", once: true },
+        }
+      );
+
+      // ── Count-up — triggered when each sticky card reaches view ──
+      const cards = gsap.utils.toArray<HTMLElement>(".aw-card");
+      cards.forEach((card, i) => {
+        const numEl = card.querySelector<HTMLElement>(".aw-num");
+        if (!numEl) return;
+        const target = stats[i].value;
+        const proxy = { val: 0 };
+        gsap.to(proxy, {
+          val: target,
+          duration: 1.8,
           ease: "power2.out",
           scrollTrigger: {
-            trigger: num,
-            start: "top 85%",
+            trigger: card,
+            start: "top 65%",
+            once: true,
           },
-          onUpdate: function() {
-            num.textContent = Math.round(Number(num.textContent)).toString();
+          onUpdate() {
+            numEl.textContent = Math.round(proxy.val).toString();
           },
         });
-      });
 
-      gsap.fromTo(
-        ".awards-intro",
-        { y: 50, opacity: 0, filter: "blur(8px)" },
-        {
-          y: 0,
-          opacity: 1,
-          filter: "blur(0px)",
-          duration: 1,
-          stagger: 0.08,
-          ease: "expo.out",
-          scrollTrigger: { trigger: sectionRef.current, start: "top 78%" },
-        },
-      );
-
-      gsap.fromTo(
-        ".award-card",
-        { y: 80, opacity: 0, scale: 0.96 },
-        {
-          y: 0,
-          opacity: 1,
-          scale: 1,
-          duration: 1.2,
-          stagger: 0.08,
-          ease: "expo.out",
-          scrollTrigger: { trigger: sectionRef.current, start: "top 70%" },
-        },
-      );
-
-      // Background decorative animation
-      gsap.to(".awards-bg-circle", {
-        scale: 1.5,
-        opacity: 0.3,
-        duration: 2,
-        repeat: -1,
-        yoyo: true,
-        ease: "sine.inOut",
+        // Subtle fade-in on each card
+        gsap.fromTo(
+          card,
+          { opacity: 0, y: 30 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.9,
+            ease: "expo.out",
+            clearProps: "transform,opacity",
+            scrollTrigger: {
+              trigger: card,
+              start: "top 80%",
+              once: true,
+            },
+          }
+        );
       });
     }, sectionRef);
 
-    return () => ctx.revert();
+    return () => {
+      splits.forEach((s) => s.revert());
+      ctx.revert();
+    };
   }, []);
 
   return (
     <section
       ref={sectionRef}
-      className="chapter relative py-[14vw] bg-background overflow-hidden border-t border-white/5"
+      className="relative overflow-visible border-t border-white/5 bg-background pb-[15vw] pt-[15vw]"
       aria-label="Awards and stats"
     >
-      <div
-        data-watermark
-        className="absolute top-1/2 left-[-8vw] -translate-y-1/2 text-[38vw] font-black text-white/[0.02] pointer-events-none select-none uppercase italic whitespace-nowrap"
-      >
-        Achievements
-      </div>
+      {/* Ambient glows */}
+      <div className="pointer-events-none absolute left-[-20vw] top-1/4 h-[40vw] w-[40vw] rounded-full bg-secondary/5 blur-[100px]" />
+      <div className="pointer-events-none absolute right-[-10vw] top-1/2 h-[30vw] w-[30vw] rounded-full bg-accent/5 blur-[80px]" />
 
-      {/* Decorative Circles */}
-      <div className="awards-bg-circle absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 border border-accent/10 rounded-full pointer-events-none" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] border border-white/5 rounded-full pointer-events-none" />
-
-      <div className="chapter-inner _container relative z-10">
-        <div className="flex flex-col md:flex-row justify-between items-end gap-12 mb-16 md:mb-24">
+      <div className="_container relative z-10">
+        {/* ── Header ── */}
+        <div className="mb-24 flex flex-col items-start justify-between gap-12 md:flex-row md:items-end px-4 md:px-0">
           <div>
-            <span className="awards-intro text-secondary font-bold uppercase tracking-[0.55em] text-[11px] mb-8 italic block">
-              Achievements
+            <span className="aw-kicker mb-8 block text-[10px] font-black uppercase tracking-[0.6em] text-secondary italic">
+              Track Record
             </span>
-            <h2 className="awards-intro text-[10vw] md:text-[5vw] font-black leading-[0.85] uppercase tracking-tighter max-w-[14ch]">
-              Winning results <span className="text-white/10 italic">that lead</span>
+            <h2
+              className="aw-heading text-[12vw] font-black uppercase leading-[0.8] tracking-tighter md:text-[7vw]"
+              style={{ perspective: "800px" }}
+            >
+              Outcomes<br />
+              <span className="text-white/10 italic">that lead</span>
             </h2>
           </div>
-          <p className="awards-intro text-white/35 text-lg md:text-xl font-light max-w-[420px] leading-relaxed">
+          <p className="aw-body max-w-[36ch] text-lg font-light leading-relaxed text-white/35 md:text-2xl">
             Awards are a signal. Outcomes are the standard. We build systems that perform and visuals that move.
           </p>
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12">
-          {stats.map((stat, index) => (
+        {/* ── Stacked cards ── centered stack */}
+        <div className="relative mx-auto max-w-[1000px]">
+          {stats.map((stat, i) => (
             <div
-              key={index}
-              className="award-card group flex flex-col items-center text-center rounded-[2rem] border border-white/10 bg-muted/40 backdrop-blur-xl p-7 md:p-10 transition-transform duration-700 hover:-translate-y-2"
+              key={i}
+              /* Each card has its own scroll real estate - increased for more breathing room */
+              style={{ height: i < stats.length - 1 ? "600px" : "auto" }}
+              className="relative"
             >
-              <div className="mb-4">
-                <span 
-                    className="stat-number text-5xl md:text-8xl font-black text-white tracking-tighter"
-                    data-target={stat.value}
+              <div
+                /*
+                  Sticky: card parks at top: (120 + i*36)px as user scrolls.
+                  Increased offsets for better visual stacking.
+                */
+                style={{
+                  position: "sticky",
+                  top: `${120 + i * 36}px`,
+                  zIndex: i + 1,
+                }}
+              >
+                <div
+                  className={`aw-card group relative overflow-hidden rounded-[2.5rem] border border-white/[0.08] bg-gradient-to-br ${stat.accent} p-10 backdrop-blur-md md:p-16`}
+                  style={{
+                    /* Slight scale down on lower cards for depth illusion */
+                    transform: `scale(${1 - (stats.length - 1 - i) * 0.015})`,
+                  }}
                 >
-                    0
-                </span>
-                <span className="text-3xl md:text-5xl font-bold text-accent">{stat.suffix}</span>
+                  {/* Card Background Image (Subtle) */}
+                  <div className="absolute inset-0 z-0 opacity-[0.04] grayscale transition-all duration-1000 group-hover:opacity-[0.08] group-hover:scale-110">
+                    <Image
+                      src={stat.image}
+                      alt=""
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 768px) 100vw, 1200px"
+                    />
+                  </div>
+
+                  {/* Content starts - relative z-10 */}
+                  <div className="relative z-10">
+                    {/* Top bar */}
+                    <div className="mb-10 flex items-center justify-between">
+                      <span className="text-[10px] font-black uppercase tracking-[0.5em] text-white/20">
+                        {String(i + 1).padStart(2, "0")} / {stats.length}
+                      </span>
+                      <span className="text-[10px] font-black uppercase tracking-[0.5em] text-accent/80 font-bold">
+                        {stat.label}
+                      </span>
+                    </div>
+
+                    {/* Giant number */}
+                    <div className="mb-10 flex items-end gap-3">
+                      <span
+                        className="aw-num font-black leading-none tracking-tighter text-white"
+                        style={{ fontSize: "clamp(5rem, 12vw, 10rem)" }}
+                      >
+                        0
+                      </span>
+                      <span
+                        className="mb-3 font-bold text-accent"
+                        style={{ fontSize: "clamp(2.5rem, 6vw, 5rem)" }}
+                      >
+                        {stat.suffix}
+                      </span>
+                    </div>
+
+                    {/* Description + line */}
+                    <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-10">
+                      <p className="max-w-[42ch] text-lg font-light leading-relaxed text-white/50 md:text-xl">
+                        {stat.desc}
+                      </p>
+                      <div className="h-[2px] w-24 shrink-0 bg-gradient-to-r from-accent/60 to-transparent" />
+                    </div>
+
+                    {/* Decorative corner accent */}
+                    <div className="pointer-events-none absolute right-12 top-12 h-32 w-32 rounded-full border border-white/[0.08] mask-image:radial-gradient(circle,white_0%,transparent_70%)" />
+                  </div>
+                </div>
               </div>
-              <p className="text-sm md:text-base text-white/40 font-bold uppercase tracking-widest max-w-[150px]">
-                {stat.label}
-              </p>
-              
-              {/* Divider line that glows on hover */}
-              <div className="w-10 h-px bg-white/10 mt-8 group-hover:w-24 group-hover:bg-accent transition-all duration-700" />
             </div>
           ))}
+        </div>
+
+        {/* Bottom indicator */}
+        <div className="mt-32 flex flex-col items-center gap-6">
+          <div className="h-20 w-px bg-gradient-to-b from-white/20 to-transparent" />
+          <p className="text-[10px] font-black uppercase tracking-[0.6em] text-white/15 animate-pulse">
+            Scroll to stack results
+          </p>
         </div>
       </div>
     </section>

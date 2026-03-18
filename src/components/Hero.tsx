@@ -9,14 +9,19 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import SplitType from "split-type";
 import { ArrowDown, Play } from "lucide-react";
 
-function ParticleBackground() {
+// ─────────────────────────────────────
+// WebGL particle sphere
+// ─────────────────────────────────────
+function ParticleField() {
   const ref = useRef<any>(null);
-  const sphere = random.inSphere(new Float32Array(5000), { radius: 1.6 });
+  const [sphere] = useState(() =>
+    random.inSphere(new Float32Array(6000), { radius: 1.5 })
+  );
 
   useFrame((_, delta) => {
     if (!ref.current) return;
-    ref.current.rotation.x -= delta / 12;
-    ref.current.rotation.y -= delta / 18;
+    ref.current.rotation.x -= delta / 14;
+    ref.current.rotation.y -= delta / 20;
   });
 
   return (
@@ -25,153 +30,174 @@ function ParticleBackground() {
         <PointMaterial
           transparent
           color="#00BFFF"
-          size={0.006}
+          size={0.005}
           sizeAttenuation
           depthWrite={false}
+          opacity={0.85}
         />
       </Points>
     </group>
   );
 }
 
+// ─────────────────────────────────────
+// Hero
+// ─────────────────────────────────────
 export default function Hero() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [expanded, setExpanded] = useState(false);
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
+    const splits: SplitType[] = [];
 
     const ctx = gsap.context(() => {
-      const split = new SplitType(".hero-title", { types: "lines,words,chars" });
+      // 1. Split h1 into chars
+      const titleEl = containerRef.current?.querySelector(".hero-title") as HTMLElement;
+      if (!titleEl) return;
 
-      gsap.set(".hero-title .char", { yPercent: 110 });
-      gsap.set(".hero-reveal", { y: 80, opacity: 0 });
-      gsap.set(".hero-media-mask", { clipPath: "inset(100% 0 0 0 round 32px)" });
+      const split = new SplitType(titleEl, { types: "chars,lines" });
+      splits.push(split);
 
-      const tl = gsap.timeline({ defaults: { ease: "expo.out" } });
-      tl.to(".hero-title .char", {
-        yPercent: 0,
-        duration: 1.4,
-        stagger: 0.012,
-        delay: 0.35,
-      })
-        .to(
-          ".hero-reveal",
+      // Title reveal: 3D perspective reveal
+      if (split.chars) {
+        gsap.fromTo(
+          split.chars,
+          { opacity: 0, y: 100, rotateX: -90, transformOrigin: "50% 50% -100px" },
           {
-            y: 0,
             opacity: 1,
-            duration: 1.1,
-            stagger: 0.08,
-          },
-          "-=0.9",
-        )
-        .to(
-          ".hero-media-mask",
-          {
-            clipPath: "inset(0% 0 0 0 round 32px)",
-            duration: 1.9,
-            ease: "power4.inOut",
-          },
-          "-=1.2",
+            y: 0,
+            rotateX: 0,
+            duration: 1.2,
+            stagger: 0.015,
+            ease: "expo.out",
+            delay: 0.8,
+            clearProps: "all",
+          }
         );
+      }
 
-      gsap.to(".hero-parallax", {
-        y: 150,
-        ease: "none",
+      // 2. Kicker / Sub / Button / Reels
+      gsap.fromTo(".hero-kicker",
+        { opacity: 0, y: 20 },
+        { opacity: 1, y: 0, duration: 1, ease: "expo.out", delay: 0.4, clearProps: "all" }
+      );
+
+      gsap.fromTo(".hero-sub",
+        { opacity: 0, y: 30 },
+        { opacity: 1, y: 0, duration: 1.2, ease: "expo.out", delay: 1, clearProps: "all" }
+      );
+
+      gsap.fromTo(".hero-reel",
+        { opacity: 0, scale: 0.95, y: 40 },
+        { opacity: 1, scale: 1, y: 0, duration: 1.5, ease: "expo.out", delay: 1.2, clearProps: "all" }
+      );
+
+      gsap.fromTo(".hero-scroll-hint",
+        { opacity: 0 },
+        { opacity: 1, duration: 1, delay: 2, clearProps: "opacity" }
+      );
+
+      // 3. Scroll effects
+      gsap.to(".hero-title-wrap", {
+        y: -100,
+        opacity: 0,
         scrollTrigger: {
           trigger: containerRef.current,
           start: "top top",
           end: "bottom top",
           scrub: true,
-        },
+        }
       });
-
-      ScrollTrigger.create({
-        trigger: containerRef.current,
-        start: "top top",
-        end: "bottom+=40% top",
-        pin: true,
-        scrub: 1.1,
-        animation: gsap.timeline().to(".hero-fade", {
-          opacity: 0,
-          scale: 0.92,
-          filter: "blur(6px)",
-          ease: "power2.out",
-        }),
+      gsap.to(".hero-reel", {
+        scale: 1.05,
+        scrollTrigger: {
+          trigger: containerRef.current,
+          start: "top top",
+          end: "bottom top",
+          scrub: true,
+        }
       });
-
-      return () => split.revert();
     }, containerRef);
 
-    return () => ctx.revert();
+    return () => {
+      splits.forEach((s) => s.revert());
+      ctx.revert();
+    };
   }, []);
 
   return (
     <section
       ref={containerRef}
-      className="relative min-h-screen pt-[12vw] pb-[5vw] flex flex-col items-center justify-between overflow-hidden bg-background"
+      className="relative flex min-h-[110vh] flex-col items-center justify-between overflow-hidden bg-background pb-[5vw] pt-[12vw]"
     >
-      {/* WebGL Background */}
-      <div className="pointer-events-none absolute inset-0 z-0 opacity-70">
-        <Canvas camera={{ position: [0, 0, 1.6] }} dpr={[1, 1.5]}>
+      {/* ── WebGL ── */}
+      <div className="pointer-events-none absolute inset-0 z-0 opacity-35">
+        <Canvas camera={{ position: [0, 0, 1.5] }} dpr={[1, 2]}>
           <Suspense fallback={null}>
             <color attach="background" args={["#0A0A0A"]} />
-            <Float speed={1.2} rotationIntensity={0.25} floatIntensity={0.6}>
-              <ParticleBackground />
+            <Float speed={1.4} rotationIntensity={0.4} floatIntensity={0.7}>
+              <ParticleField />
             </Float>
-            <Sparkles
-              count={80}
-              speed={0.25}
-              size={2}
-              scale={[10, 6, 2]}
-              color="#00BFFF"
-              opacity={0.45}
-            />
+            <Sparkles count={100} speed={0.35} size={1.2} scale={[14, 9, 4]} color="#00BFFF" opacity={0.25} />
           </Suspense>
         </Canvas>
       </div>
 
-      {/* Vignette */}
-      <div className="pointer-events-none absolute inset-0 z-[1] bg-[radial-gradient(circle_at_top,_rgba(10,10,10,0)_0,_rgba(10,10,10,0.88)_62%,_rgba(10,10,10,1)_100%)]" />
+      {/* ── Vignette ── */}
+      <div className="pointer-events-none absolute inset-0 z-[1] bg-[radial-gradient(ellipse_at_center,transparent_20%,rgba(10,10,10,0.75)_65%,rgba(10,10,10,1)_100%)]" />
 
-      {/* Background watermark */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[50vw] font-black text-white/[0.02] pointer-events-none select-none italic">
-        WINCOR
+      {/* ── Giant watermark ── */}
+      <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 select-none text-[58vw] font-black italic tracking-tighter text-white/[0.012]">
+        WINCORE
       </div>
 
-      <div className="_container hero-fade relative z-10 w-full">
-        <div className="flex justify-between items-center mb-[8vw] hero-reveal">
-          <span className="text-[10px] uppercase tracking-[0.4em] font-black text-white/40">
-            Colombo / Negombo / Global
-          </span>
-          <span className="text-[10px] uppercase tracking-[0.4em] font-black text-accent">
-            WINCORE MEDIA®
-          </span>
-        </div>
-
-        <div className="hero-parallax w-full">
-          <h1 className="hero-title text-[13vw] md:text-[8vw] leading-[0.82] font-black uppercase tracking-tighter text-center">
-            Award‑Winning <br />
-            <span className="text-white/10 italic">Creative</span> Digital <br />
-            Agency
-          </h1>
-
-          <div className="hero-reveal mt-10 flex flex-col items-center gap-4">
-            <p className="text-[11px] uppercase tracking-[0.45em] font-black text-white/45 text-center">
-              Success Designed Differently <span className="text-accent">•</span> We turn brands into experiences
-            </p>
-            <p className="text-sm md:text-base text-white/55 max-w-[56ch] text-center font-light leading-relaxed">
-              Colombo & global — immersive websites, cinematic storytelling, performance marketing, and AI-powered builds.
-            </p>
+      {/* ── Main content (fades on scroll) ── */}
+      <div className="hero-content _container relative z-10 w-full">
+        {/* Meta bar */}
+        <div className="hero-meta mb-[8vw] flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-accent" />
+            <span className="text-[10px] font-black uppercase tracking-[0.5em] text-white/25">
+              Live · Colombo · Global
+            </span>
           </div>
+          <span className="text-[10px] font-black uppercase tracking-[0.5em] text-accent/70">
+            Wincore Media®
+          </span>
+        </div>
+
+        {/* Title */}
+        <div className="hero-title-wrap flex flex-col items-center">
+          <h1
+            className="hero-title w-full text-center text-[15vw] font-black uppercase leading-[0.78] tracking-[-0.04em] md:text-[10vw]"
+            style={{ perspective: "900px" }}
+          >
+            Creating <br />
+            <span className="font-light italic text-white/5">Icons</span> Of <br />
+            Digital Era
+          </h1>
+        </div>
+
+        {/* Sub */}
+        <div className="hero-sub mt-12 flex flex-col items-center gap-5">
+          <p className="text-[10px] font-black uppercase tracking-[0.65em] text-white/25">
+            Success Designed&nbsp;
+            <span className="text-secondary italic">Differently</span>
+          </p>
+          <p className="max-w-[58ch] text-center text-sm font-light leading-relaxed text-white/35 md:text-lg">
+            We engineer hyper-premium digital experiences — cinematic storytelling, AI-powered builds, and WebGL-heavy interfaces.
+          </p>
         </div>
       </div>
 
-      <div className="w-full h-[52vh] md:h-[78vh] relative overflow-hidden px-[5vw] mt-[5vw] hero-fade">
-        <div className="hero-media-mask w-full h-full relative rounded-[2rem] overflow-hidden group border border-white/10 bg-black/40">
-          <div className="absolute inset-0 z-10 pointer-events-none border-[0.5px] border-white/10 grid grid-cols-4 grid-rows-2">
+      {/* ── Showreel ── */}
+      <div className="hero-reel relative mt-[5vw] w-full overflow-hidden px-[5vw]">
+        <div className="group relative h-[50vh] w-full overflow-hidden rounded-[1.75rem] border border-white/[0.08] bg-black/50 md:h-[74vh]">
+          {/* Grid overlay */}
+          <div className="pointer-events-none absolute inset-0 z-10 grid grid-cols-4 grid-rows-2">
             {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="border-[0.5px] border-white/5" />
+              <div key={i} className="border-[0.5px] border-white/[0.04]" />
             ))}
           </div>
 
@@ -180,36 +206,36 @@ export default function Hero() {
             loop
             muted
             playsInline
-            className={`w-full h-full object-cover transition-transform duration-[3s] grayscale group-hover:grayscale-0 ${
-              expanded ? "scale-100" : "scale-110"
+            className={`h-full w-full object-cover grayscale transition-all duration-[2.5s] group-hover:grayscale-0 ${
+              expanded ? "scale-100" : "scale-[1.08]"
             }`}
           >
             <source src="https://thefirstthelast.agency/assets/video/reel_small.mp4" type="video/mp4" />
           </video>
 
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
 
+          {/* Expand button */}
           <button
             type="button"
             onClick={() => setExpanded((v) => !v)}
-            className="absolute bottom-8 right-8 md:bottom-12 md:right-12 z-20 w-28 h-28 md:w-32 md:h-32 rounded-full border border-white/20 bg-white/5 backdrop-blur-xl flex flex-col items-center justify-center gap-2 hover:bg-white hover:text-black transition-all"
-            aria-label={expanded ? "Collapse showreel" : "Expand showreel"}
+            className="absolute bottom-8 right-8 z-20 flex h-28 w-28 flex-col items-center justify-center gap-2 rounded-full border border-white/15 bg-white/5 backdrop-blur-xl transition-all duration-500 hover:border-accent hover:bg-accent md:bottom-12 md:right-12 md:h-32 md:w-32"
+            aria-label={expanded ? "Collapse" : "Expand showreel"}
           >
-            <span className="text-[10px] uppercase tracking-widest font-black">
-              {expanded ? "Close" : "Expand"}
+            <span className="text-[9px] font-black uppercase tracking-widest">
+              {expanded ? "Close" : "Play"}
             </span>
-            {expanded ? <Play size={14} /> : <ArrowDown size={14} />}
+            {expanded ? <Play size={12} /> : <ArrowDown size={12} />}
           </button>
         </div>
       </div>
 
-      <div className="absolute bottom-8 left-12 hero-reveal hidden md:block">
-        <div className="flex items-center gap-6">
-          <div className="w-px h-12 bg-white/20 animate-scroll-line" />
-          <span className="text-[10px] uppercase tracking-[0.5em] font-black opacity-30 origin-left -rotate-90">
-            Scroll To Explore
-          </span>
-        </div>
+      {/* ── Scroll hint ── */}
+      <div className="hero-scroll-hint absolute bottom-8 left-12 hidden md:flex items-center gap-5">
+        <div className="h-10 w-px animate-scroll-line bg-white/15" />
+        <span className="origin-left -rotate-90 text-[9px] font-black uppercase tracking-[0.55em] text-white/20">
+          Scroll
+        </span>
       </div>
     </section>
   );

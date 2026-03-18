@@ -2,12 +2,31 @@
 
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 export default function Preloader() {
   const [percentage, setPercentage] = useState(0);
   const preloaderRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    gsap.registerPlugin(ScrollTrigger);
+  }, []);
+  
+  const hasRevealed = useRef(false);
+
+  useEffect(() => {
+    if (!hasRevealed.current) {
+      gsap.set(".preloader-reveal", { yPercent: 100, skewY: 5 });
+      gsap.to(".preloader-reveal", {
+        yPercent: 0,
+        skewY: 0,
+        duration: 1.4,
+        stagger: 0.08,
+        ease: "expo.out",
+      });
+      hasRevealed.current = true;
+    }
+
     const interval = setInterval(() => {
       setPercentage((prev) => {
         if (prev >= 100) {
@@ -19,20 +38,16 @@ export default function Preloader() {
       });
     }, 40);
 
-    gsap.set(".preloader-reveal", { yPercent: 100, skewY: 5 });
-    gsap.to(".preloader-reveal", {
-      yPercent: 0,
-      skewY: 0,
-      duration: 1.4,
-      stagger: 0.08,
-      ease: "expo.out",
-    });
+    return () => clearInterval(interval);
+  }, []);
 
+  useEffect(() => {
     if (percentage === 100) {
       const tl = gsap.timeline({
         onComplete: () => {
           if (preloaderRef.current) preloaderRef.current.style.display = "none";
           document.body.style.overflow = "";
+          ScrollTrigger.refresh(); // Crucial for resetting layout
         },
       });
 
@@ -55,8 +70,6 @@ export default function Preloader() {
         "-=0.9",
       );
     }
-
-    return () => clearInterval(interval);
   }, [percentage]);
 
   return (

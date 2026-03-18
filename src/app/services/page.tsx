@@ -10,14 +10,10 @@ export const metadata = {
 export default function ServicesPage() {
   return (
     <main className="bg-background text-foreground">
-      <PageMotion>
-        <div className="page-motion-item" data-page-motion>
-          <RecognitionBar />
-        </div>
-        <div className="page-motion-item" data-page-motion>
-          <ServicesPageContent />
-        </div>
-      </PageMotion>
+      <div className="relative">
+        <RecognitionBar />
+        <ServicesPageContent />
+      </div>
     </main>
   );
 }

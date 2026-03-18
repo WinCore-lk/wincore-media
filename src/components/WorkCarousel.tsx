@@ -12,7 +12,7 @@ const PROJECTS: Project[] = [
     title: "Brand Campaign for a local bank",
     category: "Branding / Strategy",
     image:
-      "https://images.unsplash.com/photo-1554469384-e58fac16e23a?auto=format&fit=crop&q=80&w=1600",
+      "https://images.unsplash.com/photo-1601597111158-2fcee29ac902?auto=format&fit=crop&q=80&w=1600",
     tags: ["Strategy", "Visual Identity", "UX"],
   },
   {
@@ -20,7 +20,7 @@ const PROJECTS: Project[] = [
     title: "AI-Powered Social Media Platform",
     category: "AI / Development",
     image:
-      "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&q=80&w=1600",
+      "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?auto=format&fit=crop&q=80&w=1600",
     tags: ["AI", "Product", "Engineering"],
   },
   {
@@ -36,7 +36,7 @@ const PROJECTS: Project[] = [
     title: "Full Website + WebGL for a tech startup",
     category: "UX/UI / WebGL",
     image:
-      "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=1600",
+      "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&q=80&w=1600",
     tags: ["Creative Code", "Interaction", "WebGL"],
   },
 ];
@@ -49,16 +49,31 @@ export default function WorkCarousel() {
     gsap.registerPlugin(ScrollTrigger);
 
     const ctx = gsap.context(() => {
+      // Heading reveal
+      gsap.from(".wc-heading", {
+        y: 50, opacity: 0, duration: 1.1, ease: "expo.out",
+        immediateRender: false,
+        scrollTrigger: { trigger: ".wc-heading", start: "top 88%", once: true },
+      });
+      gsap.from(".wc-meta", {
+        y: 24, opacity: 0, duration: 0.9, ease: "expo.out", delay: 0.12,
+        immediateRender: false,
+        scrollTrigger: { trigger: ".wc-meta", start: "top 90%", once: true },
+      });
+
+      // The card wrapper count = PROJECTS.length + 1 (intro slide)
+      const totalSlides = PROJECTS.length + 1;
       const horizontalScroll = gsap.to(".wc-project-card-wrapper", {
-        xPercent: -100 * PROJECTS.length,
+        xPercent: -100 * totalSlides,
         ease: "none",
         scrollTrigger: {
           trigger: triggerRef.current,
           pin: true,
-          scrub: 1,
+          scrub: 1.2,
           start: "top top",
-          end: () => `+=${(triggerRef.current?.offsetWidth || 0) * 3}`,
+          end: () => `+=${(triggerRef.current?.offsetWidth || 0) * (totalSlides - 1)}`,
           invalidateOnRefresh: true,
+          anticipatePin: 1,
         },
       });
 
@@ -80,34 +95,30 @@ export default function WorkCarousel() {
         const shine = card.querySelector(".wc-shine") as HTMLElement | null;
         if (!media) return;
 
-        gsap.set(card, { transformPerspective: 900, transformOrigin: "center" });
-        const toRX = gsap.quickTo(card, "rotationX", { duration: 0.35, ease: "power3.out" });
-        const toRY = gsap.quickTo(card, "rotationY", { duration: 0.35, ease: "power3.out" });
-        const toY = gsap.quickTo(card, "y", { duration: 0.35, ease: "power3.out" });
-        const toS = gsap.quickTo(card, "scale", { duration: 0.35, ease: "power3.out" });
-        const toMX = gsap.quickTo(media, "x", { duration: 0.6, ease: "power3.out" });
-        const toMY = gsap.quickTo(media, "y", { duration: 0.6, ease: "power3.out" });
-        const toMS = gsap.quickTo(media, "scale", { duration: 0.8, ease: "power3.out" });
-        const toShine = shine
-          ? gsap.quickTo(shine, "opacity", { duration: 0.25, ease: "power2.out" })
+        gsap.set(card, { transformPerspective: 1100, transformOrigin: "center" });
+        const toRX = gsap.quickTo(card, "rotationX", { duration: 0.45, ease: "power3.out" });
+        const toRY = gsap.quickTo(card, "rotationY", { duration: 0.45, ease: "power3.out" });
+        const toY  = gsap.quickTo(card, "y",         { duration: 0.45, ease: "power3.out" });
+        const toMX = gsap.quickTo(media, "x",         { duration: 0.7,  ease: "power3.out" });
+        const toMY = gsap.quickTo(media, "y",         { duration: 0.7,  ease: "power3.out" });
+        const toMS = gsap.quickTo(media, "scale",     { duration: 0.9,  ease: "power3.out" });
+        const toShineOpacity = shine
+          ? gsap.quickTo(shine, "opacity", { duration: 0.3, ease: "power2.out" })
           : null;
 
         const onMove = (e: MouseEvent) => {
           const r = card.getBoundingClientRect();
           const px = (e.clientX - r.left) / r.width;
-          const py = (e.clientY - r.top) / r.height;
-          const rx = (py - 0.5) * -10;
-          const ry = (px - 0.5) * 12;
-          toRX(rx);
-          toRY(ry);
-          toY(-8);
-          toS(1.01);
-          toMX((px - 0.5) * 20);
-          toMY((py - 0.5) * 16);
-          toMS(1.08);
-          toShine?.(1);
+          const py = (e.clientY - r.top)  / r.height;
+          toRX((py - 0.5) * -8);
+          toRY((px - 0.5) * 10);
+          toY(-6);
+          toMX((px - 0.5) * 18);
+          toMY((py - 0.5) * 14);
+          toMS(1.06);
+          toShineOpacity?.(1);
           if (shine) {
-            shine.style.background = `radial-gradient(600px circle at ${px * 100}% ${py * 100}%, rgba(0,191,255,0.18), transparent 45%)`;
+            shine.style.background = `radial-gradient(500px circle at ${px * 100}% ${py * 100}%, rgba(0,191,255,0.15), transparent 50%)`;
           }
         };
 
@@ -115,11 +126,10 @@ export default function WorkCarousel() {
           toRX(0);
           toRY(0);
           toY(0);
-          toS(1);
           toMX(0);
           toMY(0);
           toMS(1);
-          toShine?.(0);
+          toShineOpacity?.(0);
         };
 
         card.addEventListener("mousemove", onMove);
@@ -149,13 +159,13 @@ export default function WorkCarousel() {
             <p className="text-accent text-[11px] uppercase tracking-[0.6em] font-black mb-8 italic">
               Selected Work
             </p>
-            <h2 className="text-[12vw] md:text-[6vw] leading-[0.85] font-black uppercase tracking-tighter">
+            <h2 className="wc-heading text-[12vw] md:text-[6vw] leading-[0.85] font-black uppercase tracking-tighter">
               Our <br />
               <span className="text-white/10 italic">Works</span>
             </h2>
           </div>
           <div className="flex items-center gap-10 mb-3">
-            <span className="text-[10px] uppercase tracking-[0.5em] font-black opacity-30">
+            <span className="wc-meta text-[10px] uppercase tracking-[0.5em] font-black opacity-30">
               Selection 2026®
             </span>
             <div className="w-24 h-px bg-white/10" />

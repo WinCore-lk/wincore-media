@@ -4,51 +4,68 @@ import { useEffect, useRef } from "react";
 import gsap from "gsap";
 
 export default function RecognitionBar() {
+  const containerRef = useRef<HTMLDivElement>(null);
   const tickerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const ticker = tickerRef.current;
     if (!ticker) return;
 
-    const content = ticker.querySelector(".ticker-content");
-    if (!content) return;
-
-    // Duplicate content for seamless loop
-    const clone = content.cloneNode(true);
-    ticker.appendChild(clone);
-
-    const duration = 20; // seconds
-
-    gsap.to(ticker.children, {
-      xPercent: -100,
+    // Standard GSAP Ticker logic for seamless loop
+    const content = ticker.children[0] as HTMLElement;
+    const contentWidth = content.offsetWidth;
+    
+    // Duplicate for seamlessness if needed (though we'll use a better way)
+    const tl = gsap.timeline({
       repeat: -1,
-      duration: duration,
-      ease: "linear",
+      defaults: { ease: "none" }
     });
+
+    tl.to(ticker, {
+      x: -contentWidth,
+      duration: 30, // Slower for readability and premium feel
+    });
+
+    return () => {
+      tl.kill();
+    };
   }, []);
 
+  const items = [
+    "Most Awarded Creative & AI Agency",
+    "Digital Excellence from Colombo",
+    "Immersive WebGL & AI Experiences",
+    "Global Reach, Local Depth",
+    "Future-Proof Design Systems"
+  ];
+
   return (
-    <div className="relative py-12 md:py-20 bg-background border-y border-white/5 overflow-hidden">
-      <div ref={tickerRef} className="flex whitespace-nowrap">
-        <div className="ticker-content flex items-center gap-12 px-6">
-          <span className="text-xl md:text-3xl font-medium tracking-tight text-white/40 italic">
-            Recognized as Sri Lanka’s most awarded creative & AI-powered digital agency
-          </span>
-          <div className="w-2 h-2 rounded-full bg-accent" />
-          <span className="text-xl md:text-3xl font-medium tracking-tight text-white/40 italic">
-            Delivering global excellence from Colombo
-          </span>
-          <div className="w-2 h-2 rounded-full bg-accent" />
-          <span className="text-xl md:text-3xl font-medium tracking-tight text-white/40 italic">
-            Innovators in WebGL & AI Experiences
-          </span>
-          <div className="w-2 h-2 rounded-full bg-accent" />
-        </div>
+    <div 
+      ref={containerRef}
+      className="relative py-14 md:py-24 bg-background border-y border-white/5 overflow-hidden group"
+    >
+      <div 
+        ref={tickerRef} 
+        className="flex whitespace-nowrap will-change-transform"
+      >
+        {/* Render twice for seamless loop */}
+        {[1, 2].map((i) => (
+          <div key={i} className="flex items-center gap-12 md:gap-24 px-6 md:px-12">
+            {items.map((item, idx) => (
+              <div key={idx} className="flex items-center gap-12 md:gap-24">
+                <span className="text-2xl md:text-5xl font-black uppercase tracking-tighter text-white/20 transition-colors duration-700 group-hover:text-white/40 italic">
+                  {item}
+                </span>
+                <div className="w-2 h-2 md:w-3 md:h-3 rounded-full bg-accent shadow-[0_0_15px_rgba(0,191,255,0.5)]" />
+              </div>
+            ))}
+          </div>
+        ))}
       </div>
 
-      {/* Decorative gradient overlays for soft fade edges */}
-      <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />
-      <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
+      {/* Decorative gradient overlays */}
+      <div className="absolute inset-y-0 left-0 w-48 bg-gradient-to-r from-background via-background/80 to-transparent z-10 pointer-events-none" />
+      <div className="absolute inset-y-0 right-0 w-48 bg-gradient-to-l from-background via-background/80 to-transparent z-10 pointer-events-none" />
     </div>
   );
 }

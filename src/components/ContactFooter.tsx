@@ -35,64 +35,53 @@ export default function ContactFooter() {
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
     const ctx = gsap.context(() => {
-      gsap.set(".cf-title-line", { yPercent: 120 });
 
-      const visionTl = gsap.timeline({
-        defaults: { ease: "expo.out" },
-        scrollTrigger: {
-          trigger: footerRef.current,
-          start: "top 82%",
-          once: true,
-        },
+      gsap.fromTo(".cf-kicker",
+        { y: 20, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.8, ease: "expo.out", clearProps: "transform,opacity",
+          scrollTrigger: { trigger: ".cf-kicker", start: "top 90%", once: true } }
+      );
+
+      // Title lines — each line individually triggered
+      const titleLines = gsap.utils.toArray<HTMLElement>(".cf-title-line");
+      titleLines.forEach((el, i) => {
+        gsap.fromTo(el,
+          { yPercent: 110, opacity: 0 },
+          { yPercent: 0, opacity: 1, duration: 1, ease: "expo.out", delay: i * 0.08, clearProps: "transform,opacity",
+            scrollTrigger: { trigger: el, start: "top 92%", once: true } }
+        );
       });
 
-      visionTl
-        .fromTo(
-          ".cf-kicker",
-          { y: 20, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.55 },
-        )
-        .to(
-          ".cf-title-line",
-          { yPercent: 0, duration: 1.1, stagger: 0.08 },
-          "-=0.2",
-        )
-        .fromTo(
-          ".cf-contact-block",
-          { y: 40, opacity: 0, scale: 0.97 },
-          { y: 0, opacity: 1, scale: 1, duration: 0.9 },
-          "-=0.6",
-        );
+      gsap.fromTo(".cf-contact-block",
+        { y: 36, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.9, ease: "expo.out", clearProps: "transform,opacity",
+          scrollTrigger: { trigger: ".cf-contact-block", start: "top 88%", once: true } }
+      );
 
-      gsap.fromTo(
-        ".cf-form-shell",
-        { y: 50, opacity: 0, scale: 0.96 },
+      gsap.fromTo(".cf-form-shell",
+        { y: 40, opacity: 0 },
         {
           y: 0,
           opacity: 1,
-          scale: 1,
           duration: 1,
-          ease: "power3.out",
+          ease: "expo.out",
+          clearProps: "transform,opacity",
           scrollTrigger: {
             trigger: ".cf-form-shell",
             start: "top 88%",
             once: true,
           },
-        },
+        }
       );
 
-      gsap.fromTo(
-        ".cf-reveal",
-        { y: 80, opacity: 0 },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 1.2,
-          stagger: 0.08,
-          ease: "expo.out",
-          scrollTrigger: { trigger: footerRef.current, start: "top 75%" },
-        },
-      );
+      const reveals = gsap.utils.toArray<HTMLElement>(".cf-reveal");
+      reveals.forEach((el, i) => {
+        gsap.fromTo(el,
+          { y: 60, opacity: 0 },
+          { y: 0, opacity: 1, duration: 1, ease: "expo.out", delay: i * 0.07, clearProps: "transform,opacity",
+            scrollTrigger: { trigger: el, start: "top 90%", once: true } }
+        );
+      });
     }, footerRef);
     return () => ctx.revert();
   }, []);
@@ -101,165 +90,156 @@ export default function ContactFooter() {
     <footer
       ref={footerRef}
       id="contact"
-      className="pt-[20vw] pb-[6vw] bg-background border-t border-white/5 relative overflow-hidden"
+      className="relative overflow-hidden border-t border-white/5 bg-background pb-12 pt-[15vw]"
     >
-      <div className="absolute top-[30%] left-1/2 -translate-x-1/2 -translate-y-1/2 text-[45vw] font-black text-white/[0.02] pointer-events-none select-none italic">
-        WA
+      {/* Background large text */}
+      <div className="pointer-events-none absolute -bottom-[5vw] left-1/2 -translate-x-1/2 select-none italic text-[35vw] font-black text-white/[0.02]">
+        WINCORE
       </div>
 
       <div className="_container relative z-10">
-        <div className="grid grid-cols-1 gap-16 lg:grid-cols-2 md:gap-20 mb-[14vw]">
-          <div className="max-w-[60ch]">
-            <p className="cf-kicker mb-8 text-accent uppercase tracking-[0.48em] font-black text-[11px]">
-              Collaborate
-            </p>
-
-            <h2 className="mb-10 text-[11vw] font-black uppercase leading-[0.84] tracking-tighter md:text-[5.4vw]">
+        {/* ── Main Contact Section ── */}
+        <div className="mb-[15vw] grid grid-cols-1 gap-20 lg:grid-cols-2 lg:gap-32">
+          {/* Left: Content */}
+          <div className="flex flex-col justify-center">
+            <span className="cf-kicker mb-10 text-[11px] font-black uppercase tracking-[0.5em] text-accent">
+              Let&apos;s Build Together
+            </span>
+            <h2 className="mb-14 text-[13vw] font-black uppercase leading-[0.82] tracking-tighter md:text-[6.5vw]">
               <span className="block overflow-hidden">
-                <span className="cf-title-line block">Have a vision?</span>
+                <span className="cf-title-line block">HAVE A</span>
               </span>
               <span className="block overflow-hidden">
-                <span className="cf-title-line block text-white/20 italic">Let&apos;s build it.</span>
+                <span className="cf-title-line block text-white/20 italic">VISION?</span>
               </span>
             </h2>
 
-            <div className="cf-contact-block space-y-8">
-              <div>
-                <p className="mb-3 text-[10px] uppercase tracking-[0.3em] font-black text-white/35">
-                  Write to us
+            <div className="cf-contact-block space-y-12">
+              <div className="group">
+                <p className="mb-4 text-[10px] font-black uppercase tracking-[0.4em] text-white/30 transition-colors group-hover:text-accent">
+                  Direct Line
                 </p>
                 <a
                   href="mailto:hello@wincore.media"
-                  className="cursor-hover font-light text-2xl transition-colors hover:text-accent"
+                  className="cursor-hover text-3xl font-light tracking-tight transition-all duration-500 hover:tracking-wide md:text-4xl"
                 >
                   hello@wincore.media
                 </a>
               </div>
-              <div className="h-px w-full bg-gradient-to-r from-accent/50 via-white/10 to-transparent" />
-              <div>
-                <p className="mb-3 text-[10px] uppercase tracking-[0.3em] font-black text-white/35">
-                  Locations
-                </p>
-                <p className="font-light text-xl text-white/80">
-                  Negombo <span className="text-white/20">/</span> Colombo
-                </p>
+
+              <div className="h-[2px] w-full bg-gradient-to-r from-accent/40 via-white/5 to-transparent" />
+
+              <div className="grid grid-cols-2 gap-10 md:gap-20">
+                <div>
+                  <p className="mb-4 text-[10px] font-black uppercase tracking-[0.4em] text-white/30">
+                    Presence
+                  </p>
+                  <p className="text-xl font-light text-white/70 leading-relaxed">
+                    Colombo <br />
+                    <span className="text-white/20">Sri Lanka</span>
+                  </p>
+                </div>
+                <div>
+                  <p className="mb-4 text-[10px] font-black uppercase tracking-[0.4em] text-white/30">
+                    Socials
+                  </p>
+                  <div className="flex flex-col gap-3 text-sm font-bold uppercase tracking-widest text-white/40">
+                    <a href="#" className="cursor-hover transition-colors hover:text-white">Instagram</a>
+                    <a href="#" className="cursor-hover transition-colors hover:text-white">LinkedIn</a>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
 
-          <div className="cf-form-shell rounded-[2rem] border border-white/10 bg-white/[0.03] p-8 md:p-12 backdrop-blur-sm">
-            <form className="space-y-8" aria-label="Contact form">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="group relative">
-                  <label className="mb-2 block text-[9px] font-black uppercase tracking-[0.35em] text-white/35">
-                    Name
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Your name"
-                    className="w-full bg-transparent border-b border-white/15 py-3 text-lg font-light outline-none transition-all placeholder:opacity-20 focus:border-accent"
-                    required
-                  />
-                </div>
-                <div className="group relative">
-                  <label className="mb-2 block text-[9px] font-black uppercase tracking-[0.35em] text-white/35">
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    placeholder="you@company.com"
-                    className="w-full bg-transparent border-b border-white/15 py-3 text-lg font-light outline-none transition-all placeholder:opacity-20 focus:border-accent"
-                    required
-                  />
-                </div>
-              </div>
-              <div className="group relative">
-                <label className="mb-2 block text-[9px] font-black uppercase tracking-[0.35em] text-white/35">
-                  Your Story
-                </label>
-                <textarea
-                  placeholder="Tell us about your vision..."
-                  rows={3}
-                  className="w-full resize-none bg-transparent border-b border-white/15 py-3 text-lg font-light outline-none transition-all placeholder:opacity-20 focus:border-accent"
-                  required
-                />
-              </div>
+          {/* Right: Form */}
+          <div className="cf-form-shell relative">
+            {/* Glow effect */}
+            <div className="absolute -inset-1 rounded-[3rem] bg-gradient-to-br from-accent/20 to-secondary/10 blur-2xl opacity-50" />
+            
+            <div className="relative rounded-[2.5rem] border border-white/[0.08] bg-white/[0.03] p-10 backdrop-blur-2xl md:p-14">
+              <form className="space-y-10" aria-label="Quick contact">
+                <div className="space-y-8">
+                  <div className="relative border-b border-white/10 pb-4 transition-all focus-within:border-accent">
+                    <label className="mb-2 block text-[9px] font-black uppercase tracking-[0.4em] text-white/30">
+                      Discovery
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="My name is..."
+                      className="w-full bg-transparent text-xl font-light outline-none placeholder:text-white/10 focus:placeholder:opacity-0"
+                      required
+                    />
+                  </div>
 
-              <button
-                type="submit"
-                className="cursor-hover mt-2 w-full rounded-2xl bg-accent py-5 font-black uppercase tracking-[0.3em] text-[10px] text-black shadow-[0_20px_60px_rgba(0,191,255,0.25)] transition-all duration-500 hover:scale-[1.02] hover:shadow-[0_28px_80px_rgba(0,191,255,0.35)]"
-              >
-                Start the Conversation
-              </button>
-            </form>
-          </div>
-        </div>
+                  <div className="relative border-b border-white/10 pb-4 transition-all focus-within:border-accent">
+                    <label className="mb-2 block text-[9px] font-black uppercase tracking-[0.4em] text-white/30">
+                      Email
+                    </label>
+                    <input
+                      type="email"
+                      placeholder="Reach me at..."
+                      className="w-full bg-transparent text-xl font-light outline-none placeholder:text-white/10 focus:placeholder:opacity-0"
+                      required
+                    />
+                  </div>
 
-        <div className="cf-reveal grid grid-cols-2 md:grid-cols-4 gap-10 md:gap-12 py-12 border-y border-white/5">
-          <div className="space-y-4">
-            <p className="text-white/20 uppercase tracking-[0.3em] font-black text-[10px]">
-              Colombo
-            </p>
-            <p className="text-[11px] uppercase tracking-widest font-bold text-white/70">
-              World Trade Center <br />
-              Echelon Square
-            </p>
-          </div>
-          <div className="space-y-4">
-            <p className="text-white/20 uppercase tracking-[0.3em] font-black text-[10px]">
-              Negombo
-            </p>
-            <p className="text-[11px] uppercase tracking-widest font-bold text-white/70">
-              Innovation House <br />
-              Lewis Place
-            </p>
-          </div>
-          <div className="space-y-4">
-            <p className="text-white/20 uppercase tracking-[0.3em] font-black text-[10px]">
-              Locally Rooted
-            </p>
-            <div className="flex items-center gap-3">
-              <span className="text-[11px] font-bold text-white/70">SRI LANKA</span>
-              <div className="flex flex-col gap-0.5 w-6">
-                <div className="h-1 bg-[#F8C400] rounded-sm" />
-                <div className="h-1 bg-[#C8102E] rounded-sm" />
-                <div className="h-1 bg-[#007A3D] rounded-sm" />
-              </div>
+                  <div className="relative border-b border-white/10 pb-4 transition-all focus-within:border-accent">
+                    <label className="mb-2 block text-[9px] font-black uppercase tracking-[0.4em] text-white/30">
+                      The Challenge
+                    </label>
+                    <textarea
+                      placeholder="I want to build..."
+                      rows={2}
+                      className="w-full resize-none bg-transparent text-xl font-light outline-none placeholder:text-white/10 focus:placeholder:opacity-0"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  className="cursor-hover group relative flex w-full items-center justify-center overflow-hidden rounded-2xl bg-white p-6 transition-all duration-500 hover:bg-accent"
+                >
+                  <span className="relative z-10 text-[11px] font-black uppercase tracking-[0.4em] text-black transition-colors group-hover:text-black">
+                    Unlock Velocity
+                  </span>
+                  <div className="absolute inset-0 -translate-x-full bg-accent transition-transform duration-500 group-hover:translate-x-0" />
+                </button>
+              </form>
             </div>
           </div>
-          <div className="space-y-4 text-right md:text-left">
-            <p className="text-white/20 uppercase tracking-[0.3em] font-black text-[10px]">
-              Live Pulse
-            </p>
-            <p className="text-3xl md:text-4xl font-black text-accent italic leading-none">
-              {colomboTime || "--:--:--"}
-            </p>
-          </div>
         </div>
 
-        <div className="cf-reveal flex flex-col md:flex-row justify-between items-center pt-12 gap-8">
-          <Link href="/" className="cursor-hover flex flex-col items-start">
-            <span className="text-3xl font-black tracking-tighter text-white">WINCOR</span>
-            <span className="text-[10px] uppercase tracking-[0.3em] text-accent font-bold -mt-1">
-              Agency
-            </span>
-          </Link>
-
-          <div className="flex gap-10 text-[10px] font-black uppercase tracking-[0.4em] text-white/30">
-            <a className="cursor-hover hover:text-accent transition-colors" href="#" aria-label="Instagram">
-              Instagram
-            </a>
-            <a className="cursor-hover hover:text-accent transition-colors" href="#" aria-label="LinkedIn">
-              LinkedIn
-            </a>
-            <a className="cursor-hover hover:text-accent transition-colors" href="#" aria-label="Awwwards">
-              Awwwards
-            </a>
+        {/* ── Secondary Footer ── */}
+        <div className="cf-reveal flex flex-col items-start justify-between gap-16 border-t border-white/5 pt-16 md:flex-row md:items-end">
+          <div className="flex flex-col gap-6">
+            <Link href="/" className="cursor-hover flex flex-col items-start">
+              <span className="text-4xl font-black tracking-tighter text-white">WINCOR</span>
+              <span className="text-[11px] font-bold uppercase tracking-[0.4em] text-accent -mt-1">
+                Agency
+              </span>
+            </Link>
+            <div className="flex items-center gap-4">
+              <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20">
+                Time in Colombo:
+              </span>
+              <span className="text-lg font-black italic tracking-widest text-accent/80">
+                {colomboTime || "--:--"}
+              </span>
+            </div>
           </div>
 
-          <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/10 italic text-center md:text-right">
-            © {new Date().getFullYear()} WINCORE MEDIA. ALL RIGHTS RESERVED.
-          </p>
+          <div className="flex flex-col items-start gap-8 md:items-end">
+            <p className="text-left text-[11px] font-bold uppercase tracking-[0.5em] text-white/30 md:text-right">
+              Sri Lanka&apos;s AI Native <br />
+              Digital Experience Studio®
+            </p>
+            <div className="text-left text-[10px] font-black uppercase tracking-[0.5em] text-white/10 md:text-right">
+              © {new Date().getFullYear()} WINCORE MEDIA. <br />
+              All rights reserved.
+            </div>
+          </div>
         </div>
       </div>
     </footer>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { usePathname } from "next/navigation";
 import Lenis from "lenis";
 import gsap from "gsap";
@@ -8,6 +8,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 export default function ClientProvider({ children }: { children: ReactNode }) {
   const pathname = usePathname();
+  const lenisRef = useRef<Lenis | null>(null);
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
@@ -18,10 +19,12 @@ export default function ClientProvider({ children }: { children: ReactNode }) {
       orientation: "vertical",
       gestureOrientation: "vertical",
       smoothWheel: true,
-      wheelMultiplier: 1,
+      wheelMultiplier: 1.1,
       touchMultiplier: 2,
       infinite: false,
     });
+
+    lenisRef.current = lenis;
 
     const onTick = (time: number) => {
       lenis.raf(time * 1000);
@@ -42,7 +45,13 @@ export default function ClientProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    gsap.registerPlugin(ScrollTrigger);
+    if (lenisRef.current) {
+      lenisRef.current.scrollTo(0, { immediate: true });
+    }
+
+    const timer = setTimeout(() => {
+      ScrollTrigger.refresh();
+    }, 400);
 
     const ctx = gsap.context(() => {
       const chapters = gsap.utils.toArray<HTMLElement>(".chapter");
@@ -55,17 +64,17 @@ export default function ClientProvider({ children }: { children: ReactNode }) {
 
         gsap.fromTo(
           inner,
-          { opacity: 0, y: 90, scale: 0.96, filter: "blur(10px)" },
+          { opacity: 0, y: 50, scale: 0.99, filter: "blur(5px)" },
           {
             opacity: 1,
             y: 0,
             scale: 1,
             filter: "blur(0px)",
-            duration: 1.1,
+            duration: 1.2,
             ease: "expo.out",
             scrollTrigger: {
               trigger: section,
-              start: "top 80%",
+              start: "top 85%",
               once: true,
             },
           },
@@ -84,31 +93,13 @@ export default function ClientProvider({ children }: { children: ReactNode }) {
             },
           });
         }
-
-        const parallaxItems = section.querySelectorAll<HTMLElement>("[data-parallax]");
-        parallaxItems.forEach((el) => {
-          const amount = Number(el.getAttribute("data-parallax") ?? 60);
-          gsap.fromTo(
-            el,
-            { y: amount },
-            {
-              y: -amount,
-              ease: "none",
-              scrollTrigger: {
-                trigger: section,
-                start: "top bottom",
-                end: "bottom top",
-                scrub: true,
-              },
-            },
-          );
-        });
       });
-
-      ScrollTrigger.refresh();
     });
 
-    return () => ctx.revert();
+    return () => {
+      clearTimeout(timer);
+      ctx.revert();
+    };
   }, [pathname]);
 
   return <>{children}</>;

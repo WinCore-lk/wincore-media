@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import Image from "next/image";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import SplitType from "split-type";
 
 const team = [
   {
@@ -42,101 +43,90 @@ export default function AboutTeaser() {
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
+    const splits: SplitType[] = [];
 
     const ctx = gsap.context(() => {
-      gsap.set(".abt-title-line", { yPercent: 120 });
+      // ── Heading char reveal ──
+      const headingEl = sectionRef.current?.querySelector(".abt-heading") as HTMLElement | null;
+      if (headingEl) {
+        const split = new SplitType(headingEl, { types: "chars" });
+        splits.push(split);
+        if (split.chars) {
+          gsap.from(split.chars, {
+            yPercent: 110,
+            opacity: 0,
+            duration: 1.1,
+            stagger: 0.018,
+            ease: "expo.out",
+            immediateRender: false,
+            scrollTrigger: {
+              trigger: headingEl,
+              start: "top 85%",
+              once: true,
+            },
+          });
+        }
+      }
 
-      const intro = gsap.timeline({
-        defaults: { ease: "expo.out" },
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: "top 80%",
-          once: true,
-        },
+      // ── Kicker ──
+      gsap.from(".abt-kicker", {
+        y: 20, opacity: 0, duration: 0.8, ease: "expo.out",
+        immediateRender: false,
+        scrollTrigger: { trigger: ".abt-kicker", start: "top 90%", once: true },
       });
 
-      intro
-        .fromTo(
-          ".abt-kicker",
-          { y: 20, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.55 },
-        )
-        .to(
-          ".abt-title-line",
-          { yPercent: 0, duration: 1, stagger: 0.08 },
-          "-=0.15",
-        )
-        .fromTo(
-          ".abt-lead",
-          { y: 30, opacity: 0, filter: "blur(8px)" },
-          { y: 0, opacity: 1, filter: "blur(0px)", duration: 0.75 },
-          "-=0.55",
-        )
-        .fromTo(
-          ".abt-rule",
-          { scaleX: 0, transformOrigin: "left" },
-          { scaleX: 1, duration: 0.65, ease: "power2.out" },
-          "-=0.45",
-        );
+      // ── Lead paragraph ──
+      gsap.from(".abt-lead", {
+        y: 28, opacity: 0, filter: "blur(8px)", duration: 1, ease: "expo.out",
+        immediateRender: false,
+        scrollTrigger: { trigger: ".abt-lead", start: "top 88%", once: true },
+      });
 
-      gsap.fromTo(
-        ".abt-stat-card",
-        { y: 45, opacity: 0, scale: 0.97 },
-        {
-          y: 0,
-          opacity: 1,
-          scale: 1,
-          duration: 0.8,
-          stagger: 0.1,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: ".abt-stats",
-            start: "top 86%",
-            once: true,
-          },
-        },
-      );
+      // ── Rule ──
+      gsap.from(".abt-rule", {
+        scaleX: 0, transformOrigin: "left", duration: 1.1, ease: "expo.out",
+        immediateRender: false,
+        scrollTrigger: { trigger: ".abt-rule", start: "top 90%", once: true },
+      });
 
-      const countTargets = gsap.utils.toArray<HTMLElement>(".abt-counter");
-      countTargets.forEach((el) => {
-        const value = Number(el.dataset.target || "0");
-        const counter = { value: 0 };
+      // ── Stat cards ──
+      const statCards = gsap.utils.toArray<HTMLElement>(".abt-stat-card");
+      statCards.forEach((card, i) => {
+        gsap.from(card, {
+          y: 40, opacity: 0, scale: 0.97, duration: 0.9, delay: i * 0.08, ease: "expo.out",
+          immediateRender: false,
+          scrollTrigger: { trigger: card, start: "top 90%", once: true },
+        });
 
-        gsap.to(counter, {
-          value,
-          duration: 1.5,
-          ease: "power2.out",
-          scrollTrigger: {
-            trigger: el,
-            start: "top 92%",
-            once: true,
-          },
-          onUpdate: () => {
-            el.textContent = Math.round(counter.value).toString();
-          },
+        // Count-up
+        const numEl = card.querySelector<HTMLElement>(".abt-counter");
+        if (numEl) {
+          const target = Number(numEl.dataset.target ?? 0);
+          const proxy = { val: 0 };
+          gsap.to(proxy, {
+            val: target, duration: 1.8, ease: "power2.out",
+            immediateRender: false,
+            scrollTrigger: { trigger: card, start: "top 85%", once: true },
+            onUpdate() { numEl.textContent = Math.round(proxy.val).toString(); },
+          });
+        }
+      });
+
+      // ── Photo cards — each triggered independently ──
+      const photoCards = gsap.utils.toArray<HTMLElement>(".abt-photo-card");
+      photoCards.forEach((card, i) => {
+        gsap.from(card, {
+          y: 50, opacity: 0,
+          clipPath: "inset(16% 0 0 0 round 1.25rem)",
+          duration: 1.1, delay: i * 0.07, ease: "expo.out",
+          immediateRender: false,
+          scrollTrigger: { trigger: card, start: "top 88%", once: true },
         });
       });
 
-      gsap.fromTo(
-        ".abt-photo-card",
-        { y: 60, opacity: 0, clipPath: "inset(16% 0 0 0 round 1.25rem)" },
-        {
-          y: 0,
-          opacity: 1,
-          clipPath: "inset(0% 0 0 0 round 1.25rem)",
-          duration: 1.15,
-          stagger: 0.08,
-          ease: "expo.out",
-          scrollTrigger: {
-            trigger: ".abt-gallery",
-            start: "top 84%",
-            once: true,
-          },
-        },
-      );
-
+      // ── Gallery subtle parallax ──
       gsap.to("[data-about-shift]", {
-        yPercent: -10,
+        yPercent: -8,
         ease: "none",
         scrollTrigger: {
           trigger: sectionRef.current,
@@ -147,7 +137,10 @@ export default function AboutTeaser() {
       });
     }, sectionRef);
 
-    return () => ctx.revert();
+    return () => {
+      splits.forEach((s) => s.revert());
+      ctx.revert();
+    };
   }, []);
 
   return (
@@ -155,7 +148,7 @@ export default function AboutTeaser() {
       id="about"
       ref={sectionRef}
       data-chapter="custom"
-      className="chapter relative overflow-hidden border-t border-white/5 bg-background py-[14vw]"
+      className="relative overflow-hidden border-t border-white/5 bg-background pb-[18vw] pt-[15vw]"
       aria-label="About"
     >
       <div className="pointer-events-none absolute inset-0">
@@ -176,13 +169,9 @@ export default function AboutTeaser() {
               About
             </p>
 
-            <h2 className="mb-7 text-[11.5vw] font-black uppercase leading-[0.84] tracking-tighter md:text-[5.4vw]">
-              <span className="block overflow-hidden">
-                <span className="abt-title-line block">Colombo-based.</span>
-              </span>
-              <span className="block overflow-hidden">
-                <span className="abt-title-line block text-white/20 italic">Globally delivered.</span>
-              </span>
+            <h2 className="abt-heading mb-7 text-[11.5vw] font-black uppercase leading-[0.84] tracking-tighter md:text-[5.4vw]">
+              Colombo-based.<br />
+              <span className="text-white/20 italic">Globally delivered.</span>
             </h2>
 
             <p className="abt-lead max-w-[52ch] text-lg font-light leading-relaxed text-white/60 md:text-xl">
