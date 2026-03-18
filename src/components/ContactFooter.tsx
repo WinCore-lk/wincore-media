@@ -35,16 +35,62 @@ export default function ContactFooter() {
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
     const ctx = gsap.context(() => {
+      gsap.set(".cf-title-line", { yPercent: 120 });
+
+      const visionTl = gsap.timeline({
+        defaults: { ease: "expo.out" },
+        scrollTrigger: {
+          trigger: footerRef.current,
+          start: "top 82%",
+          once: true,
+        },
+      });
+
+      visionTl
+        .fromTo(
+          ".cf-kicker",
+          { y: 20, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.55 },
+        )
+        .to(
+          ".cf-title-line",
+          { yPercent: 0, duration: 1.1, stagger: 0.08 },
+          "-=0.2",
+        )
+        .fromTo(
+          ".cf-contact-block",
+          { y: 40, opacity: 0, scale: 0.97 },
+          { y: 0, opacity: 1, scale: 1, duration: 0.9 },
+          "-=0.6",
+        );
+
       gsap.fromTo(
-        ".cf-reveal",
-        { y: 90, opacity: 0 },
+        ".cf-form-shell",
+        { y: 50, opacity: 0, scale: 0.96 },
         {
           y: 0,
           opacity: 1,
-          duration: 1.4,
+          scale: 1,
+          duration: 1,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: ".cf-form-shell",
+            start: "top 88%",
+            once: true,
+          },
+        },
+      );
+
+      gsap.fromTo(
+        ".cf-reveal",
+        { y: 80, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 1.2,
           stagger: 0.08,
           ease: "expo.out",
-          scrollTrigger: { trigger: footerRef.current, start: "top 85%" },
+          scrollTrigger: { trigger: footerRef.current, start: "top 75%" },
         },
       );
     }, footerRef);
@@ -62,73 +108,88 @@ export default function ContactFooter() {
       </div>
 
       <div className="_container relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 md:gap-24 mb-[14vw]">
-          <div>
-            <p className="cf-reveal text-accent uppercase tracking-[0.55em] font-black text-[11px] mb-10 italic">
+        <div className="grid grid-cols-1 gap-16 lg:grid-cols-2 md:gap-20 mb-[14vw]">
+          <div className="max-w-[60ch]">
+            <p className="cf-kicker mb-8 text-accent uppercase tracking-[0.48em] font-black text-[11px]">
               Collaborate
             </p>
-            <h2 className="cf-reveal text-[12vw] md:text-[6vw] font-black leading-[0.85] uppercase tracking-tighter mb-12">
-              Have a <span className="text-white/20 italic">vision?</span> <br />
-              Let&apos;s build it.
+
+            <h2 className="mb-10 text-[11vw] font-black uppercase leading-[0.84] tracking-tighter md:text-[5.4vw]">
+              <span className="block overflow-hidden">
+                <span className="cf-title-line block">Have a vision?</span>
+              </span>
+              <span className="block overflow-hidden">
+                <span className="cf-title-line block text-white/20 italic">Let&apos;s build it.</span>
+              </span>
             </h2>
 
-            <div className="cf-reveal flex flex-col md:flex-row gap-12">
-              <div className="space-y-2">
-                <p className="text-white/20 uppercase tracking-[0.3em] font-black text-[10px]">
+            <div className="cf-contact-block space-y-8">
+              <div>
+                <p className="mb-3 text-[10px] uppercase tracking-[0.3em] font-black text-white/35">
                   Write to us
                 </p>
                 <a
                   href="mailto:hello@wincore.media"
-                  className="cursor-hover text-2xl font-light hover:text-accent transition-colors"
+                  className="cursor-hover font-light text-2xl transition-colors hover:text-accent"
                 >
                   hello@wincore.media
                 </a>
               </div>
-              <div className="space-y-2">
-                <p className="text-white/20 uppercase tracking-[0.3em] font-black text-[10px]">
+              <div className="h-px w-full bg-gradient-to-r from-accent/50 via-white/10 to-transparent" />
+              <div>
+                <p className="mb-3 text-[10px] uppercase tracking-[0.3em] font-black text-white/35">
                   Locations
                 </p>
-                <p className="text-2xl font-light text-white/80">
+                <p className="font-light text-xl text-white/80">
                   Negombo <span className="text-white/20">/</span> Colombo
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="cf-reveal bg-muted/40 p-10 md:p-14 rounded-[2.5rem] border border-white/10 backdrop-blur-xl">
-            <form className="space-y-10" aria-label="Contact form">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+          <div className="cf-form-shell rounded-[2rem] border border-white/10 bg-white/[0.03] p-8 md:p-12 backdrop-blur-sm">
+            <form className="space-y-8" aria-label="Contact form">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="group relative">
+                  <label className="mb-2 block text-[9px] font-black uppercase tracking-[0.35em] text-white/35">
+                    Name
+                  </label>
                   <input
                     type="text"
-                    placeholder="Name"
-                    className="w-full bg-transparent border-b border-white/10 py-4 outline-none focus:border-accent transition-all font-light text-lg placeholder:opacity-20"
+                    placeholder="Your name"
+                    className="w-full bg-transparent border-b border-white/15 py-3 text-lg font-light outline-none transition-all placeholder:opacity-20 focus:border-accent"
                     required
                   />
                 </div>
                 <div className="group relative">
+                  <label className="mb-2 block text-[9px] font-black uppercase tracking-[0.35em] text-white/35">
+                    Email
+                  </label>
                   <input
                     type="email"
-                    placeholder="Email"
-                    className="w-full bg-transparent border-b border-white/10 py-4 outline-none focus:border-accent transition-all font-light text-lg placeholder:opacity-20"
+                    placeholder="you@company.com"
+                    className="w-full bg-transparent border-b border-white/15 py-3 text-lg font-light outline-none transition-all placeholder:opacity-20 focus:border-accent"
                     required
                   />
                 </div>
               </div>
               <div className="group relative">
+                <label className="mb-2 block text-[9px] font-black uppercase tracking-[0.35em] text-white/35">
+                  Your Story
+                </label>
                 <textarea
-                  placeholder="Your Story"
+                  placeholder="Tell us about your vision..."
                   rows={3}
-                  className="w-full bg-transparent border-b border-white/10 py-4 outline-none focus:border-accent transition-all font-light text-lg placeholder:opacity-20 resize-none"
+                  className="w-full resize-none bg-transparent border-b border-white/15 py-3 text-lg font-light outline-none transition-all placeholder:opacity-20 focus:border-accent"
                   required
                 />
               </div>
 
               <button
                 type="submit"
-                className="cursor-hover w-full py-7 bg-accent text-white font-black uppercase tracking-[0.4em] text-[11px] rounded-2xl hover:bg-white hover:text-black transition-all duration-700 shadow-[0_20px_60px_rgba(0,191,255,0.22)]"
+                className="cursor-hover mt-2 w-full rounded-2xl bg-accent py-5 font-black uppercase tracking-[0.3em] text-[10px] text-black shadow-[0_20px_60px_rgba(0,191,255,0.25)] transition-all duration-500 hover:scale-[1.02] hover:shadow-[0_28px_80px_rgba(0,191,255,0.35)]"
               >
-                Send Inquiry
+                Start the Conversation
               </button>
             </form>
           </div>

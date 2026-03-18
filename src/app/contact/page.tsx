@@ -1,5 +1,6 @@
 import ContactFooter from "@/components/ContactFooter";
 import RecognitionBar from "@/components/RecognitionBar";
+import PageMotion from "@/components/PageMotion";
 
 export const metadata = {
   title: "Contact — Wincore Agency",
@@ -9,8 +10,14 @@ export const metadata = {
 export default function ContactPage() {
   return (
     <main className="bg-background text-foreground">
-      <RecognitionBar />
-      <ContactFooter />
+      <PageMotion>
+        <div className="page-motion-item" data-page-motion>
+          <RecognitionBar />
+        </div>
+        <div className="page-motion-item" data-page-motion>
+          <ContactFooter />
+        </div>
+      </PageMotion>
     </main>
   );
 }

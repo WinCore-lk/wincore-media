@@ -31,6 +31,8 @@ export default function AwardsStats() {
   const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
+    gsap.registerPlugin(ScrollTrigger);
+
     const ctx = gsap.context(() => {
       const numbers = gsap.utils.toArray<HTMLElement>(".stat-number");
       
@@ -50,6 +52,20 @@ export default function AwardsStats() {
           },
         });
       });
+
+      gsap.fromTo(
+        ".awards-intro",
+        { y: 50, opacity: 0, filter: "blur(8px)" },
+        {
+          y: 0,
+          opacity: 1,
+          filter: "blur(0px)",
+          duration: 1,
+          stagger: 0.08,
+          ease: "expo.out",
+          scrollTrigger: { trigger: sectionRef.current, start: "top 78%" },
+        },
+      );
 
       gsap.fromTo(
         ".award-card",
@@ -99,14 +115,14 @@ export default function AwardsStats() {
       <div className="chapter-inner _container relative z-10">
         <div className="flex flex-col md:flex-row justify-between items-end gap-12 mb-16 md:mb-24">
           <div>
-            <span className="text-secondary font-bold uppercase tracking-[0.55em] text-[11px] mb-8 italic block">
+            <span className="awards-intro text-secondary font-bold uppercase tracking-[0.55em] text-[11px] mb-8 italic block">
               Achievements
             </span>
-            <h2 className="text-[10vw] md:text-[5vw] font-black leading-[0.85] uppercase tracking-tighter max-w-[14ch]">
+            <h2 className="awards-intro text-[10vw] md:text-[5vw] font-black leading-[0.85] uppercase tracking-tighter max-w-[14ch]">
               Winning results <span className="text-white/10 italic">that lead</span>
             </h2>
           </div>
-          <p className="text-white/35 text-lg md:text-xl font-light max-w-[420px] leading-relaxed">
+          <p className="awards-intro text-white/35 text-lg md:text-xl font-light max-w-[420px] leading-relaxed">
             Awards are a signal. Outcomes are the standard. We build systems that perform and visuals that move.
           </p>
         </div>

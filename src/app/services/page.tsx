@@ -1,5 +1,6 @@
-import ServiceCards from "@/components/ServiceCards";
 import RecognitionBar from "@/components/RecognitionBar";
+import ServicesPageContent from "@/components/ServicesPageContent";
+import PageMotion from "@/components/PageMotion";
 
 export const metadata = {
   title: "Services — Wincore Agency",
@@ -9,8 +10,14 @@ export const metadata = {
 export default function ServicesPage() {
   return (
     <main className="bg-background text-foreground">
-      <RecognitionBar />
-      <ServiceCards />
+      <PageMotion>
+        <div className="page-motion-item" data-page-motion>
+          <RecognitionBar />
+        </div>
+        <div className="page-motion-item" data-page-motion>
+          <ServicesPageContent />
+        </div>
+      </PageMotion>
     </main>
   );
 }
