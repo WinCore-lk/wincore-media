@@ -28,6 +28,14 @@ const FOCUS = [
   { label: "AI Workflows", tag: "Scale", desc: "Accelerated delivery with precision AI.", icon: Sparkles },
 ];
 
+const OUTCOMES = ["Branding", "Motion", "WebGL", "AI dev", "Performance"];
+
+const KPI_STATS = [
+  { label: "Awards Won", value: 12, suffix: "+", icon: Trophy, color: "text-accent" },
+  { label: "Client Retention", value: 95, suffix: "%", icon: Users, color: "text-secondary" },
+  { label: "Campaigns", value: 200, suffix: "+", icon: Zap, color: "text-white" },
+];
+
 // ─── count-up utility ─────────────────────────────────────────────────────────
 function startCountUp() {
   document.querySelectorAll<HTMLElement>(".stat-value").forEach((el) => {
@@ -45,6 +53,7 @@ function startCountUp() {
 export default function Hero() {
   const introRef = useRef<HTMLElement>(null);
   const reelRef = useRef<HTMLElement>(null);
+  const hasCountedRef = useRef(false);
   const [expanded, setExpanded] = useState(false);
   const lenis = useLenis();
 
@@ -61,9 +70,13 @@ export default function Hero() {
       gsap.set([
         ".hero-eyebrow",
         ".hero-sub",
-        ".hero-metric-shell",
-        ".hero-metric-card",
+        ".hero-kpi-strip",
+        ".hero-kpi-card",
+        ".hero-outcome-chip",
+        ".hero-action-btn",
         ".hero-side-card",
+        ".hero-why-header",
+        ".hero-why-row",
         ".hero-side-row",
         ".hero-side-cta",
         ".hero-approach-chip",
@@ -110,24 +123,44 @@ export default function Hero() {
         autoAlpha: 1, y: 0, duration: 0.85,
       }, 0.45);
 
-      // — metric groups
-      tl.to(".hero-metric-shell", {
+      // — KPI strip enters as one clear section
+      tl.to(".hero-kpi-strip", {
         autoAlpha: 1,
         y: 0,
-        duration: 0.7,
-        stagger: 0.09,
+        duration: 0.78,
         ease: "power3.out",
-      }, 0.54);
+      }, 0.72);
 
-      // — cards inside metric groups
-      tl.to(".hero-metric-card", {
+      tl.to(".hero-kpi-card", {
         autoAlpha: 1, y: 0,
-        duration: 0.58,
-        stagger: 0.06,
+        duration: 0.62,
+        stagger: 0.08,
         ease: "power3.out",
-      }, 0.62);
+      }, 0.78);
 
-      tl.add(() => startCountUp(), 0.92);
+      tl.to(".hero-outcome-chip", {
+        autoAlpha: 1,
+        y: 0,
+        scale: 1,
+        duration: 0.5,
+        ease: "power3.out",
+        stagger: 0.045,
+      }, 0.76);
+
+      tl.to(".hero-action-btn", {
+        autoAlpha: 1,
+        y: 0,
+        duration: 0.52,
+        ease: "power3.out",
+        stagger: 0.07,
+      }, 0.8);
+
+      tl.add(() => {
+        if (!hasCountedRef.current) {
+          hasCountedRef.current = true;
+          startCountUp();
+        }
+      }, 1.02);
 
       // — side card (slides in from right)
       tl.to(".hero-side-card", {
@@ -136,8 +169,22 @@ export default function Hero() {
         ease: "expo.out",
       }, 0.25);
 
-      // — side rows cascade
-      tl.to(".hero-side-row", {
+      // — why wincore header slides in
+      tl.to(".hero-why-header", {
+        autoAlpha: 1, y: 0,
+        duration: 0.65,
+        ease: "power3.out",
+      }, 0.35);
+
+      // — side rows cascade with enhanced easing
+      tl.to(".hero-why-row", {
+        autoAlpha: 1, y: 0,
+        duration: 0.7,
+        stagger: 0.12,
+        ease: "back.out(1.7)",
+      }, 0.5);
+
+      tl.to(".hero-side-row:not(.hero-why-row)", {
         autoAlpha: 1, y: 0,
         duration: 0.6,
         stagger: 0.09,
@@ -233,6 +280,14 @@ export default function Hero() {
             stagger: 0.35,
           }
         );
+
+        // Why Wincore rows subtle floating motion
+        gsap.to(".hero-why-row", {
+          y: (i) => (i % 2 === 0 ? 2 : -2),
+          rotationZ: (i) => (i % 3 === 0 ? 0.3 : -0.3),
+          duration: 3.5, repeat: -1, yoyo: true,
+          ease: "sine.inOut", stagger: 0.18,
+        });
       }, "+=0");
 
     }, introRef);
@@ -265,7 +320,7 @@ export default function Hero() {
     }
 
     const interactiveCards = Array.from(
-      introRef.current?.querySelectorAll<HTMLElement>(".hero-metric-card, .hero-side-row") ?? []
+      introRef.current?.querySelectorAll<HTMLElement>(".hero-kpi-card, .hero-side-row") ?? []
     );
 
     if (interactiveCards.length) {
@@ -373,9 +428,9 @@ export default function Hero() {
         },
       });
 
-      gsap.to(".hero-metric-card", {
+      gsap.to(".hero-kpi-card", {
         yPercent: (i) => (i % 2 === 0 ? -3.5 : 3.5),
-        rotate: (i) => (i === 0 ? -0.6 : i === 1 ? 0.6 : 0),
+        rotate: (i) => (i === 0 ? -0.45 : i === 1 ? 0.45 : 0),
         transformOrigin: "50% 50%",
         ease: "none",
         stagger: 0.03,
@@ -388,16 +443,28 @@ export default function Hero() {
         },
       });
 
-      gsap.to(".hero-metric-shell", {
-        yPercent: -4,
+      gsap.to(".hero-outcome-chip", {
+        yPercent: (i) => (i % 2 === 0 ? -4 : 4),
         ease: "none",
-        stagger: 0.08,
+        stagger: 0.03,
         scrollTrigger: {
           trigger: introRef.current,
           scroller,
           start: "top top",
           end: "bottom top",
-          scrub: 1.25,
+          scrub: 1.5,
+        },
+      });
+
+      gsap.to(".hero-kpi-strip", {
+        yPercent: -8,
+        ease: "none",
+        scrollTrigger: {
+          trigger: introRef.current,
+          scroller,
+          start: "top top",
+          end: "bottom top",
+          scrub: 1.2,
         },
       });
 
@@ -426,6 +493,48 @@ export default function Hero() {
           start: "top top",
           end: "bottom top",
           scrub: 1.5,
+        },
+      });
+
+      // Why Wincore rows get enhanced depth parallax with stagger
+      gsap.to(".hero-why-row", {
+        yPercent: (i) => (i % 2 === 0 ? -5 : 5),
+        rotationZ: (i) => (i % 2 === 0 ? -0.5 : 0.5),
+        ease: "none",
+        stagger: 0.06,
+        scrollTrigger: {
+          trigger: introRef.current,
+          scroller,
+          start: "top top",
+          end: "bottom top",
+          scrub: 1.6,
+        },
+      });
+
+      // Why Wincore card container fades and drifts
+      gsap.to(".hero-why-card", {
+        yPercent: 8,
+        ease: "none",
+        scrollTrigger: {
+          trigger: introRef.current,
+          scroller,
+          start: "top top",
+          end: "bottom top",
+          scrub: 1.3,
+        },
+      });
+
+      // Why Wincore glow pulses and expands on scroll
+      gsap.to(".hero-why-glow", {
+        scale: 1.2,
+        opacity: 0.6,
+        ease: "none",
+        scrollTrigger: {
+          trigger: introRef.current,
+          scroller,
+          start: "top top",
+          end: "bottom top",
+          scrub: 1.4,
         },
       });
 
@@ -552,138 +661,42 @@ export default function Hero() {
                 Brand systems, motion, WebGL, and AI-accelerated delivery — one team, one standard.
                 Built for clarity, speed, and measurable outcomes.
               </p>
-
-              <div className="hero-metrics-wrap mt-11 md:mt-[3.25rem]">
-                <div className="hero-metric-shell group/shell relative overflow-hidden rounded-[1.55rem] border border-white/[0.09] bg-gradient-to-br from-white/[0.05] via-black/35 to-black/50 p-3 shadow-[0_12px_34px_rgba(0,0,0,0.35)] backdrop-blur-md sm:p-4">
-                  <div className="hero-metric-sweep pointer-events-none absolute inset-y-0 left-[-30%] w-[22%] -skew-x-12 bg-gradient-to-r from-transparent via-accent/25 to-transparent" />
-                  <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(120%_100%_at_100%_0%,rgba(0,191,255,0.08),transparent_58%)]" />
-                  <div className="grid grid-cols-1 gap-3 lg:grid-cols-12 lg:gap-4">
-                    <article className="hero-metric-card relative rounded-2xl border border-white/[0.09] bg-gradient-to-b from-white/[0.08] to-white/[0.02] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] [transform-style:preserve-3d] lg:col-span-5">
-                      <div className="pointer-events-none absolute inset-0 rounded-2xl bg-[radial-gradient(95%_55%_at_15%_0%,rgba(255,255,255,0.08),transparent_65%)]" />
-                      <p className="mb-4 text-[9px] font-black uppercase tracking-[0.32em] text-white/35">
-                        Outcomes
-                      </p>
-                      <div className="hero-pills flex flex-wrap gap-2.5">
-                        {["Branding", "Motion", "WebGL", "AI dev", "Performance"].map((p) => (
-                          <span
-                            key={p}
-                            className="rounded-full border border-white/[0.1] bg-white/[0.04] px-3 py-1.5 text-[9px] font-black uppercase tracking-[0.28em] text-white/50"
-                          >
-                            {p}
-                          </span>
-                        ))}
-                      </div>
-                    </article>
-
-                    <article className="hero-metric-card relative rounded-2xl border border-white/[0.09] bg-gradient-to-b from-white/[0.08] to-white/[0.02] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] [transform-style:preserve-3d] lg:col-span-7">
-                      <div className="pointer-events-none absolute inset-0 rounded-2xl bg-[radial-gradient(95%_55%_at_15%_0%,rgba(255,255,255,0.08),transparent_65%)]" />
-                      <p className="mb-4 text-[9px] font-black uppercase tracking-[0.32em] text-white/35">
-                        Actions
-                      </p>
-                      <div className="hero-actions flex flex-wrap items-center gap-2.5">
-                        <Link
-                          href="/contact"
-                          className="cursor-hover inline-flex items-center gap-2 rounded-full bg-accent px-6 py-3 text-[9px] font-black uppercase tracking-[0.28em] text-[#0A0A0A] transition-transform hover:scale-[1.02] active:scale-[0.98]"
-                        >
-                          Start a project
-                          <ArrowRight size={14} strokeWidth={2.5} />
-                        </Link>
-                        <Link
-                          href="/works"
-                          className="cursor-hover inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/[0.04] px-6 py-3 text-[9px] font-black uppercase tracking-[0.28em] text-white/90 transition-colors hover:border-accent/50 hover:text-accent"
-                        >
-                          View work
-                        </Link>
-                        <Link
-                          href="/services"
-                          className="cursor-hover inline-flex items-center gap-2 rounded-full border border-white/15 bg-transparent px-5 py-3 text-[9px] font-black uppercase tracking-[0.26em] text-white/55 transition-colors hover:border-white/30 hover:text-white/90"
-                        >
-                          Services
-                          <ArrowRight size={13} strokeWidth={2.5} />
-                        </Link>
-                      </div>
-                    </article>
-                  </div>
-                </div>
-
-                <div className="hero-metric-shell group/shell relative mt-3 overflow-hidden rounded-[1.55rem] border border-white/[0.09] bg-gradient-to-br from-white/[0.05] via-black/35 to-black/50 p-3 shadow-[0_12px_34px_rgba(0,0,0,0.35)] backdrop-blur-md sm:mt-4 sm:p-4">
-                  <div className="hero-metric-sweep pointer-events-none absolute inset-y-0 left-[-30%] w-[22%] -skew-x-12 bg-gradient-to-r from-transparent via-secondary/20 to-transparent" />
-                  <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(120%_100%_at_100%_0%,rgba(212,175,119,0.07),transparent_60%)]" />
-                  <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                    {[
-                      { label: "Awards Won", value: 12, suffix: "+", icon: Trophy, color: "text-accent" },
-                      { label: "Client Retention", value: 95, suffix: "%", icon: Users, color: "text-secondary" },
-                      { label: "Campaigns", value: 200, suffix: "+", icon: Zap, color: "text-white" },
-                    ].map((stat, i) => (
-                      <div
-                        key={stat.label}
-                        className="hero-metric-card hero-stat group relative flex flex-col gap-1.5 rounded-2xl border border-white/[0.09] bg-gradient-to-b from-white/[0.08] to-white/[0.02] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] transition-all duration-500 hover:border-white/18 hover:bg-white/[0.08] [transform-style:preserve-3d]"
-                      >
-                        <div className="absolute inset-0 z-0 pointer-events-none opacity-0 transition-opacity duration-700 group-hover:opacity-10">
-                          <div className="absolute top-0 right-0 h-24 w-24 rounded-full bg-accent/20 blur-2xl" />
-                          <div className="absolute bottom-0 left-0 h-16 w-16 rounded-full bg-secondary/10 blur-xl" />
-                        </div>
-                        <div className="relative z-10 mb-3 flex items-center justify-between">
-                          <div className="rounded-lg bg-white/[0.03] p-2 transition-all duration-500 group-hover:bg-accent/10 group-hover:scale-110">
-                            <stat.icon
-                              className={`${stat.color} opacity-40 transition-all duration-500 group-hover:opacity-100`}
-                              size={16}
-                            />
-                          </div>
-                          <span className="text-[8px] font-black uppercase tracking-[0.2em] text-white/10 transition-colors group-hover:text-accent/40">
-                            {String(i + 1).padStart(2, "0")}
-                          </span>
-                        </div>
-                        <dt className="relative z-10 text-[9px] font-bold uppercase tracking-[0.18em] text-white/30 transition-colors group-hover:text-white/60">
-                          {stat.label}
-                        </dt>
-                        <dd className="relative z-10 flex items-baseline gap-1">
-                          <span className="stat-value text-3xl font-black tracking-tighter text-white" data-target={stat.value}>
-                            0
-                          </span>
-                          <span className={`text-sm font-bold ${stat.color}`}>{stat.suffix}</span>
-                        </dd>
-                        <div className="absolute bottom-0 left-0 h-[1.5px] w-0 bg-gradient-to-r from-transparent via-accent/40 to-transparent transition-all duration-700 group-hover:w-full" />
-                      </div>
-                    ))}
-                  </dl>
-                </div>
-              </div>
             </div>
 
             {/* ── RIGHT column (side card) ── */}
             <aside className="hero-right-col hero-side-card lg:col-span-6 lg:self-center">
-              <div className="relative overflow-hidden rounded-[2.5rem] border border-white/[0.08] bg-gradient-to-br from-white/[0.06] to-black/[0.25] p-9 shadow-[0_30px_60px_rgba(0,0,0,0.4)] backdrop-blur-xl md:p-12 lg:p-[3.25rem]">
-                <div className="hero-why-glow pointer-events-none absolute -right-12 -top-12 h-48 w-48 rounded-full bg-accent/10 blur-[80px]" />
+              <div className="hero-why-card relative overflow-visible rounded-[2.5rem] border border-white/[0.08] bg-gradient-to-br from-white/[0.06] to-black/[0.25] p-8 pl-10 shadow-[0_30px_60px_rgba(0,0,0,0.4)] backdrop-blur-xl sm:p-10 sm:pl-12 md:p-14 md:pl-16 lg:p-16 lg:pl-20">
+                <div className="hero-why-glow pointer-events-none absolute -right-12 -top-12 h-56 w-56 rounded-full bg-accent/12 blur-[90px]" />
 
-                <header className="mb-9 flex items-center justify-between md:mb-10">
-                  <p className="text-[10px] font-black uppercase tracking-[0.5em] text-accent">Why Wincore</p>
-                  <div className="h-[1px] w-12 bg-white/10" />
+                <header className="hero-why-header mb-10 flex items-center gap-6 md:mb-12">
+                  <p className="text-[12px] md:text-[13px] font-black uppercase tracking-[0.5em] text-accent whitespace-nowrap">Why Wincore</p>
+                  <div className="h-[1px] flex-1 bg-accent/20" />
                 </header>
 
-                <ul className="space-y-3.5 md:space-y-4">
-                  {FOCUS.map((item) => (
+                <ul className="space-y-4 md:space-y-5">
+                  {FOCUS.map((item, idx) => (
                     <li
                       key={item.label}
-                      className="hero-side-row group/row relative rounded-2xl border border-white/0 p-1.5 transition-all duration-500 hover:border-white/[0.05] hover:bg-white/[0.02]"
+                      className="hero-why-row hero-side-row group/row relative rounded-2xl border border-white/0 p-5 md:p-6 transition-all duration-500 hover:border-accent/30 hover:bg-accent/5"
+                      data-index={idx}
                     >
-                      <div className="flex items-start gap-4.5 py-3.5">
-                        <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/[0.03] transition-all duration-500 group-hover/row:scale-110 group-hover/row:bg-accent/10">
+                      <div className="flex items-start gap-5 py-1">
+                        <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white/[0.04] transition-all duration-500 group-hover/row:scale-115 group-hover/row:bg-accent/15">
                           <item.icon
-                            className="text-white/40 transition-colors duration-500 group-hover/row:text-accent"
-                            size={18}
-                            strokeWidth={1.5}
+                            className="text-white/50 transition-colors duration-500 group-hover/row:text-accent"
+                            size={22}
+                            strokeWidth={1.3}
                           />
-                          <div className="absolute inset-0 rounded-xl bg-accent/20 opacity-0 blur-md transition-opacity duration-500 group-hover/row:opacity-100" />
+                          <div className="absolute inset-0 rounded-xl bg-accent/25 opacity-0 blur-lg transition-opacity duration-500 group-hover/row:opacity-100" />
                         </div>
-                        <div className="flex flex-col gap-1.5 pr-2 pb-1.5">
-                          <div className="mb-0.5 flex flex-wrap items-center gap-2.5">
-                            <span className="text-[15px] font-bold tracking-tight text-white/90">{item.label}</span>
-                            <span className="shrink-0 rounded-full border border-white/10 px-2 py-0.5 text-[8px] font-black uppercase tracking-[0.15em] text-white/20">
+                        <div className="flex flex-col gap-2 pr-1 pb-0 min-w-0 flex-1">
+                          <div className="mb-1 flex flex-wrap items-center gap-3">
+                            <span className="text-[16px] md:text-[18px] font-bold tracking-tight text-white">{item.label}</span>
+                            <span className="shrink-0 rounded-full border border-accent/35 bg-accent/8 px-2.5 py-1 text-[8px] font-black uppercase tracking-[0.2em] text-accent">
                               {item.tag}
                             </span>
                           </div>
-                          <p className="text-[13px] leading-relaxed text-white/40 transition-colors group-hover/row:text-white/60">
+                          <p className="text-[14px] md:text-[15px] leading-relaxed text-white/50 transition-colors group-hover/row:text-white/70 break-words">
                             {item.desc}
                           </p>
                         </div>
@@ -720,6 +733,82 @@ export default function Hero() {
                 </div>
               </div>
             </aside>
+          </div>
+
+          <div className="hero-kpi-strip mt-12 md:mt-14 lg:mt-16">
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-12 lg:gap-5">
+              <article className="hero-kpi-card group relative overflow-visible rounded-3xl border border-white/[0.11] bg-gradient-to-b from-white/[0.08] to-white/[0.02] p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] md:p-8 lg:p-10 lg:col-span-4 [transform-style:preserve-3d]">
+                <div className="hero-metric-sweep pointer-events-none absolute inset-y-0 left-[-34%] w-[24%] -skew-x-12 bg-gradient-to-r from-transparent via-accent/25 to-transparent" />
+                <div className="mb-6 flex items-center justify-between">
+                  <p className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.32em] text-white/35">Outcomes</p>
+                  <span className="h-1.5 w-1.5 rounded-full bg-accent/80" aria-hidden />
+                </div>
+                <div className="grid grid-cols-2 gap-3 md:gap-3.5">
+                  {OUTCOMES.map((p) => (
+                    <span
+                      key={p}
+                      className="hero-outcome-chip inline-flex min-h-11 md:min-h-12 items-center justify-center rounded-xl border border-white/[0.13] bg-white/[0.04] px-4 py-2.5 text-[10px] md:text-[11px] font-black uppercase tracking-[0.22em] text-white/60"
+                    >
+                      {p}
+                    </span>
+                  ))}
+                </div>
+              </article>
+
+              <article className="hero-kpi-card group relative overflow-visible rounded-3xl border border-white/[0.11] bg-gradient-to-b from-white/[0.08] to-white/[0.02] p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] md:p-8 lg:p-10 lg:col-span-4 [transform-style:preserve-3d]">
+                <div className="hero-metric-sweep pointer-events-none absolute inset-y-0 left-[-34%] w-[24%] -skew-x-12 bg-gradient-to-r from-transparent via-secondary/20 to-transparent" />
+                <div className="mb-6 flex items-end justify-between gap-4">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.32em] text-white/35">Actions</p>
+                    <p className="mt-2 text-[13px] md:text-[14px] leading-relaxed text-white/45">Choose a path and we will turn it into a high-performing launch.</p>
+                  </div>
+                  <span className="hidden text-[8px] font-black uppercase tracking-[0.3em] text-white/20 sm:inline whitespace-nowrap ml-2">Fast response</span>
+                </div>
+                <div className="grid grid-cols-1 gap-3">
+                  <Link
+                    href="/contact"
+                    className="hero-action-btn cursor-hover inline-flex min-h-12 md:min-h-13 items-center justify-center gap-2 rounded-xl border border-accent/45 bg-accent px-5 md:px-6 py-3 text-[10px] md:text-[11px] font-black uppercase tracking-[0.24em] text-[#0A0A0A] transition-transform hover:scale-[1.01] active:scale-[0.98]"
+                  >
+                    Start a project
+                    <ArrowRight size={16} strokeWidth={2.5} />
+                  </Link>
+                  <div className="grid grid-cols-2 gap-3">
+                    <Link
+                      href="/works"
+                      className="hero-action-btn cursor-hover inline-flex min-h-12 md:min-h-13 items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/[0.04] px-4 md:px-5 py-3 text-[10px] md:text-[11px] font-black uppercase tracking-[0.24em] text-white/90 transition-colors hover:border-accent/50 hover:text-accent"
+                    >
+                      View work
+                    </Link>
+                    <Link
+                      href="/services"
+                      className="hero-action-btn cursor-hover inline-flex min-h-12 md:min-h-13 items-center justify-center gap-2 rounded-xl border border-white/15 bg-transparent px-4 md:px-5 py-3 text-[10px] md:text-[11px] font-black uppercase tracking-[0.22em] text-white/60 transition-colors hover:border-white/30 hover:text-white/92"
+                    >
+                      Services
+                    </Link>
+                  </div>
+                </div>
+              </article>
+
+              <article className="hero-kpi-card group relative overflow-visible rounded-3xl border border-white/[0.11] bg-gradient-to-b from-white/[0.08] to-white/[0.02] p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] md:p-8 lg:p-10 lg:col-span-4 [transform-style:preserve-3d]">
+                <div className="hero-metric-sweep pointer-events-none absolute inset-y-0 left-[-34%] w-[24%] -skew-x-12 bg-gradient-to-r from-transparent via-accent/20 to-transparent" />
+                <p className="mb-6 text-[10px] md:text-[11px] font-black uppercase tracking-[0.32em] text-white/35">Performance Snapshot</p>
+                <dl className="space-y-3">
+                  {KPI_STATS.map((stat, i) => (
+                    <div key={stat.label} className="hero-stat relative flex items-center justify-between rounded-xl border border-white/[0.09] bg-white/[0.02] px-4 md:px-5 py-3.5 md:py-4 transition-colors duration-500 group-hover:border-white/14\">
+                      <div className="flex items-center gap-3 min-w-0 flex-1">
+                        <span className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-white/20 shrink-0">{String(i + 1).padStart(2, "0")}</span>
+                        <stat.icon className={`${stat.color} opacity-70 shrink-0`} size={16} />
+                        <dt className="text-[11px] md:text-[12px] font-bold uppercase tracking-[0.16em] text-white/45 truncate">{stat.label}</dt>
+                      </div>
+                      <dd className="flex items-baseline gap-1 shrink-0 ml-2">
+                        <span className="stat-value text-2xl md:text-3xl font-black tracking-tight text-white" data-target={stat.value}>0</span>
+                        <span className={`text-xs md:text-sm font-black ${stat.color}`}>{stat.suffix}</span>
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+              </article>
+            </div>
           </div>
         </div>
 
