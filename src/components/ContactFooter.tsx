@@ -120,6 +120,24 @@ export default function ContactFooter() {
           },
         );
       });
+
+      gsap.fromTo(
+        ".cf-company-name",
+        { yPercent: reduced ? 0 : 105, opacity: reduced ? 1 : 0 },
+        {
+          yPercent: 0,
+          opacity: 1,
+          duration: reduced ? 0 : 1.05,
+          ease: "expo.out",
+          clearProps: "transform,opacity",
+          scrollTrigger: {
+            trigger: ".cf-company-shell",
+            scroller,
+            start: "top 92%",
+            once: true,
+          },
+        },
+      );
     }, footerRef);
 
     scheduleScrollTriggerRefresh();
@@ -200,32 +218,41 @@ export default function ContactFooter() {
         </nav>
 
         {/* ── Secondary Footer ── */}
-        <div className="cf-reveal flex flex-col items-start justify-between gap-16 border-t border-white/5 pt-16 md:flex-row md:items-end">
-          <div className="flex flex-col gap-6">
-            <Link href="/" className="cursor-hover flex flex-col items-start">
-              <span className="text-4xl font-black tracking-tighter text-white">WINCOR</span>
-              <span className="text-[11px] font-bold uppercase tracking-[0.4em] text-accent -mt-1">
-                Agency
-              </span>
-            </Link>
-            <div className="flex items-center gap-4">
-              <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20">
-                Time in Colombo:
-              </span>
-              <span className="text-lg font-black italic tracking-widest text-accent/80">
-                {colomboTime || "--:--"}
-              </span>
-            </div>
-          </div>
+        <div className="cf-reveal border-t border-white/5 pt-12 md:pt-16">
+          <div className="grid grid-cols-1 gap-10 md:grid-cols-12 md:gap-8">
+            <div className="md:col-span-7 flex flex-col gap-6">
+              <Link href="/" className="cursor-hover flex flex-col items-start">
+                <span className="text-4xl font-black tracking-tighter text-white">WINCOR</span>
+                <span className="text-[11px] font-bold uppercase tracking-[0.4em] text-accent -mt-1">
+                  Agency
+                </span>
+              </Link>
 
-          <div className="flex flex-col items-start gap-8 md:items-end">
-            <p className="text-left text-[11px] font-bold uppercase tracking-[0.5em] text-white/30 md:text-right">
-              Sri Lanka&apos;s AI Native <br />
-              Digital Experience Studio®
-            </p>
-            <div className="text-left text-[10px] font-black uppercase tracking-[0.5em] text-white/10 md:text-right">
-              © {new Date().getFullYear()} WINCORE MEDIA. <br />
-              All rights reserved.
+              <div className="flex items-center gap-4">
+                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20">
+                  Time in Colombo:
+                </span>
+                <span className="text-lg font-black italic tracking-widest text-accent/80">
+                  {colomboTime || "--:--"}
+                </span>
+              </div>
+
+              <div className="cf-company-shell mt-3 overflow-hidden">
+                <p className="cf-company-name text-left font-black uppercase leading-[0.78] tracking-tight text-white/90 text-[clamp(2.4rem,10vw,8.5rem)]">
+                  WINCORE MEDIA
+                </p>
+              </div>
+            </div>
+
+            <div className="md:col-span-5 flex flex-col items-start gap-8 md:items-end md:justify-end">
+              <p className="text-left text-[11px] font-bold uppercase tracking-[0.5em] text-white/30 md:text-right">
+                Sri Lanka&apos;s AI Native <br />
+                Digital Experience Studio®
+              </p>
+              <div className="text-left text-[10px] font-black uppercase tracking-[0.5em] text-white/10 md:text-right">
+                © {new Date().getFullYear()} WINCORE MEDIA. <br />
+                All rights reserved.
+              </div>
             </div>
           </div>
         </div>

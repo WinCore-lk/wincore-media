@@ -234,14 +234,14 @@ export default function WorkCarousel() {
           </div>
           <div className="flex items-center gap-4 text-white/35">
             <span className="hidden text-[10px] font-black uppercase tracking-[0.35em] sm:inline">
-              Scroll sideways
+              {useHorizontal ? "Scroll sideways" : "Browse projects"}
             </span>
             <div className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.03]">
-              <ArrowRight className="h-4 w-4 text-accent" aria-hidden />
+              <ArrowRight className={`h-4 w-4 text-accent transition-transform ${useHorizontal ? "" : "rotate-90"}`} aria-hidden />
             </div>
           </div>
         </div>
-        <div className="mt-8 h-px w-full overflow-hidden bg-white/[0.06]">
+        <div className={`mt-8 h-px w-full overflow-hidden bg-white/[0.06] ${useHorizontal ? "opacity-100" : "opacity-40"}`}>
           <div
             ref={progressRef}
             className="h-full origin-left scale-x-0 bg-gradient-to-r from-accent/80 to-accent/30"

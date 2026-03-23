@@ -38,9 +38,13 @@ const KPI_STATS = [
 ];
 
 // ─── count-up utility ─────────────────────────────────────────────────────────
-function startCountUp() {
-  document.querySelectorAll<HTMLElement>(".stat-value").forEach((el) => {
+function startCountUp(root: ParentNode = document, immediate = false) {
+  root.querySelectorAll<HTMLElement>(".stat-value").forEach((el) => {
     const target = parseInt(el.dataset.target ?? "0", 10);
+    if (immediate) {
+      el.textContent = target.toString();
+      return;
+    }
     const proxy = { val: 0 };
     gsap.to(proxy, {
       val: target,
@@ -102,6 +106,8 @@ export default function Hero() {
   // ─────────────────────────────────────────────────────────────────────────
   useEffect(() => {
     const reduced = prefersReducedMotion();
+    const coarsePointer =
+      typeof window !== "undefined" && window.matchMedia("(pointer: coarse)").matches;
     let cleanupMagnetic: (() => void) | undefined;
     let cleanupCardTilt: (() => void) | undefined;
 
@@ -128,7 +134,7 @@ export default function Hero() {
 
         if (!hasCountedRef.current) {
           hasCountedRef.current = true;
-          startCountUp();
+          startCountUp(introRef.current ?? document, true);
         }
         return;
       }
@@ -204,7 +210,7 @@ export default function Hero() {
       tl.add(() => {
         if (!hasCountedRef.current) {
           hasCountedRef.current = true;
-          startCountUp();
+          startCountUp(introRef.current ?? document);
         }
       }, 1.02);
 
@@ -338,7 +344,7 @@ export default function Hero() {
 
     }, introRef);
 
-    if (reduced) {
+    if (reduced || coarsePointer) {
       return () => {
         ctx.revert();
       };
