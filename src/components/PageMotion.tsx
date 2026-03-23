@@ -2,7 +2,13 @@
 
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useLenis } from "@/context/LenisContext";
+import {
+  registerGsapPlugins,
+  getScroller,
+  scheduleScrollTriggerRefresh,
+  prefersReducedMotion,
+} from "@/lib/motion";
 
 type PageMotionProps = {
   children: React.ReactNode;
@@ -10,61 +16,106 @@ type PageMotionProps = {
 
 export default function PageMotion({ children }: PageMotionProps) {
   const rootRef = useRef<HTMLDivElement>(null);
+  const lenis = useLenis();
+  // Track whether we've already set up animations for this mount to avoid
+  // double-initialisation when StrictMode double-invokes effects.
+  const animatedRef = useRef(false);
 
   useEffect(() => {
     if (!rootRef.current) return;
 
-    gsap.registerPlugin(ScrollTrigger);
-    const scroller = document.documentElement;
+    // Block until Lenis + scrollerProxy are both wired inside ClientProvider.
+    // lenis becomes truthy only AFTER scrollerProxy is configured, so this
+    // single guard is sufficient.
+    if (!lenis) return;
+
+    // Reset guard when lenis instance recreates (e.g. route change).
+    animatedRef.current = false;
+
+    // Idempotent — safe to call many times.
+    registerGsapPlugins();
+
+    const scroller = getScroller();
+    const reduced = prefersReducedMotion();
+    const root = rootRef.current;
 
     const ctx = gsap.context(() => {
-      const sections = gsap.utils.toArray<HTMLElement>("[data-page-motion]");
+      const sections = Array.from(
+        root.querySelectorAll<HTMLElement>("[data-page-motion]")
+      );
 
-      gsap.from(rootRef.current, {
-        y: 20,
-        opacity: 0,
-        duration: 0.7,
-        ease: "power2.out",
-      });
+      if (sections.length === 0) return;
+
+      // ── Hidden state ──────────────────────────────────────────────────────
+      // clip-path starts fully closed (bottom edge to top), y is pushed down,
+      // autoAlpha:0 guarantees visibility:hidden (no paint) + opacity:0.
+      const hiddenState = {
+        autoAlpha: 0,
+        y: 60,
+        filter: "blur(12px)",
+        clipPath: "inset(0 0 100% 0 round 0px)",
+      };
+
+      // Apply hidden state immediately so elements are invisible on first paint.
+      gsap.set(sections, hiddenState);
+
+      if (reduced) {
+        // Skip animation for users who prefer reduced motion.
+        gsap.set(sections, {
+          autoAlpha: 1,
+          y: 0,
+          filter: "blur(0px)",
+          clipPath: "inset(0 0 0% 0 round 0px)",
+          clearProps: "transform,filter,clipPath",
+        });
+        return;
+      }
 
       sections.forEach((section, index) => {
-        gsap.from(section, {
-          y: 84,
-          opacity: 0,
-          duration: 1,
-          ease: "expo.out",
-          delay: index === 0 ? 0.1 : 0,
-          immediateRender: false,
-          scrollTrigger: {
-            trigger: section,
-            start: index === 0 ? "top 95%" : "top 88%",
-            once: true,
-            scroller,
+        gsap.fromTo(
+          section,
+          // from — must re-specify so GSAP doesn't try to tween from the
+          // already-resolved clearProps on a previous scroll.
+          {
+            autoAlpha: 0,
+            y: 60,
+            filter: "blur(12px)",
+            clipPath: "inset(0 0 100% 0 round 0px)",
           },
-        });
-
-        gsap.to(section, {
-          yPercent: index % 2 === 0 ? -4 : -7,
-          scale: 0.995,
-          ease: "none",
-          scrollTrigger: {
-            trigger: section,
-            start: "top bottom",
-            end: "bottom top",
-            scrub: true,
-            scroller,
-          },
-        });
+          {
+            autoAlpha: 1,
+            y: 0,
+            filter: "blur(0px)",
+            clipPath: "inset(0 0 0% 0 round 0px)",
+            duration: 1.1,
+            delay: index === 0 ? 0.12 : 0,
+            ease: "expo.out",
+            clearProps: "transform,filter,clipPath",
+            scrollTrigger: {
+              trigger: section,
+              // Use a generous threshold so the first visible section always
+              // fires even when measurements are slightly off after Lenis init.
+              start: index === 0 ? "top 95%" : "top 92%",
+              end: "top 65%",
+              once: true,
+              scroller,
+            },
+          }
+        );
       });
 
-      ScrollTrigger.refresh();
-    }, rootRef);
+      // Fonts + Lenis can shift layout after the first paint — refresh ST so
+      // trigger positions are recalculated correctly.
+      scheduleScrollTriggerRefresh();
+    }, root);
 
-    return () => ctx.revert();
-  }, []);
+    return () => {
+      ctx.revert();
+    };
+  }, [lenis]); // Re-run whenever the lenis instance changes (e.g. route change).
 
   return (
-    <div ref={rootRef} className="page-motion-enter relative">
+    <div ref={rootRef} className="page-motion-root relative">
       {children}
     </div>
   );

@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import Image from "next/image";
 import gsap from "gsap";
 import { ArrowUpRight } from "lucide-react";
+import { registerGsapPlugins, getScroller } from "@/lib/motion";
 
 interface Project {
   id: number;
@@ -56,8 +57,10 @@ export default function FeaturedWorks() {
   const triggerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    registerGsapPlugins();
     const ctx = gsap.context(() => {
       const cards = gsap.utils.toArray<HTMLElement>(".project-card");
+      const scroller = getScroller();
 
       // Horizontal scroll section
       const totalWidth = cards.length * 70;
@@ -71,6 +74,7 @@ export default function FeaturedWorks() {
           end: () => `+=${(containerRef.current?.offsetWidth || 0) * 1.2}`,
           scrub: 1,
           pin: true,
+          scroller,
         },
       });
 
@@ -84,6 +88,8 @@ export default function FeaturedWorks() {
         scrollTrigger: {
           trigger: triggerRef.current,
           start: "top 75%",
+          scroller,
+          once: true,
         },
       });
 

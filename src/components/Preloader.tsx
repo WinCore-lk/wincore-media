@@ -3,16 +3,54 @@
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { registerGsapPlugins } from "@/lib/motion";
 
 export default function Preloader() {
   const [percentage, setPercentage] = useState(0);
   const preloaderRef = useRef<HTMLDivElement>(null);
+  const hasExitedRef = useRef(false);
 
   useEffect(() => {
-    gsap.registerPlugin(ScrollTrigger);
+    registerGsapPlugins();
   }, []);
   
   const hasRevealed = useRef(false);
+
+  function finishPreloader() {
+    if (hasExitedRef.current) return;
+    hasExitedRef.current = true;
+
+    const target = preloaderRef.current;
+    if (!target) return;
+
+    const tl = gsap.timeline({
+      onComplete: () => {
+        target.style.display = "none";
+        document.body.style.overflow = "";
+        window.setTimeout(() => ScrollTrigger.refresh(), 150);
+        window.setTimeout(() => ScrollTrigger.refresh(), 600);
+      },
+    });
+
+    document.body.style.overflow = "hidden";
+
+    tl.to(".preloader-reveal", {
+      yPercent: -110,
+      skewY: -6,
+      duration: 1.1,
+      stagger: 0.05,
+      ease: "expo.inOut",
+      delay: 0.3,
+    }).to(
+      target,
+      {
+        yPercent: -100,
+        duration: 1.1,
+        ease: "expo.inOut",
+      },
+      "-=0.85",
+    );
+  }
 
   useEffect(() => {
     if (!hasRevealed.current) {
@@ -42,33 +80,28 @@ export default function Preloader() {
   }, []);
 
   useEffect(() => {
+    // Fallback: never keep the app blocked if runtime errors interrupt loading.
+    const forceComplete = window.setTimeout(() => {
+      setPercentage((prev) => (prev < 100 ? 100 : prev));
+    }, 5200);
+
+    const onRuntimeError = () => {
+      setPercentage((prev) => (prev < 100 ? 100 : prev));
+    };
+
+    window.addEventListener("error", onRuntimeError);
+    window.addEventListener("unhandledrejection", onRuntimeError);
+
+    return () => {
+      window.clearTimeout(forceComplete);
+      window.removeEventListener("error", onRuntimeError);
+      window.removeEventListener("unhandledrejection", onRuntimeError);
+    };
+  }, []);
+
+  useEffect(() => {
     if (percentage === 100) {
-      const tl = gsap.timeline({
-        onComplete: () => {
-          if (preloaderRef.current) preloaderRef.current.style.display = "none";
-          document.body.style.overflow = "";
-          ScrollTrigger.refresh(); // Crucial for resetting layout
-        },
-      });
-
-      document.body.style.overflow = "hidden";
-
-      tl.to(".preloader-reveal", {
-        yPercent: -110,
-        skewY: -6,
-        duration: 1.1,
-        stagger: 0.05,
-        ease: "expo.inOut",
-        delay: 0.7,
-      }).to(
-        preloaderRef.current,
-        {
-          yPercent: -100,
-          duration: 1.3,
-          ease: "expo.inOut",
-        },
-        "-=0.9",
-      );
+      finishPreloader();
     }
   }, [percentage]);
 

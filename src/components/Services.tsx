@@ -2,46 +2,55 @@
 
 import { useRef, useEffect } from "react";
 import gsap from "gsap";
-import { 
-    Layers, 
-    Smartphone, 
-    Video, 
-    Wand2, 
-    TrendingUp, 
-    Monitor 
+import {
+  Layers,
+  Smartphone,
+  Video,
+  Wand2,
+  TrendingUp,
+  Monitor,
+  type LucideIcon,
 } from "lucide-react";
+import { registerGsapPlugins, getScroller } from "@/lib/motion";
 
-const services = [
+type ServiceItem = {
+  title: string;
+  description: string;
+  icon: LucideIcon;
+  link?: string;
+};
+
+const services: ServiceItem[] = [
   {
     title: "Digital-First Branding",
     description: "Crafting visual identities that resonate in a digital-native world.",
-    icon: <Layers size={40} className="text-secondary" />,
+    icon: Layers,
   },
   {
     title: "Social Media & Influencer Marketing",
     description: "Strategic storytelling and reach that converts followers into fans.",
-    icon: <Smartphone size={40} className="text-secondary" />,
+    icon: Smartphone,
   },
   {
     title: "Motion Video & 3D Animation",
     description: "Immersive visuals that capture attention and drive engagement.",
-    icon: <Video size={40} className="text-secondary" />,
+    icon: Video,
   },
   {
     title: "AI-Powered Website Development",
     description: "Cutting-edge web experiences powered by the latest AI technologies.",
-    icon: <Wand2 size={40} className="text-secondary" />,
+    icon: Wand2,
     link: "https://winpro-ai-site.vercel.app"
   },
   {
     title: "Performance Marketing & Ads",
     description: "Data-driven campaigns focused on measurable growth and ROI.",
-    icon: <TrendingUp size={40} className="text-secondary" />,
+    icon: TrendingUp,
   },
   {
     title: "UX/UI + WebGL Experiences",
     description: "Creating smooth, sensory-rich interfaces for high-end digital products.",
-    icon: <Monitor size={40} className="text-secondary" />,
+    icon: Monitor,
   },
 ];
 
@@ -49,18 +58,22 @@ export default function Services() {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    registerGsapPlugins();
+    const scroller = getScroller();
     const ctx = gsap.context(() => {
-        gsap.from(".service-card", {
-            y: 50,
-            opacity: 0,
-            duration: 0.8,
-            stagger: 0.1,
-            ease: "power3.out",
-            scrollTrigger: {
-                trigger: containerRef.current,
-                start: "top 80%",
-            }
-        });
+      gsap.from(".service-card", {
+        y: 50,
+        opacity: 0,
+        duration: 0.8,
+        stagger: 0.1,
+        ease: "power3.out",
+        scrollTrigger: {
+          trigger: containerRef.current,
+          start: "top 80%",
+          scroller,
+          once: true,
+        },
+      });
     }, containerRef);
     return () => ctx.revert();
   }, []);
@@ -88,7 +101,7 @@ export default function Services() {
             >
               <div>
                 <div className="mb-8 transform transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-6 origin-left">
-                  {service.icon}
+                  <service.icon size={40} className="text-secondary" />
                 </div>
                 <h3 className="text-2xl md:text-3xl font-bold text-white mb-4 group-hover:text-accent transition-colors">
                   {service.title}

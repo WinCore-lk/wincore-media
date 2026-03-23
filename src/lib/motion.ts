@@ -1,8 +1,17 @@
+import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 /**
  * Shared motion helpers — Lenis uses document.documentElement as the scroll root.
  */
+
+/** Register GSAP plugins exactly once, even across HMR reloads. */
+let _pluginsRegistered = false;
+export function registerGsapPlugins(): void {
+  if (_pluginsRegistered) return;
+  gsap.registerPlugin(ScrollTrigger);
+  _pluginsRegistered = true;
+}
 
 export function getScroller(): HTMLElement {
   return document.documentElement;

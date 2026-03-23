@@ -6,17 +6,32 @@ import ServiceCards from "@/components/ServiceCards";
 import AboutTeaser from "@/components/AboutTeaser";
 import ContactFooter from "@/components/ContactFooter";
 import PageMain from "@/components/PageMain";
+import PageMotion from "@/components/PageMotion";
 
 export default function Home() {
   return (
     <PageMain variant="home">
       <Hero />
-      <RecognitionBar />
-      <WorkCarousel />
-      <AwardsStats />
-      <ServiceCards />
-      <AboutTeaser />
-      <ContactFooter />
+      <PageMotion>
+        <div className="page-motion-item" data-page-motion>
+          <RecognitionBar />
+        </div>
+        <div className="page-motion-item" data-page-motion>
+          <WorkCarousel />
+        </div>
+        <div className="page-motion-item" data-page-motion>
+          <AwardsStats />
+        </div>
+        <div className="page-motion-item" data-page-motion>
+          <ServiceCards />
+        </div>
+        <div className="page-motion-item" data-page-motion>
+          <AboutTeaser />
+        </div>
+        <div className="page-motion-item" data-page-motion>
+          <ContactFooter />
+        </div>
+      </PageMotion>
     </PageMain>
   );
 }
