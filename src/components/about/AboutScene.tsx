@@ -42,7 +42,7 @@ function ParticleLayer({
           depthWrite={false}
           alphaTest={0.03}
           opacity={opacity}
-          blending={THREE.AdditiveBlending}
+          blending={THREE.NormalBlending}
         />
       </Points>
     </group>
@@ -100,18 +100,18 @@ function ScrollReactiveScene({ aboutId }: { aboutId: string }) {
       {/* Outer glow sphere */}
       <ParticleLayer
         positions={outer}
-        color="#00BFFF"
-        size={0.003}
+        color="#006699"
+        size={0.0032}
         speed={{ x: 1 / 55, y: 1 / 70 }}
-        opacity={0.22}
+        opacity={0.14}
       />
       {/* Inner shimmer sphere */}
       <ParticleLayer
         positions={inner}
-        color="#D4AF77"
-        size={0.0023}
+        color="#886644"
+        size={0.0025}
         speed={{ x: -1 / 45, y: 1 / 60 }}
-        opacity={0.16}
+        opacity={0.12}
       />
     </group>
   );
@@ -122,9 +122,9 @@ export default function AboutScene({ aboutId }: { aboutId: string }) {
     <Canvas
       camera={{ position: [0, 0, 1.9], fov: 44 }}
       dpr={[1, 1.2]}
-      gl={{ alpha: true, antialias: true, powerPreference: "high-performance" }}
+      gl={{ alpha: false, antialias: true, powerPreference: "high-performance" }}
     >
-      <color attach="background" args={["#0A0A0A"]} />
+      <color attach="background" args={["#ffffff"]} />
       <ScrollReactiveScene aboutId={aboutId} />
     </Canvas>
   );

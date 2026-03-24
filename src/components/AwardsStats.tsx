@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import Image from "next/image";
 import gsap from "gsap";
 import SplitType from "split-type";
+import { ArrowUpRight } from "lucide-react";
 import {
   registerGsapPlugins,
   getScroller,
@@ -117,21 +118,37 @@ export default function AwardsStats() {
           },
         });
 
-        // Subtle fade-in on each card
+        // ── 3D Kinetic Warp Entrance ──
+        const isEven = i % 2 === 0;
+        
         gsap.fromTo(
           card,
-          { opacity: reduced ? 1 : 0, y: reduced ? 0 : 30 },
+          { 
+            opacity: 0, 
+            x: isEven ? -140 : 140, 
+            y: 30,
+            skewY: isEven ? -6 : 6,
+            rotateY: isEven ? 20 : -20,
+            filter: "blur(12px) contrast(1.1)",
+            scale: 0.9,
+            transformPerspective: 1800,
+          },
           {
             opacity: 1,
+            x: 0,
             y: 0,
-            duration: reduced ? 0 : 0.9,
+            skewY: 0,
+            rotateY: 0,
+            filter: "blur(0px) contrast(1)",
+            scale: 1,
+            duration: 1.45,
             ease: "expo.out",
-            clearProps: "transform,opacity",
+            clearProps: "all",
             scrollTrigger: {
               trigger: card,
               scroller,
-              start: "top 80%",
-              once: true,
+              start: "top 92%",
+              toggleActions: "play none none reverse",
             },
           }
         );
@@ -149,7 +166,7 @@ export default function AwardsStats() {
   return (
     <section
       ref={sectionRef}
-      className="relative overflow-visible border-t border-white/5 bg-background pb-[15vw] pt-[15vw]"
+      className="relative overflow-visible border-t border-black/5 bg-background pb-[15vw] pt-[15vw]"
       aria-label="Awards and stats"
     >
       {/* Ambient glows */}
@@ -168,92 +185,91 @@ export default function AwardsStats() {
               style={{ perspective: "800px" }}
             >
               Outcomes<br />
-              <span className="text-white/10 italic">that lead</span>
+              <span className="text-black/[0.08] italic">that lead</span>
             </h2>
           </div>
-          <p className="aw-body max-w-[36ch] text-lg font-light leading-relaxed text-white/35 md:text-2xl">
+          <p className="aw-body max-w-[36ch] text-lg font-light leading-relaxed text-black/40 md:text-2xl">
             Awards are a signal. Outcomes are the standard. We build systems that perform and visuals that move.
           </p>
         </div>
 
-        {/* ── Stacked cards ── centered stack */}
-        <div className="relative mx-auto max-w-[1000px]">
+        {/* ── 3D Kinetic Warp Gallery ── */}
+        <div className="flex flex-col gap-24 md:gap-32 lg:gap-40">
           {stats.map((stat, i) => (
             <div
               key={i}
-              /* Each card has its own scroll real estate - increased for more breathing room */
-              style={{ height: i < stats.length - 1 ? "600px" : "auto" }}
-              className="relative"
+              className="aw-card-wrapper perspective-[2000px]"
             >
               <div
-                /*
-                  Sticky: card parks at top: (120 + i*36)px as user scrolls.
-                  Increased offsets for better visual stacking.
-                */
-                style={{
-                  position: "sticky",
-                  top: `${120 + i * 36}px`,
-                  zIndex: i + 1,
-                }}
+                className="aw-card group relative min-h-[340px] md:min-h-[460px] overflow-hidden rounded-[3rem] border border-black/[0.06] bg-gradient-to-br from-white via-white/80 to-black/[0.01] p-10 md:p-20 shadow-[0_45px_100px_rgba(0,0,0,0.04),inset_0_1px_0_rgba(255,255,255,0.8)] backdrop-blur-3xl transition-all duration-700 hover:border-accent/30 hover:shadow-[0_60px_120px_rgba(0,191,255,0.06)] will-change-transform"
               >
-                <div
-                  className={`aw-card group relative min-h-[300px] md:min-h-[400px] overflow-hidden rounded-[2.5rem] border border-white/[0.08] bg-gradient-to-br ${stat.accent} p-10 backdrop-blur-md md:p-16`}
-                  style={{
-                    /* Slight scale down on lower cards for depth illusion */
-                    transform: `scale(${1 - (stats.length - 1 - i) * 0.015})`,
-                  }}
-                >
-                  {/* Card Background Image (Subtle) */}
-                  <div className="absolute inset-0 z-0 opacity-[0.04] grayscale transition-all duration-1000 group-hover:opacity-[0.08] group-hover:scale-110">
-                    <Image
-                      src={stat.image}
-                      alt=""
-                      fill
-                      className="object-cover"
-                      sizes="(max-width: 768px) 100vw, 1200px"
-                    />
-                  </div>
+                {/* Dynamic Shine Trail */}
+                <div className="absolute inset-0 z-0 bg-gradient-to-tr from-accent/[0.03] via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
+                
+                {/* Subtle Background Image Context */}
+                <div className="absolute inset-0 z-0 opacity-[0.03] grayscale contrast-125 transition-all duration-[1.5s] group-hover:opacity-[0.07] group-hover:scale-105">
+                  <Image
+                    src={stat.image}
+                    alt=""
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 1400px"
+                  />
+                </div>
 
-                  {/* Content starts - relative z-10 */}
-                  <div className="relative z-10 flex h-full min-h-[220px] md:min-h-[270px] flex-col justify-between">
-                    {/* Top bar */}
-                    <div className="mb-4 flex items-center gap-6">
-                      <span className="text-[10px] font-black uppercase tracking-[0.5em] text-white/20">
-                        {String(i + 1).padStart(2, "0")} / {stats.length}
+                {/* Glass Glint Overlay */}
+                <div className="pointer-events-none absolute inset-0 z-0 bg-[radial-gradient(circle_at_20%_0%,rgba(255,255,255,0.5),transparent_40%)]" />
+
+                <div className="relative z-10 flex h-full flex-col justify-between">
+                  {/* Indicator Header */}
+                  <div className="mb-14 flex items-center justify-between">
+                    <div className="flex items-center gap-6">
+                      <span className="text-[10px] font-black uppercase tracking-[0.6em] text-black/15">
+                        {String(i + 1).padStart(2, "0")} <span className="text-black/5 mx-2">/</span> {stats.length}
                       </span>
+                      <div className="h-[2px] w-12 bg-accent/20" />
                       <span className="text-[10px] font-black uppercase tracking-[0.5em] text-accent/80">
                         {stat.label}
                       </span>
                     </div>
+                    <div className="flex h-12 w-12 items-center justify-center rounded-full border border-black/5 bg-black/[0.01] text-black/40 group-hover:border-accent/40 group-hover:bg-accent/10 group-hover:text-accent transition-all duration-700 hover:rotate-45">
+                      <ArrowUpRight size={18} />
+                    </div>
+                  </div>
 
-                    <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-                      {/* Giant number */}
-                      <div className="flex items-center gap-2">
-                        <span
-                          className="aw-num font-black leading-none tracking-tighter text-white"
-                          style={{ fontSize: "clamp(4.5rem, 8vw, 7rem)" }}
-                        >
+                  <div className={`grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-16 items-center ${i % 2 !== 0 ? 'md:flex-row-reverse' : ''}`}>
+                    {/* Big Projection Number with Vision Stroke */}
+                    <div className={`md:col-span-6 flex items-baseline relative ${i % 2 !== 0 ? 'md:justify-end' : ''}`}>
+                      <div className="absolute -left-12 -top-12 text-[14rem] font-black text-transparent [-webkit-text-stroke:1px_rgba(0,0,0,0.03)] select-none leading-none md:text-[18rem]">
+                        {stat.value}
+                      </div>
+                      <div className="flex items-baseline relative z-10 transition-transform duration-700 group-hover:scale-105">
+                        <span className="aw-num text-[7rem] md:text-[10rem] lg:text-[12rem] font-black leading-none tracking-tighter text-foreground" data-target={stat.value}>
                           0
                         </span>
-                        <span
-                          className="font-bold text-accent mb-2"
-                          style={{ fontSize: "clamp(2.5rem, 4.5vw, 4rem)" }}
-                        >
+                        <span className="mb-[0.2em] ml-2 text-[3.5rem] md:text-[5.5rem] font-black text-accent leading-none">
                           {stat.suffix}
                         </span>
                       </div>
-
-                      {/* Description + line */}
-                      <div className="flex flex-col md:items-end gap-6 md:pb-4">
-                        <p className="max-w-[32ch] text-base font-light leading-relaxed text-white/60 md:text-right md:text-lg">
-                          {stat.desc}
-                        </p>
-                        <div className="h-[2px] w-24 shrink-0 bg-gradient-to-r from-accent/60 to-transparent md:from-transparent md:to-accent/60" />
-                      </div>
                     </div>
 
-                    {/* Decorative corner accent */}
-                    <div className="pointer-events-none absolute right-4 top-4 h-24 w-24 rounded-full border border-white/[0.04] mask-image:radial-gradient(circle,white_0%,transparent_70%) md:right-8 md:top-8" />
+                    {/* Context & Description */}
+                    <div className={`md:col-span-6 flex flex-col gap-10 ${i % 2 !== 0 ? 'md:items-start' : 'md:items-end'}`}>
+                      <p className={`max-w-[34ch] text-lg font-light leading-relaxed text-black/50 md:text-xl md:leading-[1.7] ${i % 2 !== 0 ? 'md:text-left' : 'md:text-right'}`}>
+                        {stat.desc}
+                      </p>
+                      <div className="group/line relative h-1 w-32 bg-black/[0.04] overflow-hidden md:w-56">
+                        <div className="absolute inset-x-0 bottom-0 h-full bg-accent -translate-x-full transition-transform duration-1000 group-hover:translate-x-0" />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Geometric Detail */}
+                  <div className="absolute top-20 left-10 h-32 w-px bg-gradient-to-b from-accent/20 to-transparent" />
+                  <div className="absolute bottom-10 right-10 flex gap-1">
+                    {[1, 2, 3].map(dot => (
+                      <div key={dot} className="h-1 w-1 rounded-full bg-black/10 transition-colors group-hover:bg-accent/40" />
+                    ))}
                   </div>
                 </div>
               </div>
@@ -263,8 +279,8 @@ export default function AwardsStats() {
 
         {/* Bottom indicator */}
         <div className="mt-16 mb-8 flex flex-col items-center gap-6">
-          <div className="h-16 w-px bg-gradient-to-b from-white/20 to-transparent" />
-          <p className="text-[9px] font-black uppercase tracking-[0.6em] text-white/15 animate-pulse">
+          <div className="h-16 w-px bg-gradient-to-b from-black/20 to-transparent" />
+          <p className="text-[9px] font-black uppercase tracking-[0.6em] text-black/15 animate-pulse">
             Scroll to stack results
           </p>
         </div>

@@ -1,6 +1,8 @@
 import WorkCarousel from "@/components/WorkCarousel";
-import RecognitionBar from "@/components/RecognitionBar";
 import PageMain from "@/components/PageMain";
+import WorksHero from "@/components/WorksHero";
+import WorksModernStats from "@/components/WorksModernStats";
+import BrandWall from "@/components/BrandWall";
 
 export const metadata = {
   title: "Works — Wincore Agency",
@@ -10,8 +12,10 @@ export const metadata = {
 export default function WorksPage() {
   return (
     <PageMain>
-      <RecognitionBar />
+      <WorksHero />
       <WorkCarousel />
+      <BrandWall />
+      <WorksModernStats />
     </PageMain>
   );
 }

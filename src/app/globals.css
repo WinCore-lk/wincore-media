@@ -1,10 +1,10 @@
 @import "tailwindcss";
 
 :root {
-  --background: #0a0a0a;
-  --foreground: #ffffff;
-  --accent: #00bfff;
-  --secondary: #d4af77;
+  --background: #ffffff;
+  --foreground: #0a0a0a;
+  --accent: #0088cc; /* Slightly deeper blue for better contrast on white */
+  --secondary: #6e563a;
 }
 
 @theme {
@@ -159,11 +159,11 @@ h1, h2, h3, h4, h5, h6 {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 1rem 2rem;
+  padding: 1rem 2.5rem;
   border-radius: 9999px;
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: white;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  color: var(--foreground);
   transition: border-color 0.3s ease, color 0.3s ease;
   overflow: hidden;
   z-index: 1;
@@ -171,7 +171,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .btn-magnetic:hover {
   border-color: var(--accent);
-  color: black;
+  color: white;
 }
 
 .btn-magnetic::before {
@@ -200,8 +200,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .glass {
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(255, 255, 255, 0.6);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.05);
 }

@@ -209,7 +209,7 @@ export default function AboutTeaser() {
 
       <div
         data-watermark
-        className="pointer-events-none absolute left-[-8vw] top-1/2 -translate-y-1/2 select-none whitespace-nowrap text-[36vw] font-black uppercase italic text-white/[0.02] z-[1]"
+        className="pointer-events-none absolute left-[-8vw] top-1/2 -translate-y-1/2 select-none whitespace-nowrap text-[36vw] font-black uppercase italic text-black/[0.02] z-[1]"
       >
         Studio
       </div>
@@ -223,27 +223,27 @@ export default function AboutTeaser() {
 
             <h2 className="abt-heading mb-7 text-[11.5vw] font-black uppercase leading-[0.84] tracking-tighter md:text-[5.4vw]">
               Colombo-based.<br />
-              <span className="text-white/20 italic">Globally delivered.</span>
+              <span className="text-black/15 italic">Globally delivered.</span>
             </h2>
 
-            <p className="abt-lead max-w-[52ch] text-lg font-light leading-relaxed text-white/60 md:text-xl">
+            <p className="abt-lead max-w-[52ch] text-lg font-light leading-relaxed text-black/60 md:text-xl">
               10+ years turning numbers into stories. A tight team of strategists, designers,
               filmmakers, and builders creating high-end digital work with measurable outcomes.
             </p>
 
-            <div className="abt-rule mt-7 h-px w-full max-w-md bg-gradient-to-r from-accent via-white/15 to-transparent" />
+            <div className="abt-rule mt-7 h-px w-full max-w-md bg-gradient-to-r from-accent via-black/[0.08] to-transparent" />
 
             <div className="abt-stats mt-7 grid grid-cols-1 gap-4 sm:grid-cols-2">
               {stats.map((item) => (
                 <article
                   key={item.label}
-                  className="abt-stat-card rounded-2xl border border-white/10 bg-white/[0.03] p-5"
+                  className="abt-stat-card rounded-2xl border border-black/[0.08] bg-black/[0.01] p-5"
                 >
-                  <p className="mb-3 text-[10px] font-black uppercase tracking-[0.35em] text-white/35">
+                  <p className="mb-3 text-[10px] font-black uppercase tracking-[0.35em] text-black/35">
                     {item.label}
                   </p>
                   <div className="flex items-baseline gap-1">
-                    <span className="abt-counter text-5xl font-black leading-none md:text-6xl" data-target={item.value}>
+                    <span className="abt-counter text-5xl font-black leading-none text-foreground md:text-6xl" data-target={item.value}>
                       0
                     </span>
                     <span className="text-3xl font-bold text-accent md:text-4xl">{item.suffix}</span>

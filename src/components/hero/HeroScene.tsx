@@ -110,7 +110,7 @@ export default function HeroScene({ heroId }: { heroId: string }) {
       gl={{ alpha: false, antialias: true, powerPreference: "high-performance" }}
     >
       <Suspense fallback={null}>
-        <color attach="background" args={["#0A0A0A"]} />
+        <color attach="background" args={["#ffffff"]} />
         <CameraParallax heroId={heroId} />
         <ParticleLayer
           positions={outer}

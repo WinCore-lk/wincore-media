@@ -61,10 +61,10 @@ export default function Header() {
     <>
       <header
         ref={headerRef}
-        className="fixed top-0 left-0 z-[100] flex w-full items-center justify-between border-b border-white/[0.06] bg-background/80 px-6 py-5 backdrop-blur-xl md:px-10"
+        className="fixed top-0 left-0 z-[100] flex w-full items-center justify-between border-b border-black/[0.06] bg-background/80 px-6 py-5 backdrop-blur-xl md:px-10"
       >
         <Link href="/" className="group flex flex-col items-start" onClick={() => setIsMenuOpen(false)}>
-          <span className="text-2xl font-black tracking-tighter text-white md:text-3xl">WINCOR</span>
+          <span className="text-2xl font-black tracking-tighter text-foreground md:text-3xl">WINCOR</span>
           <span className="-mt-1 text-[10px] font-bold uppercase tracking-[0.3em] text-accent">Agency</span>
         </Link>
 
@@ -73,7 +73,7 @@ export default function Header() {
             <Link
               key={item.href}
               href={item.href}
-              className="cursor-hover text-xs font-bold uppercase tracking-[0.35em] text-white/55 transition-colors hover:text-white"
+              className="cursor-hover text-xs font-bold uppercase tracking-[0.35em] text-black/40 transition-colors hover:text-black"
             >
               {item.label}
             </Link>
@@ -87,9 +87,9 @@ export default function Header() {
           aria-expanded={isMenuOpen}
           aria-label="Toggle menu"
         >
-          <div className={cn("h-0.5 w-8 bg-white transition-all duration-300", isMenuOpen && "translate-y-2 rotate-45")} />
-          <div className={cn("h-0.5 w-8 bg-white transition-all duration-300", isMenuOpen && "opacity-0")} />
-          <div className={cn("h-0.5 w-8 bg-white transition-all duration-300", isMenuOpen && "-translate-y-2 -rotate-45")} />
+          <div className={cn("h-0.5 w-8 bg-foreground transition-all duration-300", isMenuOpen && "translate-y-2 rotate-45")} />
+          <div className={cn("h-0.5 w-8 bg-foreground transition-all duration-300", isMenuOpen && "opacity-0")} />
+          <div className={cn("h-0.5 w-8 bg-foreground transition-all duration-300", isMenuOpen && "-translate-y-2 -rotate-45")} />
         </button>
       </header>
 
@@ -105,7 +105,7 @@ export default function Header() {
             <Link
               key={item.href}
               href={item.href}
-              className="cursor-hover text-2xl font-black uppercase tracking-[0.2em] text-white/90"
+              className="cursor-hover text-2xl font-black uppercase tracking-[0.2em] text-black/80"
               onClick={() => setIsMenuOpen(false)}
             >
               {item.label}
@@ -113,7 +113,7 @@ export default function Header() {
           ))}
           <Link
             href="/"
-            className="mt-6 text-xs font-bold uppercase tracking-[0.4em] text-white/35"
+            className="mt-6 text-xs font-bold uppercase tracking-[0.4em] text-black/30"
             onClick={() => setIsMenuOpen(false)}
           >
             Home

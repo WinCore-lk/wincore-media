@@ -34,7 +34,7 @@ const OUTCOMES = ["Branding", "Motion", "WebGL", "AI dev", "Performance"];
 const KPI_STATS = [
   { label: "Awards Won", value: 12, suffix: "+", icon: Trophy, color: "text-accent" },
   { label: "Client Retention", value: 95, suffix: "%", icon: Users, color: "text-secondary" },
-  { label: "Campaigns", value: 200, suffix: "+", icon: Zap, color: "text-white" },
+  { label: "Campaigns", value: 200, suffix: "+", icon: Zap, color: "text-foreground" },
 ];
 
 // ─── count-up utility ─────────────────────────────────────────────────────────
@@ -699,16 +699,16 @@ export default function Hero() {
       >
         {/* background layers */}
         <div className="pointer-events-none absolute inset-0 z-0">
-          <div className="hero-parallax-slow absolute inset-0 bg-[radial-gradient(ellipse_120%_80%_at_50%_-20%,rgba(0,191,255,0.16),transparent_58%)]" />
-          <div className="hero-parallax-fast absolute bottom-0 left-1/2 h-[min(60vh,520px)] w-[min(100%,900px)] -translate-x-1/2 bg-[radial-gradient(ellipse_at_center,rgba(212,175,119,0.09),transparent_68%)] blur-2xl" />
-          <div className="absolute inset-0 bg-[linear-gradient(to_bottom,transparent_0%,#0A0A0A_92%)]" />
+          <div className="hero-parallax-slow absolute inset-0 bg-[radial-gradient(ellipse_120%_80%_at_50%_-20%,rgba(255,255,255,0.1),transparent_58%)]" />
+          <div className="hero-parallax-fast absolute bottom-0 left-1/2 h-[min(60vh,520px)] w-[min(100%,900px)] -translate-x-1/2 bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.06),transparent_68%)] blur-2xl" />
+          <div className="absolute inset-0 bg-[linear-gradient(to_bottom,transparent_0%,white_92%)]" />
         </div>
 
-        <div className="hero-canvas-wrap pointer-events-none absolute inset-0 z-[1] opacity-[0.3] md:opacity-[0.36]">
+        <div className="hero-canvas-wrap pointer-events-none absolute inset-0 z-[1] opacity-[0.2] md:opacity-[0.25]">
           <HeroScene heroId="hero-section" />
         </div>
 
-        <div className="pointer-events-none absolute inset-0 z-[2] bg-[radial-gradient(ellipse_85%_55%_at_50%_35%,transparent_0%,rgba(10,10,10,0.78)_58%,#0A0A0A_100%)]" />
+        <div className="pointer-events-none absolute inset-0 z-[2] bg-[radial-gradient(ellipse_85%_55%_at_50%_35%,transparent_0%,rgba(255,255,255,0.4)_58%,white_100%)]" />
 
         <div className="hero-content-layer _container relative z-10 mx-auto w-full max-w-[1240px]">
           <div className="grid min-h-[min(85vh,900px)] grid-cols-1 items-start gap-16 lg:grid-cols-12 lg:gap-16 lg:items-center">
@@ -716,7 +716,7 @@ export default function Hero() {
             {/* ── LEFT column ── */}
             <div className="hero-left-col flex flex-col text-left lg:col-span-6">
 
-              <p className="hero-eyebrow mb-5 text-[10px] font-black uppercase tracking-[0.5em] text-white/40">
+              <p className="hero-eyebrow mb-5 text-[10px] font-black uppercase tracking-[0.5em] text-black/40">
                 Wincore Agency · <span className="text-accent/90">Colombo &amp; global</span>
               </p>
 
@@ -725,21 +725,23 @@ export default function Hero() {
                 sliding .hero-line-inner is invisible before it enters.
                 The pb-[0.06em] prevents descenders from clipping.
               */}
-              <h1 className="hero-headline font-heading text-[2.1rem] font-black uppercase leading-[1.02] tracking-tight text-white sm:text-5xl md:text-6xl lg:text-[3.35rem] lg:leading-[1.05]">
+              <h1 className="hero-headline font-heading text-[2.1rem] font-black uppercase leading-[1.02] tracking-tight text-foreground sm:text-5xl md:text-6xl lg:text-[3.35rem] lg:leading-[1.05]">
                 <span className="hero-line block overflow-hidden pb-[0.2em]">
                   <span className="hero-line-inner block">Creative digital</span>
                 </span>
                 <span className="hero-line block overflow-hidden pb-[0.2em]">
-                  <span className="hero-line-inner block text-white/35">that actually</span>
+                  <span className="hero-line-inner block text-black/20">
+                    that actually
+                  </span>
                 </span>
                 <span className="hero-line block overflow-hidden pb-[0.2em]">
-                  <span className="hero-line-inner hero-performs block bg-gradient-to-r from-white via-white to-accent bg-[length:200%_100%] bg-clip-text text-transparent">
+                  <span className="hero-line-inner hero-performs block bg-gradient-to-r from-black via-black/80 to-accent bg-[length:200%_100%] bg-clip-text text-transparent">
                     performs
                   </span>
                 </span>
               </h1>
 
-              <p className="hero-sub mt-7 max-w-xl text-base font-light leading-relaxed text-white/50 md:mt-8 md:text-lg">
+              <p className="hero-sub mt-7 max-w-xl text-base font-light leading-relaxed text-black/40 md:mt-8 md:text-lg">
                 Brand systems, motion, WebGL, and AI-accelerated delivery — one team, one standard.
                 Built for clarity, speed, and measurable outcomes.
               </p>
@@ -747,7 +749,7 @@ export default function Hero() {
 
             {/* ── RIGHT column (side card) ── */}
             <aside className="hero-right-col hero-side-card lg:col-span-6 lg:self-center">
-              <div className="hero-why-card relative overflow-visible rounded-[2.5rem] border border-white/[0.08] bg-gradient-to-br from-white/[0.06] to-black/[0.25] p-8 pl-10 shadow-[0_30px_60px_rgba(0,0,0,0.4)] backdrop-blur-xl sm:p-10 sm:pl-12 md:p-14 md:pl-16 lg:p-16 lg:pl-20">
+              <div className="hero-why-card relative overflow-visible rounded-[2.5rem] border border-black/[0.05] bg-gradient-to-br from-white via-white/80 to-black/[0.02] p-8 pl-10 shadow-[0_30px_60px_rgba(0,0,0,0.05)] backdrop-blur-xl sm:p-10 sm:pl-12 md:p-14 md:pl-16 lg:p-16 lg:pl-20">
                 <div className="hero-why-glow pointer-events-none absolute -right-12 -top-12 h-56 w-56 rounded-full bg-accent/12 blur-[90px]" />
 
                 <header className="hero-why-header mb-10 flex items-center gap-6 md:mb-12">
@@ -763,9 +765,9 @@ export default function Hero() {
                       data-index={idx}
                     >
                       <div className="flex items-start gap-5 py-1">
-                        <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white/[0.04] transition-all duration-500 group-hover/row:scale-115 group-hover/row:bg-accent/15">
+                        <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-black/[0.03] transition-all duration-500 group-hover/row:scale-115 group-hover/row:bg-accent/15">
                           <item.icon
-                            className="text-white/50 transition-colors duration-500 group-hover/row:text-accent"
+                            className="text-black/30 transition-colors duration-500 group-hover/row:text-accent"
                             size={22}
                             strokeWidth={1.3}
                           />
@@ -773,12 +775,12 @@ export default function Hero() {
                         </div>
                         <div className="flex flex-col gap-2 pr-1 pb-0 min-w-0 flex-1">
                           <div className="mb-1 flex flex-wrap items-center gap-3">
-                            <span className="text-[16px] md:text-[18px] font-bold tracking-tight text-white">{item.label}</span>
-                            <span className="shrink-0 rounded-full border border-accent/35 bg-accent/8 px-2.5 py-1 text-[8px] font-black uppercase tracking-[0.2em] text-accent">
+                            <span className="text-[16px] md:text-[18px] font-bold tracking-tight text-foreground">{item.label}</span>
+                            <span className="shrink-0 rounded-full border border-accent/25 bg-accent/8 px-2.5 py-1 text-[8px] font-black uppercase tracking-[0.2em] text-accent">
                               {item.tag}
                             </span>
                           </div>
-                          <p className="text-[14px] md:text-[15px] leading-relaxed text-white/50 transition-colors group-hover/row:text-white/70 break-words">
+                          <p className="text-[14px] md:text-[15px] leading-relaxed text-black/40 transition-colors group-hover/row:text-foreground/70 break-words">
                             {item.desc}
                           </p>
                         </div>
@@ -787,10 +789,10 @@ export default function Hero() {
                   ))}
                 </ul>
 
-                <div className="hero-side-cta mt-10 border-t border-white/[0.08] pt-8.5 md:mt-11 md:pt-9">
+                <div className="hero-side-cta mt-10 border-t border-black/[0.08] pt-8.5 md:mt-11 md:pt-9">
                   <Link
                     href="/about"
-                    className="hero-approach-btn cursor-hover group/btn relative flex w-full items-center justify-between gap-5 overflow-hidden rounded-2xl border border-white/[0.11] bg-gradient-to-r from-white/[0.07] via-white/[0.03] to-transparent px-5 py-4 transition-all duration-500 hover:border-accent/45 hover:shadow-[0_16px_40px_rgba(0,191,255,0.14)] md:px-6 md:py-[1.125rem]"
+                    className="hero-approach-btn cursor-hover group/btn relative flex w-full items-center justify-between gap-5 overflow-hidden rounded-2xl border border-black/[0.11] bg-gradient-to-r from-black/[0.07] via-black/[0.03] to-transparent px-5 py-4 transition-all duration-500 hover:border-accent/45 hover:shadow-[0_16px_40px_rgba(0,191,255,0.14)] md:px-6 md:py-[1.125rem]"
                   >
                     <div className="hero-approach-glint pointer-events-none absolute inset-y-0 left-[-35%] w-[28%] -skew-x-12 bg-gradient-to-r from-transparent via-accent/30 to-transparent" />
                     <div className="absolute inset-x-0 bottom-0 h-[1px] w-0 bg-gradient-to-r from-transparent via-accent/60 to-transparent transition-all duration-700 group-hover/btn:w-full" />
@@ -819,17 +821,17 @@ export default function Hero() {
 
           <div className="hero-kpi-strip mt-14 md:mt-[4.5rem] lg:mt-20">
             <div className="grid grid-cols-1 gap-5 md:gap-6 lg:grid-cols-12 lg:gap-6">
-              <article className="hero-kpi-card group relative overflow-visible rounded-3xl border border-white/[0.11] bg-gradient-to-b from-white/[0.08] to-white/[0.02] p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] md:p-8 lg:p-9 lg:col-span-4 [transform-style:preserve-3d]">
-                <div className="hero-metric-sweep pointer-events-none absolute inset-y-0 left-[-34%] w-[24%] -skew-x-12 bg-gradient-to-r from-transparent via-accent/25 to-transparent" />
+              <article className="hero-kpi-card group relative overflow-visible rounded-3xl border border-black/5 bg-gradient-to-b from-black/[0.04] to-black/[0.01] p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] md:p-8 lg:p-9 lg:col-span-4 [transform-style:preserve-3d]">
+                <div className="hero-metric-sweep pointer-events-none absolute inset-y-0 left-[-34%] w-[24%] -skew-x-12 bg-gradient-to-r from-transparent via-accent/15 to-transparent" />
                 <div className="mb-6 md:mb-7 flex items-center justify-between">
-                  <p className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] text-white/35">Outcomes</p>
+                  <p className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] text-black/35">Outcomes</p>
                   <span className="h-2 w-2 rounded-full bg-accent/80" aria-hidden />
                 </div>
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-3.5">
                   {OUTCOMES.map((p) => (
                     <span
                       key={p}
-                      className="hero-outcome-chip inline-flex min-h-12 items-center justify-center rounded-xl border border-white/[0.13] bg-white/[0.04] px-4 py-3 text-center text-[10px] md:text-[11px] font-black uppercase tracking-[0.12em] leading-tight text-white/60"
+                      className="hero-outcome-chip inline-flex min-h-12 items-center justify-center rounded-xl border border-black/10 bg-black/[0.03] px-4 py-3 text-center text-[10px] md:text-[11px] font-black uppercase tracking-[0.12em] leading-tight text-foreground/70"
                     >
                       {p}
                     </span>
@@ -837,19 +839,19 @@ export default function Hero() {
                 </div>
               </article>
 
-              <article className="hero-kpi-card group relative overflow-visible rounded-3xl border border-white/[0.11] bg-gradient-to-b from-white/[0.08] to-white/[0.02] p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] md:p-8 lg:p-9 lg:col-span-4 [transform-style:preserve-3d]">
+              <article className="hero-kpi-card group relative overflow-visible rounded-3xl border border-black/5 bg-gradient-to-b from-black/[0.04] to-black/[0.01] p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] md:p-8 lg:p-9 lg:col-span-4 [transform-style:preserve-3d]">
                 <div className="hero-metric-sweep pointer-events-none absolute inset-y-0 left-[-34%] w-[24%] -skew-x-12 bg-gradient-to-r from-transparent via-secondary/20 to-transparent" />
                 <div className="mb-6 md:mb-7 flex flex-col gap-3">
                   <div className="min-w-0 flex-1">
-                    <p className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] text-white/35">Actions</p>
-                    <p className="mt-2 text-[13px] md:text-[14px] leading-relaxed text-white/45">Choose a path and we will turn it into a high-performing launch.</p>
+                    <p className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] text-black/35">Actions</p>
+                    <p className="mt-2 text-[13px] md:text-[14px] leading-relaxed text-black/45">Choose a path and we will turn it into a high-performing launch.</p>
                   </div>
-                  <span className="hidden text-[8px] font-black uppercase tracking-[0.2em] text-white/20 sm:block whitespace-nowrap">Fast response</span>
+                  <span className="hidden text-[8px] font-black uppercase tracking-[0.2em] text-black/20 sm:block whitespace-nowrap">Fast response</span>
                 </div>
                 <div className="grid grid-cols-1 gap-3.5">
                   <Link
                     href="/contact"
-                    className="hero-action-btn cursor-hover inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-accent/45 bg-accent px-5 py-3.5 text-[10px] md:text-[11px] font-black uppercase tracking-[0.12em] text-[#0A0A0A] transition-transform hover:scale-[1.01] active:scale-[0.98]"
+                    className="hero-action-btn cursor-hover inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-accent/45 bg-accent px-5 py-3.5 text-[10px] md:text-[11px] font-black uppercase tracking-[0.12em] text-white transition-transform hover:scale-[1.01] active:scale-[0.98]"
                   >
                     Start a project
                     <ArrowRight size={14} strokeWidth={2.5} />
@@ -857,13 +859,13 @@ export default function Hero() {
                   <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     <Link
                       href="/works"
-                      className="hero-action-btn cursor-hover inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/[0.04] px-4 py-3.5 text-[10px] md:text-[11px] font-black uppercase tracking-[0.12em] text-white/90 transition-colors hover:border-accent/50 hover:text-accent"
+                      className="hero-action-btn cursor-hover inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-black/10 bg-black/[0.04] px-4 py-3.5 text-[10px] md:text-[11px] font-black uppercase tracking-[0.12em] text-foreground transition-colors hover:border-accent/50 hover:text-accent"
                     >
                       View work
                     </Link>
                     <Link
                       href="/services"
-                      className="hero-action-btn cursor-hover inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-white/15 bg-transparent px-4 py-3.5 text-[10px] md:text-[11px] font-black uppercase tracking-[0.12em] text-white/60 transition-colors hover:border-white/30 hover:text-white/92"
+                      className="hero-action-btn cursor-hover inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-black/5 bg-transparent px-4 py-3.5 text-[10px] md:text-[11px] font-black uppercase tracking-[0.12em] text-black/60 transition-colors hover:border-black/20 hover:text-black/90"
                     >
                       Services
                     </Link>
@@ -871,19 +873,19 @@ export default function Hero() {
                 </div>
               </article>
 
-              <article className="hero-kpi-card group relative overflow-visible rounded-3xl border border-white/[0.11] bg-gradient-to-b from-white/[0.08] to-white/[0.02] p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] md:p-8 lg:p-9 lg:col-span-4 [transform-style:preserve-3d]">
+              <article className="hero-kpi-card group relative overflow-visible rounded-3xl border border-black/5 bg-gradient-to-b from-black/[0.04] to-black/[0.01] p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] md:p-8 lg:p-9 lg:col-span-4 [transform-style:preserve-3d]">
                 <div className="hero-metric-sweep pointer-events-none absolute inset-y-0 left-[-34%] w-[24%] -skew-x-12 bg-gradient-to-r from-transparent via-accent/20 to-transparent" />
-                <p className="mb-6 md:mb-7 text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] text-white/35">Performance Snapshot</p>
+                <p className="mb-6 md:mb-7 text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] text-black/35">Performance Snapshot</p>
                 <dl className="space-y-3.5">
                   {KPI_STATS.map((stat, i) => (
-                    <div key={stat.label} className="hero-stat relative flex items-center justify-between rounded-xl border border-white/[0.09] bg-white/[0.02] px-4 py-3.5 transition-colors duration-500 group-hover:border-white/14">
+                    <div key={stat.label} className="hero-stat relative flex items-center justify-between rounded-xl border border-black/10 bg-black/[0.02] px-4 py-3.5 transition-colors duration-500 group-hover:border-black/20">
                       <div className="flex items-center gap-3 min-w-0 flex-1">
-                        <span className="text-[9px] font-black uppercase tracking-[0.16em] text-white/20 shrink-0">{String(i + 1).padStart(2, "0")}</span>
+                        <span className="text-[9px] font-black uppercase tracking-[0.16em] text-black/20 shrink-0">{String(i + 1).padStart(2, "0")}</span>
                         <stat.icon className={`${stat.color} opacity-70 shrink-0`} size={16} />
-                        <dt className="text-[11px] md:text-[12px] font-bold uppercase tracking-[0.1em] text-white/45 leading-tight">{stat.label}</dt>
+                        <dt className="text-[11px] md:text-[12px] font-bold uppercase tracking-[0.1em] text-black/45 leading-tight">{stat.label}</dt>
                       </div>
                       <dd className="flex items-baseline gap-1.5 shrink-0 ml-3">
-                        <span className="stat-value text-[1.9rem] md:text-[2.1rem] font-black tracking-tight text-white" data-target={stat.value}>0</span>
+                        <span className="stat-value text-[1.9rem] md:text-[2.1rem] font-black tracking-tight text-foreground" data-target={stat.value}>0</span>
                         <span className={`text-[0.9rem] font-black ${stat.color}`}>{stat.suffix}</span>
                       </dd>
                     </div>
@@ -896,9 +898,9 @@ export default function Hero() {
 
         {/* scroll hint */}
         <div className="hero-scroll-hint pointer-events-none absolute bottom-6 left-1/2 z-10 hidden -translate-x-1/2 md:block">
-          <div className="flex flex-col items-center gap-2 text-[9px] font-black uppercase tracking-[0.4em] text-white/30">
+          <div className="flex flex-col items-center gap-2 text-[9px] font-black uppercase tracking-[0.4em] text-black/30">
             <span>Scroll</span>
-            <div className="hero-scroll-line h-10 w-px origin-top bg-gradient-to-b from-accent/60 to-transparent" />
+            <div className="hero-scroll-line h-10 w-px origin-top bg-gradient-to-b from-black/20 to-transparent" />
           </div>
         </div>
       </section>

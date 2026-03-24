@@ -55,27 +55,27 @@ export default function RecognitionBar() {
   }, []);
 
   return (
-    <div className="group relative overflow-hidden border-y border-white/5 bg-background py-12 md:py-20">
+    <div className="group relative overflow-hidden border-y border-black/5 bg-background py-12 md:py-20">
       <div className="relative">
         <div ref={trackRef} className="flex w-max will-change-transform">
           {/* One measured strip, duplicated for seamless loop */}
           <div ref={measureRef} className="flex shrink-0 items-center gap-10 px-6 md:gap-20 md:px-12">
             {items.map((item, idx) => (
               <div key={idx} className="flex items-center gap-10 md:gap-20">
-                <span className="text-xl font-black uppercase italic tracking-tighter text-white/22 transition-colors duration-700 group-hover:text-white/38 md:text-4xl lg:text-5xl">
+                <span className="text-xl font-black uppercase italic tracking-tighter text-black/10 transition-colors duration-700 group-hover:text-black/25 md:text-4xl lg:text-5xl">
                   {item}
                 </span>
-                <span className="h-2 w-2 shrink-0 rounded-full bg-accent shadow-[0_0_18px_rgba(0,191,255,0.45)] md:h-2.5 md:w-2.5" />
+                <span className="h-2 w-2 shrink-0 rounded-full bg-accent shadow-[0_0_18px_rgba(0,191,255,0.25)] md:h-2.5 md:w-2.5" />
               </div>
             ))}
           </div>
           <div className="flex shrink-0 items-center gap-10 px-6 md:gap-20 md:px-12" aria-hidden>
             {items.map((item, idx) => (
               <div key={`dup-${idx}`} className="flex items-center gap-10 md:gap-20">
-                <span className="text-xl font-black uppercase italic tracking-tighter text-white/22 md:text-4xl lg:text-5xl">
+                <span className="text-xl font-black uppercase italic tracking-tighter text-black/10 md:text-4xl lg:text-5xl">
                   {item}
                 </span>
-                <span className="h-2 w-2 shrink-0 rounded-full bg-accent shadow-[0_0_18px_rgba(0,191,255,0.45)] md:h-2.5 md:w-2.5" />
+                <span className="h-2 w-2 shrink-0 rounded-full bg-accent shadow-[0_0_18px_rgba(0,191,255,0.25)] md:h-2.5 md:w-2.5" />
               </div>
             ))}
           </div>

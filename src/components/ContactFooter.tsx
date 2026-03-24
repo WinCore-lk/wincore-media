@@ -149,7 +149,7 @@ export default function ContactFooter() {
     <footer
       ref={footerRef}
       id="contact"
-      className="relative overflow-hidden border-t border-white/5 bg-background pb-16 pt-20 md:pb-24 md:pt-28"
+      className="relative overflow-hidden border-t border-black/5 bg-background pb-16 pt-20 md:pb-24 md:pt-28"
     >
       <div className="_container relative z-10">
         {/* ── Main Contact Section ── */}
@@ -159,10 +159,10 @@ export default function ContactFooter() {
           </span>
           <h2 className="mb-14 text-[16vw] font-black uppercase leading-[0.75] tracking-tighter md:text-[14vw]">
             <span className="block overflow-hidden">
-              <span className="cf-title-line block">GOT A</span>
+              <span className="cf-title-line block text-foreground">GOT A</span>
             </span>
             <span className="block overflow-hidden flex items-center justify-center gap-4">
-              <span className="cf-title-line block italic text-transparent [-webkit-text-stroke:2px_rgba(255,255,255,0.8)] md:[-webkit-text-stroke:4px_rgba(255,255,255,0.8)]">
+              <span className="cf-title-line block italic text-transparent [-webkit-text-stroke:2px_rgba(0,0,0,0.8)] md:[-webkit-text-stroke:4px_rgba(0,0,0,0.8)]">
                 VISION?
               </span>
             </span>
@@ -171,13 +171,13 @@ export default function ContactFooter() {
           <div className="cf-contact-block relative z-20">
             <a
               href="mailto:hello@wincore.media"
-              className="group relative flex items-center gap-6 overflow-hidden rounded-full border border-white/10 bg-white/[0.03] py-4 pl-8 pr-4 backdrop-blur-xl transition-all duration-500 hover:border-accent/50 hover:bg-white/10"
+              className="group relative flex items-center gap-6 overflow-hidden rounded-full border border-black/10 bg-black/[0.03] py-4 pl-8 pr-4 backdrop-blur-xl transition-all duration-500 hover:border-accent/50 hover:bg-black/[0.05]"
             >
               <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-accent/20 to-transparent transition-transform duration-500 group-hover:translate-x-0" />
-              <span className="relative z-10 text-sm font-bold uppercase tracking-widest text-white/90 transition-colors group-hover:text-white md:text-xl">
+              <span className="relative z-10 text-sm font-bold uppercase tracking-widest text-black/90 transition-colors group-hover:text-foreground md:text-xl">
                 hello@wincore.media
               </span>
-              <div className="relative z-10 flex h-14 w-14 items-center justify-center rounded-full bg-accent text-black transition-transform duration-500 group-hover:scale-110 group-hover:bg-white">
+              <div className="relative z-10 flex h-14 w-14 items-center justify-center rounded-full bg-accent text-white transition-transform duration-500 group-hover:scale-110 group-hover:bg-foreground">
                 <svg
                   width="24"
                   height="24"
@@ -197,39 +197,39 @@ export default function ContactFooter() {
         </div>
 
         <nav
-          className="cf-reveal mb-12 flex flex-wrap items-center justify-center gap-x-10 gap-y-4 border-b border-white/5 pb-12 md:justify-between"
+          className="cf-reveal mb-12 flex flex-wrap items-center justify-center gap-x-10 gap-y-4 border-b border-black/5 pb-12 md:justify-between"
           aria-label="Footer"
         >
-          <Link href="/" className="text-[10px] font-black uppercase tracking-[0.45em] text-white/35 transition-colors hover:text-accent">
+          <Link href="/" className="text-[10px] font-black uppercase tracking-[0.45em] text-black/35 transition-colors hover:text-accent">
             Home
           </Link>
-          <Link href="/works" className="text-[10px] font-black uppercase tracking-[0.45em] text-white/35 transition-colors hover:text-accent">
+          <Link href="/works" className="text-[10px] font-black uppercase tracking-[0.45em] text-black/35 transition-colors hover:text-accent">
             Works
           </Link>
-          <Link href="/services" className="text-[10px] font-black uppercase tracking-[0.45em] text-white/35 transition-colors hover:text-accent">
+          <Link href="/services" className="text-[10px] font-black uppercase tracking-[0.45em] text-black/35 transition-colors hover:text-accent">
             Services
           </Link>
-          <Link href="/about" className="text-[10px] font-black uppercase tracking-[0.45em] text-white/35 transition-colors hover:text-accent">
+          <Link href="/about" className="text-[10px] font-black uppercase tracking-[0.45em] text-black/35 transition-colors hover:text-accent">
             About
           </Link>
-          <Link href="/contact" className="text-[10px] font-black uppercase tracking-[0.45em] text-white/35 transition-colors hover:text-accent">
+          <Link href="/contact" className="text-[10px] font-black uppercase tracking-[0.45em] text-black/35 transition-colors hover:text-accent">
             Contact
           </Link>
         </nav>
 
         {/* ── Secondary Footer ── */}
-        <div className="cf-reveal border-t border-white/5 pt-12 md:pt-16">
+        <div className="cf-reveal border-t border-black/5 pt-12 md:pt-16">
           <div className="grid grid-cols-1 gap-10 md:grid-cols-12 md:gap-8">
             <div className="md:col-span-7 flex flex-col gap-6">
               <Link href="/" className="cursor-hover flex flex-col items-start">
-                <span className="text-4xl font-black tracking-tighter text-white">WINCOR</span>
+                <span className="text-4xl font-black tracking-tighter text-foreground">WINCOR</span>
                 <span className="text-[11px] font-bold uppercase tracking-[0.4em] text-accent -mt-1">
                   Agency
                 </span>
               </Link>
 
               <div className="flex items-center gap-4">
-                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20">
+                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-black/20">
                   Time in Colombo:
                 </span>
                 <span className="text-lg font-black italic tracking-widest text-accent/80">
@@ -238,18 +238,18 @@ export default function ContactFooter() {
               </div>
 
               <div className="cf-company-shell mt-3 overflow-hidden">
-                <p className="cf-company-name text-left font-black uppercase leading-[0.78] tracking-tight text-white/90 text-[clamp(2.4rem,10vw,8.5rem)]">
+                <p className="cf-company-name text-left font-black uppercase leading-[0.78] tracking-tight text-black/90 text-[clamp(2.4rem,10vw,8.5rem)]">
                   WINCORE MEDIA
                 </p>
               </div>
             </div>
 
             <div className="md:col-span-5 flex flex-col items-start gap-8 md:items-end md:justify-end">
-              <p className="text-left text-[11px] font-bold uppercase tracking-[0.5em] text-white/30 md:text-right">
+              <p className="text-left text-[11px] font-bold uppercase tracking-[0.5em] text-black/30 md:text-right">
                 Sri Lanka&apos;s AI Native <br />
                 Digital Experience Studio®
               </p>
-              <div className="text-left text-[10px] font-black uppercase tracking-[0.5em] text-white/10 md:text-right">
+              <div className="text-left text-[10px] font-black uppercase tracking-[0.5em] text-black/10 md:text-right">
                 © {new Date().getFullYear()} WINCORE MEDIA. <br />
                 All rights reserved.
               </div>

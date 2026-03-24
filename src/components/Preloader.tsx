@@ -114,11 +114,11 @@ export default function Preloader() {
       <div className="flex justify-between items-start relative z-10">
         <div className="overflow-hidden">
           <span className="preloader-reveal block text-[10px] uppercase tracking-[0.4em] font-black text-accent">
-            WINCOR <span className="text-white/30">Agency</span>
+            WINCOR <span className="text-black/30">Agency</span>
           </span>
         </div>
         <div className="overflow-hidden hidden md:block">
-          <span className="preloader-reveal block text-[10px] uppercase tracking-[0.4em] font-black text-white/10 italic">
+          <span className="preloader-reveal block text-[10px] uppercase tracking-[0.4em] font-black text-black/15 italic">
             Initializing cinematic experience…
           </span>
         </div>
@@ -126,14 +126,14 @@ export default function Preloader() {
 
       <div className="flex flex-col md:flex-row justify-between items-end gap-10 relative z-10">
         <div className="max-w-[820px] overflow-hidden">
-          <h1 className="preloader-reveal text-[14vw] md:text-[7vw] font-black leading-[0.85] uppercase tracking-tighter">
+          <h1 className="preloader-reveal text-[14vw] md:text-[7vw] font-black leading-[0.85] uppercase tracking-tighter text-foreground">
             Success <br />
-            <span className="text-white/10 italic">Designed</span>
+            <span className="text-black/10 italic">Designed</span>
           </h1>
         </div>
 
         <div className="overflow-hidden">
-          <div className="preloader-reveal flex items-baseline gap-4">
+          <div className="preloader-reveal flex items-baseline gap-4 text-foreground">
             <span className="text-[26vw] md:text-[12vw] font-black leading-none italic">
               {percentage}
             </span>
@@ -151,7 +151,7 @@ export default function Preloader() {
 
       <div className="absolute inset-0 opacity-[0.03] pointer-events-none grid grid-cols-12 h-full w-full">
         {Array.from({ length: 12 }).map((_, i) => (
-          <div key={i} className="border-r border-white/20 h-full" />
+          <div key={i} className="border-r border-black/20 h-full" />
         ))}
       </div>
     </div>

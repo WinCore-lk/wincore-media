@@ -176,12 +176,12 @@ export default function FeaturedWorks() {
           <p className="works-kicker mb-4 text-xs font-bold uppercase tracking-[0.4em] text-accent">
             Works
           </p>
-          <p className="works-heading max-w-xl text-3xl font-bold leading-tight text-white md:text-5xl">
+          <p className="works-heading max-w-xl text-3xl font-bold leading-tight text-foreground md:text-5xl">
             Featured campaigns and experiences.
           </p>
         </div>
         <div className="hidden md:block">
-          <span className="text-xs font-medium uppercase tracking-[0.3em] text-white/40">
+          <span className="text-xs font-medium uppercase tracking-[0.3em] text-black/40">
             Horizontal reel · 0{projects.length}
           </span>
         </div>
@@ -194,7 +194,7 @@ export default function FeaturedWorks() {
         {projects.map((project) => (
           <div
             key={project.id}
-            className="project-card group relative flex h-[55vh] w-[75vw] flex-shrink-0 cursor-pointer overflow-hidden rounded-[32px] border border-white/10 bg-black/40 backdrop-blur-sm md:w-[520px]"
+            className="project-card group relative flex h-[55vh] w-[75vw] flex-shrink-0 cursor-pointer overflow-hidden rounded-[32px] border border-black/[0.06] bg-white/40 backdrop-blur-sm md:w-[520px] shadow-[0_30px_60px_rgba(0,0,0,0.05)]"
           >
             <div className="project-image absolute inset-0 h-full w-full transition-transform duration-700">
               <Image
@@ -227,8 +227,8 @@ export default function FeaturedWorks() {
             </div>
 
             {/* Bottom info for when not hovered */}
-            <div className="absolute -bottom-1 left-0 z-20 w-full p-6 text-white transition-opacity duration-300 group-hover:opacity-0">
-              <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">
+            <div className="absolute -bottom-1 left-0 z-20 w-full p-8 text-foreground transition-opacity duration-300 group-hover:opacity-0 bg-gradient-to-t from-white via-white/80 to-transparent">
+              <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.3em] text-black/40">
                 {project.category}
               </p>
               <h3 className="text-lg font-semibold">{project.title}</h3>

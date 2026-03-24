@@ -72,7 +72,7 @@ function ServiceRow({
     <div
       onMouseEnter={onHover}
       onMouseLeave={onLeave}
-      className="sc-service-row group relative border-b border-white/[0.06] py-12 md:py-16"
+      className="sc-service-row group relative border-b border-black/[0.05] py-12 md:py-16"
     >
       {/* Hover background */}
       <div className="absolute inset-0 bg-gradient-to-r from-accent/[0.04] to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
@@ -80,17 +80,17 @@ function ServiceRow({
       <div className="relative z-10 flex flex-col gap-6 md:flex-row md:items-center md:justify-between md:gap-8">
         {/* Number + Title */}
         <div className="flex items-center gap-5 transition-transform duration-500 group-hover:translate-x-4 md:gap-10">
-          <span className="w-10 shrink-0 text-right text-xs font-black italic text-accent/30 transition-colors duration-500 group-hover:text-accent md:w-12">
+          <span className="w-10 shrink-0 text-right text-xs font-black italic text-accent/40 transition-colors duration-500 group-hover:text-accent md:w-12">
             {service.num}
           </span>
-          <h3 className="text-[10vw] font-black uppercase leading-[0.9] tracking-tight text-white/90 transition-colors duration-500 group-hover:text-white sm:text-[8.8vw] md:text-[3.6vw] md:leading-[0.92]">
+          <h3 className="text-[10vw] font-black uppercase leading-[0.9] tracking-tight text-foreground/80 transition-colors duration-500 group-hover:text-foreground sm:text-[8.8vw] md:text-[3.6vw] md:leading-[0.92]">
             {service.title}
           </h3>
         </div>
 
         {/* Desc + CTA */}
         <div className="ml-0 flex flex-col items-start gap-2.5 transition-transform duration-500 group-hover:-translate-x-4 sm:ml-14 md:ml-0 md:items-end md:text-right">
-          <p className="max-w-[40ch] text-sm font-light leading-relaxed text-white/35 transition-colors duration-500 group-hover:text-white/75 md:text-base">
+          <p className="max-w-[40ch] text-sm font-light leading-relaxed text-black/45 transition-colors duration-500 group-hover:text-black/75 md:text-base">
             {service.desc}
           </p>
           <div className="flex translate-y-2 items-center gap-2 text-accent opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100">
@@ -221,7 +221,7 @@ export default function ServiceCards() {
     <section
       id="services"
       ref={sectionRef}
-      className="relative overflow-hidden border-t border-white/5 bg-background py-[12vw] md:py-[9vw]"
+      className="relative overflow-hidden border-t border-black/5 bg-background py-[12vw] md:py-[9vw]"
       aria-label="Capabilities"
     >
       {/* Right-side accent glow */}
@@ -242,15 +242,15 @@ export default function ServiceCards() {
             </p>
             <h2
               ref={headingRef}
-              className="text-[14vw] font-black uppercase leading-[0.8] tracking-tight md:text-[7.4vw]"
+              className="text-[14vw] font-black uppercase leading-[0.8] tracking-tight text-foreground md:text-[7.4vw]"
             >
               Building<br />
-              <span className="text-white/5 italic">Impact</span>
+              <span className="text-black/[0.08] italic">Impact</span>
             </h2>
           </div>
           <p
             ref={subRef}
-            className="sc-header-sub max-w-[40ch] text-base font-light leading-relaxed text-white/38 md:text-xl"
+            className="sc-header-sub max-w-[40ch] text-base font-light leading-relaxed text-black/45 md:text-xl"
           >
             We bridge AI precision with cinematic strategy. Every service is built as a growth layer, not a one-off task.
           </p>
