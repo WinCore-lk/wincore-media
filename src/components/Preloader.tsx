@@ -1,70 +1,109 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { registerGsapPlugins } from "@/lib/motion";
+import { usePreloaderMarkComplete } from "@/context/PreloaderContext";
+
+gsap.registerPlugin(ScrollTrigger);
+
+/** Floating tags — tftl-agency Preloader.tsx pattern */
+const PRELOADER_TAGS: { text: string; bg: string; style: CSSProperties }[] = [
+  { text: "Wincore", bg: "rgba(0,136,204,0.2)", style: { left: "18%", top: "22%" } },
+  { text: "Brand · Motion", bg: "rgba(110,86,58,0.15)", style: { left: "12%", top: "42%" } },
+  { text: "WebGL", bg: "rgba(0,136,204,0.12)", style: { left: "62%", top: "28%" } },
+  { text: "Performance", bg: "rgba(0,0,0,0.06)", style: { right: "14%", bottom: "26%" } },
+];
 
 export default function Preloader() {
   const [percentage, setPercentage] = useState(0);
   const preloaderRef = useRef<HTMLDivElement>(null);
+  const tagRefs = useRef<(HTMLDivElement | null)[]>([]);
   const hasExitedRef = useRef(false);
+  const markPreloaderComplete = usePreloaderMarkComplete();
 
   useEffect(() => {
     registerGsapPlugins();
   }, []);
-  
-  const hasRevealed = useRef(false);
 
-  function finishPreloader() {
+  const finishPreloader = useCallback(() => {
     if (hasExitedRef.current) return;
     hasExitedRef.current = true;
 
     const target = preloaderRef.current;
     if (!target) return;
 
-    const tl = gsap.timeline({
-      onComplete: () => {
-        target.style.display = "none";
-        document.body.style.overflow = "";
-        window.setTimeout(() => ScrollTrigger.refresh(), 150);
-        window.setTimeout(() => ScrollTrigger.refresh(), 600);
-      },
-    });
-
     document.body.style.overflow = "hidden";
 
-    tl.to(".preloader-reveal", {
-      yPercent: -110,
-      skewY: -6,
-      duration: 1.1,
-      stagger: 0.05,
-      ease: "expo.inOut",
-      delay: 0.3,
-    }).to(
-      target,
-      {
-        yPercent: -100,
+    let exitCtx: ReturnType<typeof gsap.context> | undefined;
+    exitCtx = gsap.context(() => {
+      const tl = gsap.timeline({
+        onComplete: () => {
+          target.style.display = "none";
+          document.body.style.overflow = "";
+          markPreloaderComplete();
+          window.setTimeout(() => ScrollTrigger.refresh(), 150);
+          window.setTimeout(() => ScrollTrigger.refresh(), 600);
+          exitCtx?.revert();
+        },
+      });
+
+      tl.to(".preloader-reveal", {
+        yPercent: -110,
+        skewY: -6,
         duration: 1.1,
+        stagger: 0.05,
         ease: "expo.inOut",
-      },
-      "-=0.85",
-    );
-  }
+        delay: 0.3,
+      }).to(
+        target,
+        {
+          yPercent: -100,
+          duration: 1.1,
+          ease: "expo.inOut",
+        },
+        "-=0.85",
+      );
+    }, preloaderRef);
+  }, [markPreloaderComplete]);
 
   useEffect(() => {
-    if (!hasRevealed.current) {
-      gsap.set(".preloader-reveal", { yPercent: 100, skewY: 5 });
-      gsap.to(".preloader-reveal", {
-        yPercent: 0,
-        skewY: 0,
-        duration: 1.4,
-        stagger: 0.08,
-        ease: "expo.out",
-      });
-      hasRevealed.current = true;
-    }
+    if (!preloaderRef.current) return;
 
+    const ctx = gsap.context(() => {
+      const tags = tagRefs.current.filter(Boolean);
+      gsap.set(".preloader-reveal", { yPercent: 100, skewY: 5 });
+
+      const tl = gsap.timeline();
+      tl.from(
+        tags,
+        {
+          autoAlpha: 0,
+          y: 20,
+          duration: 0.6,
+          stagger: 0.12,
+          ease: "power3.out",
+        },
+        0.2,
+      );
+      tl.to(
+        ".preloader-reveal",
+        {
+          yPercent: 0,
+          skewY: 0,
+          duration: 1.4,
+          stagger: 0.08,
+          ease: "expo.out",
+        },
+        0,
+      );
+    }, preloaderRef);
+
+    return () => ctx.revert();
+  }, []);
+
+  useEffect(() => {
     const interval = setInterval(() => {
       setPercentage((prev) => {
         if (prev >= 100) {
@@ -80,7 +119,6 @@ export default function Preloader() {
   }, []);
 
   useEffect(() => {
-    // Fallback: never keep the app blocked if runtime errors interrupt loading.
     const forceComplete = window.setTimeout(() => {
       setPercentage((prev) => (prev < 100 ? 100 : prev));
     }, 5200);
@@ -103,11 +141,29 @@ export default function Preloader() {
     if (percentage === 100) {
       finishPreloader();
     }
-  }, [percentage]);
+  }, [percentage, finishPreloader]);
+
+  // Safety: always unblock the app + hero animations if exit timeline never completes
+  useEffect(() => {
+    const id = window.setTimeout(() => {
+      if (!hasExitedRef.current) {
+        hasExitedRef.current = true;
+        const el = preloaderRef.current;
+        if (el) {
+          el.style.display = "none";
+        }
+        document.body.style.overflow = "";
+        markPreloaderComplete();
+        window.setTimeout(() => ScrollTrigger.refresh(), 100);
+      }
+    }, 6500);
+    return () => window.clearTimeout(id);
+  }, [markPreloaderComplete]);
 
   return (
     <div
       ref={preloaderRef}
+      data-preloader=""
       className="fixed inset-0 z-[9999] bg-background flex flex-col justify-between p-10 md:p-24 overflow-hidden"
       aria-hidden="true"
     >
@@ -154,7 +210,24 @@ export default function Preloader() {
           <div key={i} className="border-r border-black/20 h-full" />
         ))}
       </div>
+
+      {PRELOADER_TAGS.map((t, i) => (
+        <div
+          key={t.text}
+          ref={(el) => {
+            tagRefs.current[i] = el;
+          }}
+          className="preloader-tag pointer-events-none absolute z-[1] hidden sm:block"
+          style={t.style}
+        >
+          <div
+            className="inline-flex items-center rounded-full px-3 py-1.5 text-[0.75rem] font-medium text-foreground/90"
+            style={{ background: t.bg }}
+          >
+            {t.text}
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
-

@@ -280,9 +280,9 @@ export default function ServiceCards() {
           transform: "translate(-50%, -50%)",
           opacity: activeIndex !== null ? 1 : 0,
           scale: activeIndex !== null ? "1" : "0.85",
-          filter: activeIndex !== null ? "blur(0px) brightness(1.1)" : "blur(20px) brightness(0.5)",
+          filter: activeIndex !== null ? "brightness(1.05)" : "brightness(0.65)",
           transition:
-            "opacity 0.8s cubic-bezier(0.16,1,0.3,1), scale 0.8s cubic-bezier(0.16,1,0.3,1), filter 1s ease",
+            "opacity 0.8s cubic-bezier(0.16,1,0.3,1), scale 0.8s cubic-bezier(0.16,1,0.3,1), filter 0.6s ease",
         }}
       >
         {SERVICES.map((s, i) => (
@@ -296,7 +296,7 @@ export default function ServiceCards() {
               transition: "opacity 0.7s ease, scale 1.2s cubic-bezier(0.16,1,0.3,1), filter 0.8s ease",
             }}
           >
-            <Image src={s.image} alt={s.title} fill className="object-cover" sizes="440px" />
+            <Image src={s.image} alt={s.title} fill className="object-cover" sizes="440px" quality={90} />
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
           </div>
         ))}

@@ -137,16 +137,14 @@ export default function WorkCarousel() {
                 const maxDistance = window.innerWidth;
                 
                 const normalizedDistance = Math.min(distanceFromCenter / maxDistance, 1);
-                const scale = 1 - normalizedDistance * 0.18;
-                const blur = normalizedDistance * 10;
-                const opacity = 1 - normalizedDistance * 0.4;
-                
-                gsap.set(card, { 
-                  scale, 
-                  filter: `blur(${blur}px)`,
+                const scale = 1 - normalizedDistance * 0.12;
+                const opacity = 1; // Always show full opacity per user request
+
+                gsap.set(card, {
+                  scale,
                   opacity,
                   transformPerspective: 1200,
-                  rotateY: (cardCenter - center) * 0.02
+                  rotateY: (cardCenter - center) * 0.02,
                 });
               });
             },
@@ -233,12 +231,12 @@ export default function WorkCarousel() {
         ref={pinRef}
         className={`relative z-[1] w-full ${useHorizontal ? "h-[85vh] overflow-hidden" : "h-auto overflow-visible"}`}
       >
-        <div ref={trackRef} className={useHorizontal ? "flex h-full w-max will-change-transform" : "grid grid-cols-1 gap-12 px-4 pb-20"}>
+        <div ref={trackRef} className={useHorizontal ? "flex h-full w-max will-change-transform" : "grid grid-cols-1 gap-12 px-5 pb-24 sm:px-6 md:px-8"}>
           {PROJECTS.map((project, i) => (
             <div
               key={project.id}
               className={useHorizontal
-                ? "box-border flex h-full w-[100vw] flex-shrink-0 items-center justify-center px-4 md:px-20"
+                ? "box-border flex h-full w-[100vw] flex-shrink-0 items-center justify-center px-5 sm:px-8 md:px-16 lg:px-24"
                 : "relative w-full aspect-video"}
             >
               <button
@@ -250,14 +248,16 @@ export default function WorkCarousel() {
                   src={project.image}
                   alt={project.title}
                   fill
-                  className="object-cover transition-transform duration-1000 group-hover:scale-[1.05] saturate-[1.2]"
+                  className="object-cover transition-transform duration-1000 group-hover:scale-[1.03] saturate-[1.05]"
                   sizes="100vw"
+                  quality={90}
                   priority={i === 0}
+                  loading={i === 0 ? undefined : "lazy"}
                 />
                 <div className="wc-shine pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500" />
                 <div className="absolute inset-0 bg-gradient-to-t from-white via-white/20 to-transparent" />
                 
-                <div className="absolute bottom-12 left-12 right-12 z-10">
+                <div className="absolute bottom-14 left-8 right-8 z-10 sm:bottom-16 sm:left-12 sm:right-12 md:left-14 md:right-14">
                   <span className="text-accent uppercase tracking-[0.5em] font-black text-[10px] mb-4 block">
                     {project.category}
                   </span>

@@ -61,24 +61,37 @@ export default function Header() {
     <>
       <header
         ref={headerRef}
-        className="fixed top-0 left-0 z-[100] flex w-full items-center justify-between border-b border-black/[0.06] bg-background/80 px-6 py-5 backdrop-blur-xl md:px-10"
+        className="fixed top-0 left-0 z-[100] flex w-full items-center justify-between border-b border-black/[0.06] bg-background/80 px-5 py-5 backdrop-blur-xl sm:px-8 md:px-12"
       >
-        <Link href="/" className="group flex flex-col items-start" onClick={() => setIsMenuOpen(false)}>
-          <span className="text-2xl font-black tracking-tighter text-foreground md:text-3xl">WINCOR</span>
-          <span className="-mt-1 text-[10px] font-bold uppercase tracking-[0.3em] text-accent">Agency</span>
+        <Link href="/" className="group flex items-center gap-1.5 md:gap-2.5 transition-transform hover:scale-[1.02]" onClick={() => setIsMenuOpen(false)}>
+          <span className="text-xl md:text-2xl lg:text-3xl font-extrabold tracking-tight text-foreground">
+            WINCOR
+          </span>
+          <span className="flex h-4 items-center rounded bg-black/5 px-1.5 text-[8px] font-bold uppercase tracking-[0.1em] text-black/60 md:h-5 md:px-2 md:text-[10px]">
+            Agency
+          </span>
         </Link>
 
-        <nav className="hidden items-center gap-10 md:flex" aria-label="Primary">
-          {NAV.map((item) => (
+        <div className="flex md:gap-8 items-center">
+          <nav className="hidden items-center gap-8 md:flex" aria-label="Primary">
+            {NAV.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className="cursor-hover text-xs font-bold uppercase tracking-[0.35em] text-black/40 transition-colors hover:text-black"
+              className="cursor-hover relative text-xs font-bold uppercase tracking-[0.2em] text-black/50 transition-colors pb-1 hover:text-black after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-0 after:bg-black after:transition-all after:duration-300 hover:after:w-full"
             >
               {item.label}
             </Link>
-          ))}
-        </nav>
+            ))}
+          </nav>
+          
+          <Link
+            href="/contact"
+            className="hidden items-center justify-center rounded-full bg-foreground px-5 py-2.5 text-[10px] font-black uppercase tracking-[0.2em] text-white transition-transform hover:scale-105 md:flex"
+          >
+            Start Project
+          </Link>
+        </div>
 
         <button
           type="button"
@@ -100,7 +113,7 @@ export default function Header() {
         )}
         aria-hidden={!isMenuOpen}
       >
-        <nav className="flex h-full flex-col items-center justify-center gap-10 px-6" aria-label="Mobile primary">
+        <nav className="flex h-full flex-col items-center justify-center gap-8 px-6 pt-24 pb-12 overflow-y-auto" aria-label="Mobile primary">
           {NAV.map((item) => (
             <Link
               key={item.href}

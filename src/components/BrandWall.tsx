@@ -29,7 +29,6 @@ export default function BrandWall() {
               y: (i % 2 === 0 ? 50 : -50),
               rotateX: (i % 2 === 0 ? 15 : -15),
               opacity: 0,
-              filter: "blur(20px)"
           });
       });
 
@@ -39,7 +38,6 @@ export default function BrandWall() {
         },
         {
           opacity: 1,
-          filter: "blur(0px)",
           duration: 1.6,
           stagger: 0.08,
           ease: "expo.out",
@@ -92,7 +90,7 @@ export default function BrandWall() {
       className="relative py-12 md:py-16 bg-background overflow-hidden"
     >
       <div className="_container relative z-10">
-        <div className="mb-32 text-center max-w-4xl mx-auto">
+        <div className="mb-16 md:mb-24 text-center max-w-4xl mx-auto">
           <span className="mb-6 inline-block text-[11px] font-black uppercase tracking-[0.8em] text-accent/60">Legacy Partners</span>
           <h2 className="font-heading text-6xl md:text-8xl lg:text-9xl font-black uppercase leading-[0.85] tracking-tighter text-foreground">
             Driven by the <br />
@@ -104,7 +102,7 @@ export default function BrandWall() {
           {brands.map((brand, i) => (
             <div 
               key={i}
-              className="brand-item group relative w-40 h-24 md:w-64 md:h-40 flex items-center justify-center rounded-[2rem] border border-black/5 bg-gradient-to-br from-black/[0.02] to-transparent backdrop-blur-2xl transition-all duration-700 hover:border-accent/40 hover:bg-black/[0.02] will-change-transform"
+              className="brand-item group relative w-40 h-24 md:w-64 md:h-40 flex items-center justify-center rounded-[2rem] border border-black/5 bg-gradient-to-br from-white/90 to-black/[0.02] transition-all duration-700 hover:border-accent/40 hover:bg-white will-change-transform"
             >
               <div className="brand-shine absolute inset-0 bg-gradient-to-tr from-accent/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-[2rem]" />
               <div className="absolute inset-0 rounded-[2rem] bg-[radial-gradient(circle_at_center,rgba(0,0,0,0.03),transparent_70%)] opacity-0 group-hover:opacity-100 transition-opacity" />

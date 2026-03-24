@@ -3,9 +3,13 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { usePathname } from "next/navigation";
 import Lenis from "lenis";
+import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { LenisProvider } from "@/context/LenisContext";
+import { PreloaderProvider } from "@/context/PreloaderContext";
 import { registerGsapPlugins } from "@/lib/motion";
+
+gsap.registerPlugin(ScrollTrigger);
 
 export default function ClientProvider({ children }: { children: ReactNode }) {
   const pathname = usePathname();
@@ -59,13 +63,12 @@ export default function ClientProvider({ children }: { children: ReactNode }) {
     // ScrollTriggers created throughout the app.
     ScrollTrigger.defaults({ scroller: document.documentElement });
 
-    // RAF loop — Lenis is set to autoRaf:false so we drive it manually.
-    let rafId = 0;
-    function raf(time: number) {
-      instance.raf(time);
-      rafId = requestAnimationFrame(raf);
-    }
-    rafId = requestAnimationFrame(raf);
+    // Drive Lenis from GSAP's ticker so ScrollTrigger and Lenis share one clock.
+    const onTicker = (time: number) => {
+      instance.raf(time * 1000);
+    };
+    gsap.ticker.add(onTicker);
+    gsap.ticker.lagSmoothing(0);
 
     // Expose lenis to React context — this is the signal that PageMotion
     // components wait for before setting up their scroll triggers.
@@ -86,7 +89,7 @@ export default function ClientProvider({ children }: { children: ReactNode }) {
     const tLoad = window.setTimeout(refreshAll, 1200);
 
     return () => {
-      cancelAnimationFrame(rafId);
+      gsap.ticker.remove(onTicker);
       window.removeEventListener("resize", onResize);
       instance.destroy();
       lenisRef.current = null;
@@ -109,5 +112,9 @@ export default function ClientProvider({ children }: { children: ReactNode }) {
     };
   }, [pathname, lenis]);
 
-  return <LenisProvider value={lenis}>{children}</LenisProvider>;
+  return (
+    <LenisProvider value={lenis}>
+      <PreloaderProvider>{children}</PreloaderProvider>
+    </LenisProvider>
+  );
 }

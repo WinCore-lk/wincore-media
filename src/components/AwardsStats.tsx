@@ -123,13 +123,12 @@ export default function AwardsStats() {
         
         gsap.fromTo(
           card,
-          { 
-            opacity: 0, 
-            x: isEven ? -140 : 140, 
+          {
+            opacity: 0,
+            x: isEven ? -140 : 140,
             y: 30,
             skewY: isEven ? -6 : 6,
             rotateY: isEven ? 20 : -20,
-            filter: "blur(12px) contrast(1.1)",
             scale: 0.9,
             transformPerspective: 1800,
           },
@@ -139,7 +138,6 @@ export default function AwardsStats() {
             y: 0,
             skewY: 0,
             rotateY: 0,
-            filter: "blur(0px) contrast(1)",
             scale: 1,
             duration: 1.45,
             ease: "expo.out",
@@ -166,7 +164,7 @@ export default function AwardsStats() {
   return (
     <section
       ref={sectionRef}
-      className="relative overflow-visible border-t border-black/5 bg-background pb-[15vw] pt-[15vw]"
+      className="relative overflow-visible border-t border-black/5 bg-background pb-[min(12rem,18vw)] pt-[min(12rem,18vw)] md:pb-[min(14rem,16vw)] md:pt-[min(14rem,16vw)]"
       aria-label="Awards and stats"
     >
       {/* Ambient glows */}
@@ -201,13 +199,13 @@ export default function AwardsStats() {
               className="aw-card-wrapper perspective-[2000px]"
             >
               <div
-                className="aw-card group relative min-h-[340px] md:min-h-[460px] overflow-hidden rounded-[3rem] border border-black/[0.06] bg-gradient-to-br from-white via-white/80 to-black/[0.01] p-10 md:p-20 shadow-[0_45px_100px_rgba(0,0,0,0.04),inset_0_1px_0_rgba(255,255,255,0.8)] backdrop-blur-3xl transition-all duration-700 hover:border-accent/30 hover:shadow-[0_60px_120px_rgba(0,191,255,0.06)] will-change-transform"
+                className="aw-card group relative min-h-[340px] md:min-h-[460px] overflow-hidden rounded-[3rem] border border-black/[0.06] bg-gradient-to-br from-white via-white/80 to-black/[0.01] px-12 py-14 shadow-[0_45px_100px_rgba(0,0,0,0.04),inset_0_1px_0_rgba(255,255,255,0.8)] backdrop-blur-3xl transition-all duration-700 hover:border-accent/30 hover:shadow-[0_60px_120px_rgba(0,191,255,0.06)] will-change-transform md:px-16 md:py-16 lg:px-24 lg:py-24"
               >
                 {/* Dynamic Shine Trail */}
                 <div className="absolute inset-0 z-0 bg-gradient-to-tr from-accent/[0.03] via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
                 
                 {/* Subtle Background Image Context */}
-                <div className="absolute inset-0 z-0 opacity-[0.03] grayscale contrast-125 transition-all duration-[1.5s] group-hover:opacity-[0.07] group-hover:scale-105">
+                <div className="absolute inset-0 z-0 opacity-[0.06] mix-blend-multiply grayscale contrast-125 transition-all duration-[1.5s] group-hover:opacity-[0.2] group-hover:grayscale-[40%] group-hover:scale-105">
                   <Image
                     src={stat.image}
                     alt=""
@@ -240,7 +238,7 @@ export default function AwardsStats() {
                   <div className={`grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-16 items-center ${i % 2 !== 0 ? 'md:flex-row-reverse' : ''}`}>
                     {/* Big Projection Number with Vision Stroke */}
                     <div className={`md:col-span-6 flex items-baseline relative ${i % 2 !== 0 ? 'md:justify-end' : ''}`}>
-                      <div className="absolute -left-12 -top-12 text-[14rem] font-black text-transparent [-webkit-text-stroke:1px_rgba(0,0,0,0.03)] select-none leading-none md:text-[18rem]">
+                      <div className="absolute -left-12 -top-12 text-[14rem] font-black text-transparent [-webkit-text-stroke:1px_rgba(0,0,0,0.08)] select-none leading-none md:text-[18rem]">
                         {stat.value}
                       </div>
                       <div className="flex items-baseline relative z-10 transition-transform duration-700 group-hover:scale-105">

@@ -20,7 +20,12 @@ export type Project = {
   link: string;
 };
 
-import GrainOverlay from "@/components/GrainOverlay";
+function descriptionParagraphs(text: string) {
+  return text
+    .split(/\n+/)
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
 
 export default function ProjectModal({
   project,
@@ -32,67 +37,74 @@ export default function ProjectModal({
   onClose: () => void;
 }) {
   const modalRef = useRef<HTMLDivElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
     if (!isOpen) return;
 
     const ctx = gsap.context(() => {
-      // Reset states
       gsap.set(".modal-bg", { opacity: 0 });
-      gsap.set(".modal-content", { y: 60, opacity: 0, scale: 0.98, filter: "blur(10px)" });
-      gsap.set(".stagger-item", { y: 30, opacity: 0 });
-      gsap.set(".image-reveal", { scale: 1.15, opacity: 0, filter: "contrast(1.2) brightness(0.8)" });
-      gsap.set(".meta-item", { x: -25, opacity: 0 });
+      gsap.set(".modal-content", { y: 40, opacity: 0, scale: 0.98 });
+      gsap.set(".stagger-item", { y: 24, opacity: 0 });
+      gsap.set(".image-reveal", { scale: 1.02, opacity: 0 });
+      gsap.set(".meta-item", { y: 16, opacity: 0 });
       gsap.set(".close-btn", { scale: 0, opacity: 0 });
 
       const tl = gsap.timeline({ defaults: { ease: "expo.out" } });
 
       tl.to(".modal-bg", {
         opacity: 1,
-        duration: 1,
+        duration: 0.55,
       })
-      .to(".modal-content", {
-        y: 0,
-        opacity: 1,
-        scale: 1,
-        filter: "blur(0px)",
-        duration: 1.4,
-      }, "-=0.6")
-      .to(".image-reveal", {
-        scale: 1,
-        opacity: 1,
-        filter: "contrast(1) brightness(1)",
-        duration: 1.8,
-        ease: "power3.out"
-      }, "-=1.2")
-      .to(".stagger-item", {
-        y: 0,
-        opacity: 1,
-        duration: 1,
-        stagger: 0.12,
-      }, "-=1.4")
-      .to(".meta-item", {
-        x: 0,
-        opacity: 1,
-        duration: 0.8,
-        stagger: 0.1,
-      }, "-=1.2")
-      .to(".close-btn", {
-        scale: 1,
-        opacity: 1,
-        duration: 0.8,
-        ease: "back.out(1.7)"
-      }, "-=1.5");
-
-      // Floating animation for image
-      gsap.to(".image-reveal img", {
-        yPercent: 3,
-        duration: 8,
-        repeat: -1,
-        yoyo: true,
-        ease: "sine.inOut"
-      });
+        .to(
+          ".modal-content",
+          {
+            y: 0,
+            opacity: 1,
+            scale: 1,
+            duration: 0.75,
+          },
+          "-=0.35",
+        )
+        .to(
+          ".image-reveal",
+          {
+            scale: 1,
+            opacity: 1,
+            duration: 0.9,
+            ease: "power3.out",
+          },
+          "-=0.55",
+        )
+        .to(
+          ".stagger-item",
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.65,
+            stagger: 0.08,
+          },
+          "-=0.5",
+        )
+        .to(
+          ".meta-item",
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.5,
+            stagger: 0.06,
+          },
+          "-=0.45",
+        )
+        .to(
+          ".close-btn",
+          {
+            scale: 1,
+            opacity: 1,
+            duration: 0.45,
+            ease: "back.out(1.6)",
+          },
+          "-=0.6",
+        );
     }, modalRef);
 
     return () => ctx.revert();
@@ -119,145 +131,135 @@ export default function ProjectModal({
 
   if (!project) return null;
 
+  const parsedDescription = descriptionParagraphs(project.description);
+  const bodyCopy =
+    parsedDescription.length > 0
+      ? parsedDescription
+      : [
+          "Strategic storytelling, motion, and interface craft — built for measurable outcomes.",
+        ];
+
   return (
     <div
       ref={modalRef}
-      className={`fixed inset-0 z-[2000] flex items-center justify-center p-0 md:p-6 lg:p-12 transition-all duration-500 ${isOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
+      className={`fixed inset-0 z-[2000] flex items-start justify-center overflow-y-auto overscroll-contain p-4 sm:p-6 md:items-center md:p-10 lg:p-12 transition-all duration-300 ${
+        isOpen ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
+      }`}
       role="dialog"
       aria-modal="true"
       aria-label={`Project: ${project.title}`}
     >
-      {/* Background Overlay */}
-      <div 
-        className="modal-bg absolute inset-0 bg-black/95 backdrop-blur-3xl"
-        onMouseDown={onClose}
-      />
+      <div className="modal-bg absolute inset-0 bg-black/50 backdrop-blur-md" onMouseDown={onClose} />
 
-      {/* Modal Container */}
-      <div 
-        ref={contentRef}
-        className="modal-content relative w-full max-w-[1400px] h-full md:h-auto max-h-full overflow-hidden bg-[#0a0a0a] md:rounded-[2.5rem] border border-white/10 shadow-[0_50px_100px_rgba(0,0,0,0.9)] flex flex-col lg:flex-row"
+      <div
+        className="modal-content relative z-[1] my-auto flex w-full max-w-[min(100%,1280px)] flex-col overflow-hidden rounded-[1.35rem] border border-black/10 bg-background shadow-[0_48px_120px_rgba(0,0,0,0.14)] sm:rounded-2xl lg:my-6 lg:max-h-[min(94dvh,960px)] lg:flex-row lg:rounded-[2rem]"
       >
-        {/* Close Button */}
         <button
           type="button"
           onClick={onClose}
-          className="absolute top-6 right-6 z-[2010] w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white hover:text-black transition-all group backdrop-blur-md"
+          className="close-btn group absolute right-4 top-4 z-[2010] flex h-12 w-12 items-center justify-center rounded-full border border-black/10 bg-background/95 text-foreground shadow-sm backdrop-blur-sm transition-colors hover:bg-foreground hover:text-background sm:right-6 sm:top-6 lg:right-7 lg:top-7"
           aria-label="Close project modal"
         >
-          <X className="w-5 h-5 group-hover:rotate-90 transition-transform duration-500" />
+          <X className="h-5 w-5 transition-transform duration-300 group-hover:rotate-90" />
         </button>
 
-        {/* Left: Image / Visual Section */}
-        <div className="relative w-full lg:w-3/5 h-[40vh] lg:h-auto overflow-hidden bg-zinc-900">
-          <div className="image-reveal absolute inset-0">
-            <Image 
-              src={project.image} 
-              alt={project.title} 
-              fill 
-              className="object-cover"
-              sizes="(max-width: 1024px) 100vw, 60vw"
-              priority
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent opacity-60" />
-            <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a]/40 via-transparent to-transparent hidden lg:block" />
-          </div>
-          
-          {/* Subtle decoration */}
-          <div className="absolute bottom-8 left-8 right-8 flex items-end justify-between stagger-item">
-            <div className="hidden md:block">
-              <span className="text-[10px] font-black uppercase tracking-[0.4em] text-black/40 mb-2 block">Visual identity</span>
-              <div className="h-px w-24 bg-accent/30" />
+        {/* Image — tall enough, contain so nothing is cropped off-frame */}
+        <div className="relative flex w-full shrink-0 flex-col bg-muted lg:w-[47%] lg:min-h-0 lg:min-w-0 lg:border-r lg:border-black/8 lg:self-stretch">
+          <div className="relative aspect-[16/11] w-full sm:aspect-[16/10] lg:aspect-auto lg:h-full lg:min-h-[min(66vh,580px)]">
+            <div className="image-reveal absolute inset-0">
+              <Image
+                src={project.image}
+                alt={project.title}
+                fill
+                className="object-contain object-center p-6 sm:p-8 lg:p-10"
+                sizes="(max-width: 1024px) 100vw, 46vw"
+                priority
+              />
+              <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-background/90 via-background/20 to-transparent lg:from-background/70" />
             </div>
+          </div>
+
+          <div className="pointer-events-none absolute bottom-6 left-6 right-6 sm:bottom-8 sm:left-8 stagger-item md:block">
+            <span className="mb-2 block text-[10px] font-black uppercase tracking-[0.35em] text-foreground/50">
+              Visual identity
+            </span>
+            <div className="h-px w-20 bg-accent/50" />
           </div>
         </div>
 
-        {/* Right: Content Section */}
-        <div className="w-full lg:w-2/5 p-8 md:p-12 lg:p-16 overflow-y-auto scrollbar-hide flex flex-col">
-          <div className="mb-auto">
-            <div className="stagger-item">
-              <span className="text-accent uppercase tracking-[0.4em] font-black text-[10px] mb-4 block">
-                Case Study / {project.category}
-              </span>
-              <h2 className="text-4xl md:text-5xl lg:text-3xl font-black leading-[0.95] mb-8 text-foreground uppercase tracking-tighter">
+        {/* Copy + meta — scrolls independently on short viewports */}
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto">
+          <div className="flex flex-1 flex-col gap-10 px-8 pb-14 pt-[5rem] sm:gap-11 sm:px-12 sm:pb-16 sm:pt-[4.75rem] lg:gap-12 lg:px-16 lg:pb-20 lg:pt-20">
+            <header className="stagger-item space-y-4">
+              <p className="text-[11px] font-black uppercase tracking-[0.32em] text-accent">
+                Case study · {project.category}
+              </p>
+              <h2 className="break-words text-[1.85rem] font-black uppercase leading-[1.08] tracking-tight text-foreground sm:text-[2.1rem] lg:text-[2.25rem]">
                 {project.title}
               </h2>
+            </header>
+
+            <div className="stagger-item space-y-5 text-[16px] font-light leading-[1.65] text-foreground/75 sm:text-[17px] lg:leading-[1.7]">
+              {bodyCopy.map((para, i) => (
+                <p key={i} className="max-w-prose">
+                  {para}
+                </p>
+              ))}
             </div>
 
-            <div className="space-y-6 text-black/50 text-base md:text-lg font-light leading-relaxed stagger-item">
-              <p>
-                A cinematic creative solution crafted by Wincore Agency. We combined strategic storytelling with immersive motion and luxury-grade UI to drive measurable outcomes.
-              </p>
-              <p>
-                Built with Next.js, Three.js, and GSAP, the experience balances performance with high-end interaction design.
-              </p>
-            </div>
-
-            <div className="mt-10 flex flex-wrap gap-2.5 stagger-item">
+            <div className="stagger-item flex flex-wrap gap-2.5 sm:gap-3">
               {project.tags.map((tag) => (
                 <span
                   key={tag}
-                  className="text-[9px] uppercase tracking-widest font-bold px-4 py-2 bg-black/5 rounded-full border border-black/10 text-black/70 hover:bg-accent/10 hover:border-accent/30 transition-colors"
+                  className="inline-flex items-center rounded-full border border-black/10 bg-black/[0.03] px-4 py-2.5 text-[10px] font-bold uppercase tracking-wider text-foreground/85 sm:px-5 sm:py-2.5"
                 >
                   {tag}
                 </span>
               ))}
             </div>
 
-            {/* Meta Grid */}
-            <div className="mt-16 grid grid-cols-2 gap-x-8 gap-y-10 pt-10 border-t border-black/5">
-              <div className="meta-item">
-                <div className="flex items-center gap-2 mb-3">
-                  <Calendar className="w-3.5 h-3.5 text-accent" />
-                  <h4 className="text-[10px] uppercase tracking-[0.2em] font-black text-black/30">Duration</h4>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 md:gap-6">
+              {[
+                { icon: Calendar, label: "Duration", value: project.duration },
+                { icon: Briefcase, label: "Role", value: project.role },
+                { icon: Code2, label: "Stack", value: project.stack },
+                { icon: Rocket, label: "Impact", value: project.impact },
+              ].map(({ icon: Icon, label, value }) => (
+                <div
+                  key={label}
+                  className="meta-item rounded-2xl border border-black/8 bg-black/[0.02] px-6 py-8 sm:px-7 sm:py-9 md:px-8 md:py-10"
+                >
+                  <div className="mb-3.5 flex items-center gap-2.5 text-[10px] font-black uppercase tracking-[0.18em] text-foreground/50">
+                    <Icon className="h-4 w-4 shrink-0 text-accent" aria-hidden />
+                    {label}
+                  </div>
+                  <p className="break-words text-[15px] font-medium leading-snug text-foreground sm:text-base">
+                    {value}
+                  </p>
                 </div>
-                <p className="text-sm font-medium text-black/90">{project.duration}</p>
-              </div>
-              
-              <div className="meta-item">
-                <div className="flex items-center gap-2 mb-3">
-                  <Briefcase className="w-3.5 h-3.5 text-accent" />
-                  <h4 className="text-[10px] uppercase tracking-[0.2em] font-black text-black/30">Role</h4>
-                </div>
-                <p className="text-sm font-medium text-black/90">{project.role}</p>
-              </div>
-
-              <div className="meta-item">
-                <div className="flex items-center gap-2 mb-3">
-                  <Code2 className="w-3.5 h-3.5 text-accent" />
-                  <h4 className="text-[10px] uppercase tracking-[0.2em] font-black text-black/30">Stack</h4>
-                </div>
-                <p className="text-sm font-medium text-black/90">{project.stack}</p>
-              </div>
-
-              <div className="meta-item">
-                <div className="flex items-center gap-2 mb-3">
-                  <Rocket className="w-3.5 h-3.5 text-accent" />
-                  <h4 className="text-[10px] uppercase tracking-[0.2em] font-black text-black/30">Impact</h4>
-                </div>
-                <p className="text-sm font-medium text-black/90">{project.impact}</p>
-              </div>
+              ))}
             </div>
           </div>
 
-          {/* Action Footer */}
-          <div className="mt-16 pt-8 flex flex-col sm:flex-row gap-4 stagger-item">
+          <div className="stagger-item mt-auto flex flex-col gap-4 border-t border-black/8 bg-background/95 px-8 py-10 sm:flex-row sm:gap-5 sm:px-12 sm:py-12 lg:px-16 lg:py-12">
             <Link
               href="/contact"
-              className="group relative flex-1 inline-flex items-center justify-center gap-3 rounded-2xl bg-accent px-8 py-5 text-[11px] font-black uppercase tracking-[0.3em] text-white overflow-hidden transition-all hover:scale-[1.02] active:scale-[0.98]"
+              className="group relative inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-accent px-8 py-4 text-[10px] font-black uppercase tracking-[0.28em] text-white transition-transform hover:scale-[1.01] active:scale-[0.99] sm:py-5"
               onClick={onClose}
             >
-              <div className="absolute inset-0 bg-white/20 translate-y-full transition-transform duration-500 group-hover:translate-y-0" />
               <span className="relative z-10">Start a project</span>
-              <ArrowRight className="relative z-10 w-4 h-4 transition-transform group-hover:translate-x-1" />
+              <ArrowRight className="relative z-10 h-4 w-4 transition-transform group-hover:translate-x-0.5" />
             </Link>
-            
-            <button
-              className="group flex items-center justify-center gap-3 rounded-2xl border border-black/10 px-8 py-5 text-[11px] font-black uppercase tracking-[0.3em] text-black/60 hover:bg-black/5 hover:text-black transition-all"
+
+            <a
+              href={project.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl border border-black/12 bg-background px-8 py-4 text-[10px] font-black uppercase tracking-[0.28em] text-foreground/75 transition-colors hover:border-accent/40 hover:text-foreground sm:py-5"
             >
-              <span>Live Site</span>
-              <ExternalLink className="w-4 h-4 opacity-40 group-hover:opacity-100 transition-opacity" />
-            </button>
+              Live site
+              <ExternalLink className="h-4 w-4 opacity-60" />
+            </a>
           </div>
         </div>
       </div>

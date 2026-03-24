@@ -9,11 +9,11 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: "#0A0A0A",
-        foreground: "#FFFFFF",
-        accent: "#00BFFF",
-        secondary: "#D4AF77",
-        muted: "#1A1A1A",
+        background: "#ffffff",
+        foreground: "#0a0a0a",
+        accent: "#0088cc",
+        secondary: "#6e563a",
+        muted: "#f4f4f5",
       },
       fontFamily: {
         sans: ["var(--font-satoshi)", "Inter", "sans-serif"],

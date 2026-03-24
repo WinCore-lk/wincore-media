@@ -54,7 +54,7 @@ export default function WorksModernStats() {
       const items = gsap.utils.toArray(".stat-panel");
       const xPercent = -100 * (items.length - 1);
 
-      gsap.to(items, {
+      const scrollTween = gsap.to(items, {
         xPercent: xPercent,
         ease: "none",
         scrollTrigger: {
@@ -77,7 +77,7 @@ export default function WorksModernStats() {
           ease: "none",
           scrollTrigger: {
             trigger: item,
-            containerAnimation: gsap.getById("stat-scroll"), // note: will need an id or use the tween
+            containerAnimation: scrollTween,
             start: "left center",
             end: "right center",
             scrub: true,
@@ -89,6 +89,7 @@ export default function WorksModernStats() {
           ease: "none",
           scrollTrigger: {
             trigger: item,
+            containerAnimation: scrollTween,
             start: "left right",
             end: "right left",
             scrub: true,
@@ -120,26 +121,26 @@ export default function WorksModernStats() {
                 src={stat.image} 
                 alt="" 
                 fill 
-                className="object-cover opacity-15 saturate-125 brightness-110" 
+                className="object-cover opacity-100" 
               />
-              <div className={`absolute inset-0 bg-gradient-to-r from-white via-transparent to-white`} />
+              <div className="absolute inset-0 bg-black/50" />
             </div>
 
             {/* Content */}
             <div className="stat-text relative z-10 text-center px-4 max-w-4xl">
-              <span className="mb-6 inline-block text-[10px] font-black uppercase tracking-[0.8em] text-accent/60">
+              <span className="mb-6 inline-block text-[10px] font-black uppercase tracking-[0.8em] text-accent">
                 Metric {i + 1}
               </span>
-              <h2 className="font-heading text-[22vw] md:text-[18vw] font-black uppercase leading-none tracking-tighter text-foreground">
+              <h2 className="font-heading text-[22vw] md:text-[18vw] font-black uppercase leading-none tracking-tighter text-white">
                 {stat.value}
-                <span className="text-black/5">{stat.suffix}</span>
+                <span className="text-white/50">{stat.suffix}</span>
               </h2>
               <div className="mt-8 flex flex-col items-center">
-                <p className="text-xl md:text-3xl font-black uppercase tracking-tight text-foreground mb-4">
+                <p className="text-xl md:text-3xl font-black uppercase tracking-tight text-white mb-4">
                   {stat.label}
                 </p>
-                <div className="h-px w-24 bg-accent/20 mb-6" />
-                <p className="mx-auto max-w-lg text-base md:text-lg font-light leading-relaxed text-black/40">
+                <div className="h-px w-24 bg-accent/50 mb-6" />
+                <p className="mx-auto max-w-lg text-base md:text-lg font-medium leading-relaxed text-white/80">
                   {stat.desc}
                 </p>
               </div>

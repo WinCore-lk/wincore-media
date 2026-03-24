@@ -86,23 +86,6 @@ export default function ContactFooter() {
         },
       );
 
-      gsap.fromTo(
-        ".cf-form-shell",
-        { y: reduced ? 0 : 40, opacity: reduced ? 1 : 0 },
-        {
-          y: 0,
-          opacity: 1,
-          duration: reduced ? 0 : 1,
-          ease: "expo.out",
-          clearProps: "transform,opacity",
-          scrollTrigger: {
-            trigger: ".cf-form-shell",
-            scroller,
-            start: "top 88%",
-            once: true,
-          },
-        },
-      );
 
       const reveals = gsap.utils.toArray<HTMLElement>(".cf-reveal");
       reveals.forEach((el, i) => {
@@ -171,7 +154,7 @@ export default function ContactFooter() {
           <div className="cf-contact-block relative z-20">
             <a
               href="mailto:hello@wincore.media"
-              className="group relative flex items-center gap-6 overflow-hidden rounded-full border border-black/10 bg-black/[0.03] py-4 pl-8 pr-4 backdrop-blur-xl transition-all duration-500 hover:border-accent/50 hover:bg-black/[0.05]"
+              className="group relative flex items-center gap-6 overflow-hidden rounded-full border border-black/10 bg-white/60 py-5 pl-10 pr-5 shadow-[0_4px_24px_rgba(0,0,0,0.03)] backdrop-blur-xl transition-all duration-500 hover:border-accent/50 hover:bg-white/80 hover:shadow-[0_8px_32px_rgba(0,191,255,0.15)]"
             >
               <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-accent/20 to-transparent transition-transform duration-500 group-hover:translate-x-0" />
               <span className="relative z-10 text-sm font-bold uppercase tracking-widest text-black/90 transition-colors group-hover:text-foreground md:text-xl">

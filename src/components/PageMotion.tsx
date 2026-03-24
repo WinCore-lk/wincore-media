@@ -2,13 +2,17 @@
 
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useLenis } from "@/context/LenisContext";
+import { usePreloaderDone } from "@/context/PreloaderContext";
 import {
   registerGsapPlugins,
   getScroller,
   scheduleScrollTriggerRefresh,
   prefersReducedMotion,
 } from "@/lib/motion";
+
+gsap.registerPlugin(ScrollTrigger);
 
 type PageMotionProps = {
   children: React.ReactNode;
@@ -17,6 +21,7 @@ type PageMotionProps = {
 export default function PageMotion({ children }: PageMotionProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const lenis = useLenis();
+  const preloaderDone = usePreloaderDone();
   // Track whether we've already set up animations for this mount to avoid
   // double-initialisation when StrictMode double-invokes effects.
   const animatedRef = useRef(false);
@@ -27,7 +32,7 @@ export default function PageMotion({ children }: PageMotionProps) {
     // Block until Lenis + scrollerProxy are both wired inside ClientProvider.
     // lenis becomes truthy only AFTER scrollerProxy is configured, so this
     // single guard is sufficient.
-    if (!lenis) return;
+    if (!lenis || !preloaderDone) return;
 
     // Reset guard when lenis instance recreates (e.g. route change).
     animatedRef.current = false;
@@ -51,9 +56,7 @@ export default function PageMotion({ children }: PageMotionProps) {
       // autoAlpha:0 guarantees visibility:hidden (no paint) + opacity:0.
       const hiddenState = {
         autoAlpha: 0,
-        y: 60,
-        filter: "blur(12px)",
-        clipPath: "inset(0 0 100% 0 round 0px)",
+        y: 48,
       };
 
       // Apply hidden state immediately so elements are invisible on first paint.
@@ -64,9 +67,7 @@ export default function PageMotion({ children }: PageMotionProps) {
         gsap.set(sections, {
           autoAlpha: 1,
           y: 0,
-          filter: "blur(0px)",
-          clipPath: "inset(0 0 0% 0 round 0px)",
-          clearProps: "transform,filter,clipPath",
+          clearProps: "transform",
         });
         return;
       }
@@ -78,19 +79,15 @@ export default function PageMotion({ children }: PageMotionProps) {
           // already-resolved clearProps on a previous scroll.
           {
             autoAlpha: 0,
-            y: 60,
-            filter: "blur(12px)",
-            clipPath: "inset(0 0 100% 0 round 0px)",
+            y: 48,
           },
           {
             autoAlpha: 1,
             y: 0,
-            filter: "blur(0px)",
-            clipPath: "inset(0 0 0% 0 round 0px)",
             duration: 1.1,
             delay: index === 0 ? 0.12 : 0,
             ease: "expo.out",
-            clearProps: "transform,filter,clipPath",
+            clearProps: "transform",
             scrollTrigger: {
               trigger: section,
               // Use a generous threshold so the first visible section always
@@ -112,7 +109,7 @@ export default function PageMotion({ children }: PageMotionProps) {
     return () => {
       ctx.revert();
     };
-  }, [lenis]); // Re-run whenever the lenis instance changes (e.g. route change).
+  }, [lenis, preloaderDone]); // Re-run whenever the lenis instance changes (e.g. route change).
 
   return (
     <div ref={rootRef} className="page-motion-root relative">

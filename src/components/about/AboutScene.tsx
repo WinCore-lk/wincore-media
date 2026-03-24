@@ -5,7 +5,10 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { PointMaterial, Points } from "@react-three/drei";
 import type { Points as PointsMesh } from "three";
 import * as THREE from "three";
+import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+gsap.registerPlugin(ScrollTrigger);
 import { createSpherePoints } from "@/lib/sphere-points";
 import { registerGsapPlugins, getScroller, prefersReducedMotion } from "@/lib/motion";
 

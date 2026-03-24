@@ -115,7 +115,7 @@ export default function ContactPageContent() {
   return (
     <section
       ref={rootRef}
-      className="relative overflow-hidden border-t border-white/5 bg-background pb-20 pt-10 md:pb-28 md:pt-12"
+      className="relative overflow-hidden border-t border-black/5 bg-background pb-24 pt-12 md:pb-32 md:pt-16"
       aria-label="Contact"
     >
       <div className="pointer-events-none absolute inset-0">
@@ -128,11 +128,11 @@ export default function ContactPageContent() {
           <p className="cp-eyebrow mb-4 text-[10px] font-black uppercase tracking-[0.5em] text-accent">
             Contact
           </p>
-          <h1 className="cp-title font-heading text-3xl font-black uppercase leading-[1.05] tracking-tight text-white sm:text-4xl md:text-5xl lg:text-[2.85rem]">
+          <h1 className="cp-title font-heading text-3xl font-black uppercase leading-[1.1] md:leading-[1.05] tracking-tight text-foreground sm:text-4xl md:text-5xl lg:text-[2.85rem] break-words">
             Tell us what you&apos;re{" "}
-            <span className="text-secondary italic">building</span>
+            <span className="text-secondary italic inline-block mt-2 md:mt-0">building</span>
           </h1>
-          <p className="cp-lead mt-5 max-w-xl text-sm leading-relaxed text-white/45 md:text-base">
+          <p className="cp-lead mt-5 max-w-xl text-sm leading-relaxed text-foreground/55 md:text-base">
             New brand, campaign, site, or WebGL piece — share a few details and we&apos;ll reply within
             two business days.
           </p>
@@ -143,47 +143,47 @@ export default function ContactPageContent() {
           <aside className="flex flex-col gap-4 lg:col-span-4">
             <a
               href="mailto:hello@wincore.media"
-              className="cp-card group flex items-start gap-4 rounded-2xl border border-white/[0.1] bg-white/[0.03] p-5 transition-colors hover:border-accent/35 md:p-6"
+              className="cp-card group flex items-start gap-4 rounded-2xl border border-black/10 bg-black/[0.03] px-6 py-8 transition-colors hover:border-accent/35 sm:px-7 sm:py-9 md:px-8 md:py-10"
             >
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/[0.05] text-accent">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-black/10 bg-black/[0.04] text-accent">
                 <Mail size={18} />
               </div>
               <div>
-                <p className="text-[9px] font-black uppercase tracking-[0.35em] text-white/35">Email</p>
-                <p className="mt-1 text-sm font-semibold text-white transition-colors group-hover:text-accent md:text-base">
+                <p className="text-[9px] font-black uppercase tracking-[0.35em] text-foreground/45">Email</p>
+                <p className="mt-1 text-sm font-semibold text-foreground transition-colors group-hover:text-accent md:text-base">
                   hello@wincore.media
                 </p>
               </div>
               <ArrowUpRight
-                className="ml-auto h-4 w-4 shrink-0 text-white/20 transition-colors group-hover:text-accent"
+                className="ml-auto h-4 w-4 shrink-0 text-foreground/25 transition-colors group-hover:text-accent"
                 aria-hidden
               />
             </a>
 
-            <div className="cp-card flex items-start gap-4 rounded-2xl border border-white/[0.1] bg-white/[0.02] p-5 md:p-6">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/[0.05] text-secondary/90">
+            <div className="cp-card flex items-start gap-4 rounded-2xl border border-black/10 bg-black/[0.02] px-6 py-8 sm:px-7 sm:py-9 md:px-8 md:py-10">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-black/10 bg-black/[0.04] text-secondary/90">
                 <MapPin size={18} />
               </div>
               <div>
-                <p className="text-[9px] font-black uppercase tracking-[0.35em] text-white/35">Studio</p>
-                <p className="mt-1 text-sm leading-snug text-white/65">
+                <p className="text-[9px] font-black uppercase tracking-[0.35em] text-foreground/45">Studio</p>
+                <p className="mt-1 text-sm leading-snug text-foreground/65">
                   Colombo, Sri Lanka — working with teams globally.
                 </p>
               </div>
             </div>
 
-            <div className="cp-card flex items-start gap-4 rounded-2xl border border-white/[0.1] bg-white/[0.02] p-5 md:p-6">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/[0.05] text-accent/90">
+            <div className="cp-card flex items-start gap-4 rounded-2xl border border-black/10 bg-black/[0.02] px-6 py-8 sm:px-7 sm:py-9 md:px-8 md:py-10">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-black/10 bg-black/[0.04] text-accent/90">
                 <Clock size={18} />
               </div>
               <div>
-                <p className="text-[9px] font-black uppercase tracking-[0.35em] text-white/35">
+                <p className="text-[9px] font-black uppercase tracking-[0.35em] text-foreground/45">
                   Local time
                 </p>
                 <p className="mt-1 font-mono text-lg font-bold tabular-nums text-accent/85">
                   {colomboTime || "—"}
                 </p>
-                <p className="mt-1 text-[11px] text-white/30">Asia/Colombo (GMT+5:30)</p>
+                <p className="mt-1 text-[11px] text-foreground/40">Asia/Colombo (GMT+5:30)</p>
               </div>
             </div>
           </aside>
@@ -192,20 +192,20 @@ export default function ContactPageContent() {
           <div className="cp-form-shell lg:col-span-8">
             <form
               onSubmit={handleSubmit}
-              className="rounded-2xl border border-white/[0.1] bg-gradient-to-br from-white/[0.05] to-transparent p-6 shadow-[0_0_0_1px_rgba(255,255,255,0.03)] md:p-8 lg:p-10"
+              className="rounded-2xl border border-black/10 bg-white px-8 py-10 shadow-[0_1px_0_rgba(0,0,0,0.04),0_12px_40px_rgba(0,0,0,0.04)] md:px-10 md:py-12 lg:px-12 lg:py-14"
             >
-              <div className="mb-8 flex flex-col gap-2 border-b border-white/[0.06] pb-6 md:flex-row md:items-end md:justify-between">
-                <h2 className="text-lg font-black uppercase tracking-tight text-white md:text-xl">
+              <div className="mb-8 flex flex-col gap-2 border-b border-black/8 pb-6 md:flex-row md:items-end md:justify-between">
+                <h2 className="text-lg font-black uppercase tracking-tight text-foreground md:text-xl">
                   Project details
                 </h2>
-                <span className="text-[9px] font-black uppercase tracking-[0.35em] text-white/25">
+                <span className="text-[9px] font-black uppercase tracking-[0.35em] text-foreground/40">
                   All fields help us scope faster
                 </span>
               </div>
 
               <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
                 <label className="cp-form-field flex flex-col gap-2">
-                  <span className="text-[9px] font-black uppercase tracking-[0.3em] text-white/40">
+                  <span className="text-[9px] font-black uppercase tracking-[0.3em] text-foreground/50">
                     Name *
                   </span>
                   <input
@@ -213,12 +213,12 @@ export default function ContactPageContent() {
                     type="text"
                     required
                     autoComplete="name"
-                    className="rounded-xl border border-white/[0.1] bg-[#0c0c0c] px-4 py-3 text-sm text-white outline-none ring-accent/0 transition-[border-color,box-shadow] placeholder:text-white/25 focus:border-accent/40 focus:ring-2 focus:ring-accent/20"
+                    className="rounded-xl border border-black/10 bg-muted px-5 py-3.5 text-sm text-foreground outline-none ring-accent/0 transition-[border-color,box-shadow] placeholder:text-foreground/35 focus:border-accent/40 focus:ring-2 focus:ring-accent/20"
                     placeholder="Your name"
                   />
                 </label>
                 <label className="cp-form-field flex flex-col gap-2">
-                  <span className="text-[9px] font-black uppercase tracking-[0.3em] text-white/40">
+                  <span className="text-[9px] font-black uppercase tracking-[0.3em] text-foreground/50">
                     Work email *
                   </span>
                   <input
@@ -226,29 +226,29 @@ export default function ContactPageContent() {
                     type="email"
                     required
                     autoComplete="email"
-                    className="rounded-xl border border-white/[0.1] bg-[#0c0c0c] px-4 py-3 text-sm text-white outline-none transition-[border-color,box-shadow] placeholder:text-white/25 focus:border-accent/40 focus:ring-2 focus:ring-accent/20"
+                    className="rounded-xl border border-black/10 bg-muted px-5 py-3.5 text-sm text-foreground outline-none transition-[border-color,box-shadow] placeholder:text-foreground/35 focus:border-accent/40 focus:ring-2 focus:ring-accent/20"
                     placeholder="you@company.com"
                   />
                 </label>
                 <label className="cp-form-field flex flex-col gap-2 md:col-span-2">
-                  <span className="text-[9px] font-black uppercase tracking-[0.3em] text-white/40">
+                  <span className="text-[9px] font-black uppercase tracking-[0.3em] text-foreground/50">
                     Company / brand
                   </span>
                   <input
                     name="company"
                     type="text"
                     autoComplete="organization"
-                    className="rounded-xl border border-white/[0.1] bg-[#0c0c0c] px-4 py-3 text-sm text-white outline-none transition-[border-color,box-shadow] placeholder:text-white/25 focus:border-accent/40 focus:ring-2 focus:ring-accent/20"
+                    className="rounded-xl border border-black/10 bg-muted px-5 py-3.5 text-sm text-foreground outline-none transition-[border-color,box-shadow] placeholder:text-foreground/35 focus:border-accent/40 focus:ring-2 focus:ring-accent/20"
                     placeholder="Optional"
                   />
                 </label>
                 <label className="cp-form-field flex flex-col gap-2 md:col-span-2">
-                  <span className="text-[9px] font-black uppercase tracking-[0.3em] text-white/40">
+                  <span className="text-[9px] font-black uppercase tracking-[0.3em] text-foreground/50">
                     Project type
                   </span>
                   <select
                     name="type"
-                    className="cursor-pointer rounded-xl border border-white/[0.1] bg-[#0c0c0c] px-4 py-3 text-sm text-white outline-none transition-[border-color,box-shadow] focus:border-accent/40 focus:ring-2 focus:ring-accent/20"
+                    className="cursor-pointer rounded-xl border border-black/10 bg-muted px-5 py-3.5 text-sm text-foreground outline-none transition-[border-color,box-shadow] focus:border-accent/40 focus:ring-2 focus:ring-accent/20"
                     defaultValue=""
                   >
                     <option value="" disabled>
@@ -263,14 +263,14 @@ export default function ContactPageContent() {
                   </select>
                 </label>
                 <label className="cp-form-field flex flex-col gap-2 md:col-span-2">
-                  <span className="text-[9px] font-black uppercase tracking-[0.3em] text-white/40">
+                  <span className="text-[9px] font-black uppercase tracking-[0.3em] text-foreground/50">
                     Message *
                   </span>
                   <textarea
                     name="message"
                     required
                     rows={5}
-                    className="resize-y rounded-xl border border-white/[0.1] bg-[#0c0c0c] px-4 py-3 text-sm leading-relaxed text-white outline-none transition-[border-color,box-shadow] placeholder:text-white/25 focus:border-accent/40 focus:ring-2 focus:ring-accent/20"
+                    className="resize-y rounded-xl border border-black/10 bg-muted px-5 py-3.5 text-sm leading-relaxed text-foreground outline-none transition-[border-color,box-shadow] placeholder:text-foreground/35 focus:border-accent/40 focus:ring-2 focus:ring-accent/20"
                     placeholder="Timeline, budget range, links to references…"
                   />
                 </label>
@@ -282,13 +282,13 @@ export default function ContactPageContent() {
                 </p>
               )}
 
-              <div className="mt-8 flex flex-col gap-4 border-t border-white/[0.06] pt-6 sm:flex-row sm:items-center sm:justify-between">
-                <p className="text-[11px] leading-relaxed text-white/30">
+              <div className="mt-8 flex flex-col gap-4 border-t border-black/8 pt-6 sm:flex-row sm:items-center sm:justify-between">
+                <p className="text-[11px] leading-relaxed text-foreground/45">
                   Prefer a call? Mention it in your message and we&apos;ll schedule.
                 </p>
                 <button
                   type="submit"
-                  className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full bg-accent px-10 py-3.5 text-[10px] font-black uppercase tracking-[0.35em] text-[#0A0A0A] transition-transform hover:scale-[1.02] active:scale-[0.98]"
+                  className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full bg-accent px-10 py-3.5 text-[10px] font-black uppercase tracking-[0.35em] text-white transition-transform hover:scale-[1.02] active:scale-[0.98]"
                 >
                   Send via email
                   <ArrowUpRight size={16} />
@@ -299,7 +299,7 @@ export default function ContactPageContent() {
         </div>
 
         <nav
-          className="cp-footer-row mt-16 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 border-t border-white/[0.06] pt-10 md:justify-between"
+          className="cp-footer-row mt-16 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 border-t border-black/8 pt-10 md:justify-between"
           aria-label="Footer"
         >
           <div className="flex flex-wrap justify-center gap-x-8 gap-y-2 md:justify-start">
@@ -312,13 +312,13 @@ export default function ContactPageContent() {
               <Link
                 key={href}
                 href={href}
-                className="text-[9px] font-black uppercase tracking-[0.35em] text-white/35 transition-colors hover:text-accent"
+                className="text-[9px] font-black uppercase tracking-[0.35em] text-foreground/45 transition-colors hover:text-accent"
               >
                 {label}
               </Link>
             ))}
           </div>
-          <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/15">
+          <p className="text-[9px] font-black uppercase tracking-[0.3em] text-foreground/30">
             © {new Date().getFullYear()} Wincore Media
           </p>
         </nav>

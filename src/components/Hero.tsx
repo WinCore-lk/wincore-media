@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
 import dynamic from "next/dynamic";
 import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Link from "next/link";
 import {
   ArrowDown, ArrowRight, Play,
@@ -16,6 +17,20 @@ import {
   prefersReducedMotion,
 } from "@/lib/motion";
 import { useLenis } from "@/context/LenisContext";
+import { usePreloaderDone } from "@/context/PreloaderContext";
+import SplitType from "split-type";
+
+gsap.registerPlugin(ScrollTrigger);
+
+const ctaHover =
+  "transition-transform duration-300 ease-out hover:scale-[1.03] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background";
+
+/** TFTL-style floating hero badges — accent pills (reference: tftl-agency/components/Hero.tsx) */
+const HERO_TIPS: { text: string; bg: string; color: string }[] = [
+  { text: "Creative digital studio", bg: "rgba(0,136,204,0.08)", color: "#0a0a0a" },
+  { text: "WebGL · Motion · AI", bg: "rgba(0,0,0,0.04)", color: "#0a0a0a" },
+  { text: "Colombo & global", bg: "rgba(0,136,204,0.06)", color: "#0a0a0a" },
+];
 
 const HeroScene = dynamic(() => import("@/components/hero/HeroScene"), {
   ssr: false,
@@ -37,8 +52,8 @@ const KPI_STATS = [
   { label: "Campaigns", value: 200, suffix: "+", icon: Zap, color: "text-foreground" },
 ];
 
-// ─── count-up utility ─────────────────────────────────────────────────────────
-function startCountUp(root: ParentNode = document, immediate = false) {
+// ─── count-up utility (scoped to hero root — no document-wide queries) ───────
+function startCountUp(root: ParentNode, immediate = false) {
   root.querySelectorAll<HTMLElement>(".stat-value").forEach((el) => {
     const target = parseInt(el.dataset.target ?? "0", 10);
     if (immediate) {
@@ -58,269 +73,244 @@ function startCountUp(root: ParentNode = document, immediate = false) {
 export default function Hero() {
   const introRef = useRef<HTMLElement>(null);
   const reelRef = useRef<HTMLElement>(null);
+  const tipRefs = useRef<(HTMLDivElement | null)[]>([]);
   const hasCountedRef = useRef(false);
   const [expanded, setExpanded] = useState(false);
   const lenis = useLenis();
+  const preloaderDone = usePreloaderDone();
+  /** Ensures hero runs even if preloader context is slow (fallback matches Preloader safety timeout). */
+  const [entranceUnlocked, setEntranceUnlocked] = useState(false);
 
   useEffect(() => {
     registerGsapPlugins();
   }, []);
 
+  useEffect(() => {
+    if (preloaderDone) setEntranceUnlocked(true);
+  }, [preloaderDone]);
+
+  useEffect(() => {
+    const id = window.setTimeout(() => setEntranceUnlocked(true), 7000);
+    return () => window.clearTimeout(id);
+  }, []);
+
   // ─────────────────────────────────────────────────────────────────────────
-  // STEP 1 — useLayoutEffect: set initial hidden states BEFORE first paint
-  //          This prevents the "everything visible at once" flash.
+  // STEP 1 — Initial hidden states (no blur — crisp visuals)
   // ─────────────────────────────────────────────────────────────────────────
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
-      // Lines: hide by pushing down inside their overflow-hidden parent
-      gsap.set(".hero-line-inner", { yPercent: 105 });
-
-      // Everything else: invisible + slightly offset
-      gsap.set([
-        ".hero-eyebrow",
-        ".hero-sub",
-        ".hero-kpi-strip",
-        ".hero-kpi-card",
-        ".hero-outcome-chip",
-        ".hero-action-btn",
-        ".hero-side-card",
-        ".hero-why-header",
-        ".hero-why-row",
-        ".hero-side-row",
-        ".hero-side-cta",
-        ".hero-approach-chip",
-        ".hero-approach-title",
-        ".hero-approach-arrow-wrap",
-        ".hero-scroll-hint",
-      ], { autoAlpha: 0, y: 22 });
-
-      // Side card slides from right
-      gsap.set(".hero-side-card", { autoAlpha: 0, x: 40, y: 0 });
+      gsap.set(".hero-eyebrow-part", { autoAlpha: 0, y: 18 });
+      gsap.set(".hero-sub-line", { autoAlpha: 0, y: 24 });
+      gsap.set(".hero-performs-inner", { yPercent: 105, opacity: 0 });
+      gsap.set(".hero-side-card", { autoAlpha: 0, scale: 0.95, y: 20 });
+      gsap.set(".hero-kpi-card", { autoAlpha: 0, scale: 0.95, y: 20 });
+      gsap.set(".hero-action-btn", { autoAlpha: 0, y: 16 });
+      gsap.set(".hero-canvas-wrap", { autoAlpha: 0, scale: 1.04 });
+      gsap.set(".hero-scroll-hint", { autoAlpha: 0 });
     }, introRef);
 
     return () => ctx.revert();
   }, []);
 
   // ─────────────────────────────────────────────────────────────────────────
-  // STEP 2 — Entrance timeline (independent of Lenis — fires on mount)
+  // STEP 2 — Entrance (after preloader): split headline → sub → cards; hover glint
   // ─────────────────────────────────────────────────────────────────────────
   useEffect(() => {
+    if (!entranceUnlocked) return;
+    if (!introRef.current) return;
+
     const reduced = prefersReducedMotion();
     const coarsePointer =
       typeof window !== "undefined" && window.matchMedia("(pointer: coarse)").matches;
     let cleanupMagnetic: (() => void) | undefined;
     let cleanupCardTilt: (() => void) | undefined;
+    let cleanupGlintHover: (() => void) | undefined;
+    const splits: SplitType[] = [];
 
     const ctx = gsap.context(() => {
-      if (reduced) {
-        gsap.set(".hero-line-inner", { yPercent: 0 });
-        gsap.set([
-          ".hero-eyebrow",
-          ".hero-sub",
-          ".hero-kpi-strip",
-          ".hero-kpi-card",
-          ".hero-outcome-chip",
-          ".hero-action-btn",
-          ".hero-side-card",
-          ".hero-why-header",
-          ".hero-why-row",
-          ".hero-side-row",
-          ".hero-side-cta",
-          ".hero-approach-chip",
-          ".hero-approach-title",
-          ".hero-approach-arrow-wrap",
-          ".hero-scroll-hint",
-        ], { autoAlpha: 1, x: 0, y: 0, clearProps: "transform,filter,clipPath" });
+      const root = introRef.current;
+      if (!root) return;
 
-        if (!hasCountedRef.current) {
+      if (reduced) {
+        gsap.set(".hero-eyebrow-part", { autoAlpha: 1, y: 0 });
+        gsap.set(".hero-sub-line", { autoAlpha: 1, y: 0 });
+        gsap.set(".hero-performs-inner", { yPercent: 0, opacity: 1 });
+        gsap.set(".hero-side-card", { autoAlpha: 1, scale: 1, y: 0 });
+        gsap.set(".hero-kpi-card", { autoAlpha: 1, scale: 1, y: 0 });
+        gsap.set(".hero-action-btn", { autoAlpha: 1, y: 0 });
+        gsap.set(".hero-canvas-wrap", { autoAlpha: 1, scale: 1 });
+        gsap.set(".hero-scroll-hint", { autoAlpha: 1 });
+
+        if (!hasCountedRef.current && introRef.current) {
           hasCountedRef.current = true;
-          startCountUp(introRef.current ?? document, true);
+          startCountUp(introRef.current, true);
         }
         return;
       }
 
-      const tl = gsap.timeline({
-        delay: 0.1,
-        defaults: { ease: "expo.out" },
+      /* Only split plain lines — gradient “performs” is animated separately */
+      root.querySelectorAll<HTMLElement>(".hero-line-split").forEach((line) => {
+        try {
+          splits.push(new SplitType(line, { types: "words" }));
+        } catch {
+          /* ignore */
+        }
+      });
+      const wordEls = splits.flatMap((s) => s.words ?? []).filter(Boolean) as HTMLElement[];
+      const lineEls = Array.from(root.querySelectorAll<HTMLElement>(".hero-line-split"));
+
+      let useLineFallback = wordEls.length === 0 && lineEls.length > 0;
+      if (useLineFallback) {
+        splits.forEach((s) => s.revert());
+        splits.length = 0;
+        gsap.set(lineEls, { yPercent: 110 });
+      } else if (wordEls.length) {
+        gsap.set(wordEls, { y: "0.65em", opacity: 0 });
+      }
+
+      const HEADLINE_START = 0.42;
+      const WORD_STAGGER = 0.07;
+      const WORD_DURATION = 0.62;
+      const lastWordT =
+        wordEls.length > 0
+          ? HEADLINE_START + Math.max(0, wordEls.length - 1) * WORD_STAGGER + WORD_DURATION * 0.28
+          : HEADLINE_START;
+      const performsInAt = wordEls.length ? lastWordT : HEADLINE_START;
+      const performsDone = performsInAt + 0.72;
+      const headlineEnd = (wordEls.length ? performsDone : HEADLINE_START + 0.55) + 0.04;
+
+      const tl = gsap.timeline({ delay: 0.08, defaults: { ease: "power3.out" } });
+
+      tl.to(
+        ".hero-eyebrow-part, .hero-tag-pill",
+        { autoAlpha: 1, y: 0, duration: 0.58, stagger: 0.09, ease: "power3.out" },
+        0,
+      );
+
+      if (useLineFallback) {
+        tl.to(
+          lineEls,
+          {
+            yPercent: 0,
+            duration: 0.95,
+            stagger: 0.12,
+            ease: "power4.out",
+          },
+          HEADLINE_START,
+        );
+        tl.to(
+          ".hero-performs-inner",
+          { yPercent: 0, opacity: 1, duration: 0.78, ease: "power4.out" },
+          HEADLINE_START + 0.95 + 0.12,
+        );
+      } else if (wordEls.length) {
+        tl.to(
+          wordEls,
+          {
+            y: 0,
+            opacity: 1,
+            duration: WORD_DURATION,
+            stagger: WORD_STAGGER,
+            ease: "power4.out",
+          },
+          HEADLINE_START,
+        );
+        tl.to(
+          ".hero-performs-inner",
+          { yPercent: 0, opacity: 1, duration: 0.78, ease: "power4.out" },
+          performsInAt,
+        );
+      } else {
+        tl.to(
+          ".hero-performs-inner",
+          { yPercent: 0, opacity: 1, duration: 0.78, ease: "power4.out" },
+          HEADLINE_START,
+        );
+      }
+
+      tl.fromTo(
+        ".hero-canvas-wrap",
+        { autoAlpha: 0, scale: 1.04 },
+        { autoAlpha: 1, scale: 1, duration: 1.05, ease: "power3.out" },
+        0.42,
+      );
+
+      tl.to(
+        ".hero-sub-line",
+        { autoAlpha: 1, y: 0, duration: 0.72, stagger: 0.14, ease: "power3.out" },
+        headlineEnd,
+      );
+
+      tl.from(
+        ".hero-side-card, .hero-kpi-card",
+        {
+          opacity: 0,
+          scale: 0.95,
+          y: 20,
+          duration: 0.75,
+          stagger: 0.2,
+          ease: "back.out(1.5)",
+        },
+        ">",
+      );
+
+      tl.to(
+        ".hero-action-btn",
+        { autoAlpha: 1, y: 0, duration: 0.45, stagger: 0.1, ease: "power2.out" },
+        ">",
+      );
+
+      tl.add(() => {
+        if (!hasCountedRef.current && introRef.current) {
+          hasCountedRef.current = true;
+          startCountUp(introRef.current);
+        }
       });
 
-      // — eyebrow
-      tl.to(".hero-eyebrow", {
-        autoAlpha: 1, y: 0, duration: 0.8,
-      }, 0);
-
-      // — headline lines (slide up from clip mask)
-      tl.to(".hero-line-inner", {
-        yPercent: 0,
-        duration: 1.1,
-        stagger: 0.13,
-        ease: "power4.out",
-      }, 0.12);
-
-      // — sub-copy
-      tl.to(".hero-sub", {
-        autoAlpha: 1, y: 0, duration: 0.85,
-      }, 0.45);
-
-      // — Three.js layer settles in with subtle cinematic bloom
-      tl.fromTo(".hero-canvas-wrap", {
-        autoAlpha: 0,
-        scale: 1.08,
-        filter: "blur(14px)",
-      }, {
-        autoAlpha: 1,
-        scale: 1,
-        filter: "blur(0px)",
-        duration: 1.25,
-        ease: "power3.out",
-      }, 0.12);
-
-      // — KPI strip enters as one clear section
-      tl.to(".hero-kpi-strip", {
-        autoAlpha: 1,
-        y: 0,
-        duration: 0.78,
-        ease: "power3.out",
-      }, 0.72);
-
-      tl.to(".hero-kpi-card", {
-        autoAlpha: 1, y: 0, scale: 1,
-        duration: 0.68,
-        stagger: 0.08,
-        ease: "power3.out",
-      }, 0.78);
-
-      tl.to(".hero-outcome-chip", {
-        autoAlpha: 1,
-        y: 0,
-        scale: 1,
-        duration: 0.5,
-        ease: "power3.out",
-        stagger: 0.045,
-      }, 0.76);
-
-      tl.to(".hero-action-btn", {
-        autoAlpha: 1,
-        y: 0,
-        duration: 0.52,
-        ease: "power3.out",
-        stagger: 0.07,
-      }, 0.8);
+      tl.to(".hero-scroll-hint", { autoAlpha: 1, duration: 0.45, ease: "power2.out" }, ">");
 
       tl.add(() => {
-        if (!hasCountedRef.current) {
-          hasCountedRef.current = true;
-          startCountUp(introRef.current ?? document);
-        }
-      }, 1.02);
-
-      // — side card (slides in from right)
-      tl.to(".hero-side-card", {
-        autoAlpha: 1, x: 0,
-        duration: 1.05,
-        ease: "expo.out",
-      }, 0.25);
-
-      // — why wincore header slides in
-      tl.to(".hero-why-header", {
-        autoAlpha: 1, y: 0,
-        duration: 0.65,
-        ease: "power3.out",
-      }, 0.35);
-
-      // — side rows cascade with enhanced easing
-      tl.to(".hero-why-row", {
-        autoAlpha: 1, y: 0,
-        duration: 0.7,
-        stagger: 0.12,
-        ease: "back.out(1.7)",
-      }, 0.5);
-
-      tl.to(".hero-side-row:not(.hero-why-row)", {
-        autoAlpha: 1, y: 0,
-        duration: 0.6,
-        stagger: 0.09,
-        ease: "back.out(1.5)",
-      }, 0.55);
-
-      // — side CTA (staged reveal for stronger hierarchy)
-      tl.fromTo(".hero-side-cta", {
-        autoAlpha: 0,
-        y: 30,
-        clipPath: "inset(0 0 100% 0 round 1.25rem)",
-      }, {
-        autoAlpha: 1,
-        y: 0,
-        clipPath: "inset(0 0 0% 0 round 1.25rem)",
-        duration: 0.72,
-        ease: "power4.out",
-      }, 0.86);
-      tl.to(".hero-approach-chip", {
-        autoAlpha: 1,
-        y: 0,
-        duration: 0.45,
-        ease: "power3.out",
-      }, 0.99);
-      tl.to(".hero-approach-title", {
-        autoAlpha: 1,
-        y: 0,
-        duration: 0.52,
-        ease: "power3.out",
-      }, 1.03);
-      tl.to(".hero-approach-arrow-wrap", {
-        autoAlpha: 1,
-        y: 0,
-        duration: 0.52,
-        ease: "power3.out",
-      }, 1.05);
-
-      // — scroll hint
-      tl.to(".hero-scroll-hint", {
-        autoAlpha: 1, y: 0, duration: 0.6,
-      }, 1.0);
-
-      // ── after entrance: ambient idle loops ────────────────────────────────
-      tl.add(() => {
-        // gradient shimmer on "performs"
-        gsap.fromTo(".hero-performs",
+        gsap.fromTo(
+          ".hero-performs",
           { backgroundPositionX: "0%" },
-          { backgroundPositionX: "100%", duration: 4, repeat: -1, yoyo: true, ease: "sine.inOut" }
+          {
+            backgroundPositionX: "100%",
+            duration: 4,
+            repeat: -1,
+            yoyo: true,
+            ease: "sine.inOut",
+          },
         );
 
-        // floating stat cards
         gsap.to(".hero-stat", {
           y: (i) => (i % 2 === 0 ? 3 : -3),
-          duration: 2.8, repeat: -1, yoyo: true,
-          ease: "sine.inOut", stagger: 0.15,
+          duration: 2.8,
+          repeat: -1,
+          yoyo: true,
+          ease: "sine.inOut",
+          stagger: 0.15,
         });
 
-        // glow orb pulse on card
-        gsap.fromTo(".hero-why-glow",
+        gsap.fromTo(
+          ".hero-why-glow",
           { scale: 1, opacity: 0.6 },
-          { scale: 1.3, opacity: 1, duration: 4, repeat: -1, yoyo: true, ease: "sine.inOut" }
+          { scale: 1.3, opacity: 1, duration: 4, repeat: -1, yoyo: true, ease: "sine.inOut" },
         );
 
-        // scroll line pulse
-        gsap.fromTo(".hero-scroll-line",
-          { scaleY: 0.2, opacity: 0.3 },
-          { scaleY: 1, opacity: 1, duration: 1.4, repeat: -1, yoyo: true, ease: "sine.inOut" }
-        );
-
-        // CTA glint sweep
-        gsap.fromTo(".hero-approach-glint",
-          { xPercent: -130, opacity: 0.1 },
+        gsap.fromTo(
+          ".hero-scroll-line",
+          { scaleY: 0, transformOrigin: "top center" },
           {
-            xPercent: 180,
-            opacity: 0.42,
-            duration: 2.8,
+            scaleY: 1,
+            duration: 1.1,
             repeat: -1,
-            repeatDelay: 1.5,
+            yoyo: true,
             ease: "sine.inOut",
-          }
+          },
         );
 
-        // Metric shell sweep keeps card groups feeling alive.
-        gsap.fromTo(".hero-metric-sweep",
+        gsap.fromTo(
+          ".hero-metric-sweep",
           { xPercent: -135, opacity: 0.05 },
           {
             xPercent: 180,
@@ -330,28 +320,62 @@ export default function Hero() {
             repeatDelay: 1.2,
             ease: "sine.inOut",
             stagger: 0.35,
-          }
+          },
         );
 
-        // Why Wincore rows subtle floating motion
         gsap.to(".hero-why-row", {
           y: (i) => (i % 2 === 0 ? 2 : -2),
           rotationZ: (i) => (i % 3 === 0 ? 0.3 : -0.3),
-          duration: 3.5, repeat: -1, yoyo: true,
-          ease: "sine.inOut", stagger: 0.18,
+          duration: 3.5,
+          repeat: -1,
+          yoyo: true,
+          ease: "sine.inOut",
+          stagger: 0.18,
         });
-      }, "+=0");
-
+      });
     }, introRef);
 
-    if (reduced || coarsePointer) {
+    if (reduced) {
       return () => {
+        splits.forEach((s) => s.revert());
         ctx.revert();
       };
     }
 
     const approachBtn = introRef.current?.querySelector<HTMLElement>(".hero-approach-btn");
-    if (approachBtn) {
+    const glintEl = approachBtn?.querySelector<HTMLElement>(".hero-approach-glint");
+
+    if (approachBtn && glintEl) {
+      let glintTween: gsap.core.Tween | null = null;
+
+      const onEnter = () => {
+        glintTween?.kill();
+        gsap.set(glintEl, { xPercent: -100 });
+        glintTween = gsap.to(glintEl, {
+          xPercent: 100,
+          duration: 1.2,
+          repeat: -1,
+          ease: "linear",
+        });
+      };
+
+      const onLeave = () => {
+        glintTween?.kill();
+        glintTween = null;
+        gsap.set(glintEl, { clearProps: "transform" });
+      };
+
+      approachBtn.addEventListener("pointerenter", onEnter);
+      approachBtn.addEventListener("pointerleave", onLeave);
+
+      cleanupGlintHover = () => {
+        glintTween?.kill();
+        approachBtn.removeEventListener("pointerenter", onEnter);
+        approachBtn.removeEventListener("pointerleave", onLeave);
+      };
+    }
+
+    if (!coarsePointer && approachBtn) {
       const xTo = gsap.quickTo(approachBtn, "x", { duration: 0.45, ease: "power3.out" });
       const yTo = gsap.quickTo(approachBtn, "y", { duration: 0.45, ease: "power3.out" });
 
@@ -363,22 +387,22 @@ export default function Hero() {
         yTo(dy);
       };
 
-      const onLeave = () => {
+      const onLeaveMag = () => {
         xTo(0);
         yTo(0);
       };
 
       approachBtn.addEventListener("pointermove", onMove);
-      approachBtn.addEventListener("pointerleave", onLeave);
+      approachBtn.addEventListener("pointerleave", onLeaveMag);
 
       cleanupMagnetic = () => {
         approachBtn.removeEventListener("pointermove", onMove);
-        approachBtn.removeEventListener("pointerleave", onLeave);
+        approachBtn.removeEventListener("pointerleave", onLeaveMag);
       };
     }
 
     const interactiveCards = Array.from(
-      introRef.current?.querySelectorAll<HTMLElement>(".hero-kpi-card, .hero-side-row") ?? []
+      introRef.current?.querySelectorAll<HTMLElement>(".hero-kpi-card, .hero-side-row") ?? [],
     );
 
     if (interactiveCards.length) {
@@ -421,17 +445,20 @@ export default function Hero() {
     }
 
     return () => {
+      splits.forEach((s) => s.revert());
+      cleanupGlintHover?.();
       cleanupMagnetic?.();
       cleanupCardTilt?.();
       ctx.revert();
     };
-  }, []); // ← zero deps: runs once, never blocked
+  }, [entranceUnlocked]);
 
   // ─────────────────────────────────────────────────────────────────────────
   // STEP 3 — Scroll animations (needs Lenis scroller)
   // ─────────────────────────────────────────────────────────────────────────
   useEffect(() => {
-    if (!lenis) return;
+    if (!lenis || !entranceUnlocked) return;
+    if (!introRef.current) return;
     const reduced = prefersReducedMotion();
     const scroller = getScroller();
 
@@ -471,30 +498,38 @@ export default function Hero() {
         },
       });
 
-      // parallax background orbs
-      gsap.to(".hero-parallax-slow", {
-        yPercent: 14,
-        ease: "none",
-        scrollTrigger: {
-          trigger: introRef.current,
-          scroller,
-          start: "top top",
-          end: "bottom top",
-          scrub: 2,
+      // Parallax background layers (pixel motion, eased scrub)
+      gsap.fromTo(
+        ".hero-parallax-slow",
+        { y: 0 },
+        {
+          y: 20,
+          ease: "power1.out",
+          scrollTrigger: {
+            trigger: introRef.current,
+            scroller,
+            start: "top top",
+            end: "bottom top",
+            scrub: 1.2,
+          },
         },
-      });
+      );
 
-      gsap.to(".hero-parallax-fast", {
-        yPercent: -10,
-        ease: "none",
-        scrollTrigger: {
-          trigger: introRef.current,
-          scroller,
-          start: "top top",
-          end: "bottom top",
-          scrub: 1.2,
+      gsap.fromTo(
+        ".hero-parallax-fast",
+        { y: 0 },
+        {
+          y: 50,
+          ease: "power1.out",
+          scrollTrigger: {
+            trigger: introRef.current,
+            scroller,
+            start: "top top",
+            end: "bottom top",
+            scrub: 1.2,
+          },
         },
-      });
+      );
 
       // Column drift to create depth while keeping readability.
       gsap.to(".hero-left-col", {
@@ -688,19 +723,25 @@ export default function Hero() {
 
     scheduleScrollTriggerRefresh();
     return () => { ctx.revert(); ctxReel.revert(); };
-  }, [lenis]);
+  }, [lenis, entranceUnlocked]);
 
   return (
     <>
       <section
         id="hero-section"
         ref={introRef}
-        className="relative flex min-h-[100svh] flex-col justify-center bg-background px-4 pt-20 pb-12 md:px-8 md:pt-24 md:pb-16"
+        className="relative flex min-h-[100svh] flex-col justify-center bg-background px-5 pt-16 pb-12 sm:px-6 md:px-10 md:pt-20 md:pb-14 lg:px-12"
       >
+        {/* tftl-style soft top wash + floating tip badges */}
+        <div
+          className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-b from-accent/[0.07] via-transparent to-transparent"
+          aria-hidden
+        />
+
         {/* background layers */}
         <div className="pointer-events-none absolute inset-0 z-0">
           <div className="hero-parallax-slow absolute inset-0 bg-[radial-gradient(ellipse_120%_80%_at_50%_-20%,rgba(255,255,255,0.1),transparent_58%)]" />
-          <div className="hero-parallax-fast absolute bottom-0 left-1/2 h-[min(60vh,520px)] w-[min(100%,900px)] -translate-x-1/2 bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.06),transparent_68%)] blur-2xl" />
+          <div className="hero-parallax-fast absolute bottom-0 left-1/2 h-[min(60vh,520px)] w-[min(100%,900px)] -translate-x-1/2 bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.08),transparent_72%)]" />
           <div className="absolute inset-0 bg-[linear-gradient(to_bottom,transparent_0%,white_92%)]" />
         </div>
 
@@ -711,46 +752,60 @@ export default function Hero() {
         <div className="pointer-events-none absolute inset-0 z-[2] bg-[radial-gradient(ellipse_85%_55%_at_50%_35%,transparent_0%,rgba(255,255,255,0.4)_58%,white_100%)]" />
 
         <div className="hero-content-layer _container relative z-10 mx-auto w-full max-w-[1240px]">
-          <div className="grid min-h-[min(85vh,900px)] grid-cols-1 items-start gap-16 lg:grid-cols-12 lg:gap-16 lg:items-center">
+          <div className="grid min-h-[min(78vh,820px)] grid-cols-1 items-start gap-10 md:gap-12 lg:grid-cols-12 lg:gap-12 lg:items-center">
 
             {/* ── LEFT column ── */}
             <div className="hero-left-col flex flex-col text-left lg:col-span-6">
 
               <p className="hero-eyebrow mb-5 text-[10px] font-black uppercase tracking-[0.5em] text-black/40">
-                Wincore Agency · <span className="text-accent/90">Colombo &amp; global</span>
+                <span className="hero-eyebrow-part inline-block">Wincore Agency · </span>
+                <span className="hero-eyebrow-part inline-block text-accent/90">Colombo &amp; global</span>
               </p>
 
-              {/* 
-                CRITICAL: each .hero-line must have overflow-hidden so the
-                sliding .hero-line-inner is invisible before it enters.
-                The pb-[0.06em] prevents descenders from clipping.
+              {/*
+                Lines 1–2: .hero-line-split → SplitType words. Line 3: gradient word in .hero-performs-inner (no split).
               */}
               <h1 className="hero-headline font-heading text-[2.1rem] font-black uppercase leading-[1.02] tracking-tight text-foreground sm:text-5xl md:text-6xl lg:text-[3.35rem] lg:leading-[1.05]">
                 <span className="hero-line block overflow-hidden pb-[0.2em]">
-                  <span className="hero-line-inner block">Creative digital</span>
+                  <span className="hero-line-inner hero-line-split block">Creative digital</span>
                 </span>
                 <span className="hero-line block overflow-hidden pb-[0.2em]">
-                  <span className="hero-line-inner block text-black/20">
-                    that actually
-                  </span>
+                  <span className="hero-line-inner hero-line-split block text-black/35">that actually</span>
                 </span>
                 <span className="hero-line block overflow-hidden pb-[0.2em]">
-                  <span className="hero-line-inner hero-performs block bg-gradient-to-r from-black via-black/80 to-accent bg-[length:200%_100%] bg-clip-text text-transparent">
-                    performs
+                  <span className="hero-performs-inner block will-change-transform">
+                    <span className="hero-performs inline-block bg-gradient-to-r from-foreground via-foreground/85 to-accent bg-[length:200%_100%] bg-clip-text text-transparent">
+                      performs
+                    </span>
                   </span>
                 </span>
               </h1>
 
-              <p className="hero-sub mt-7 max-w-xl text-base font-light leading-relaxed text-black/40 md:mt-8 md:text-lg">
-                Brand systems, motion, WebGL, and AI-accelerated delivery — one team, one standard.
-                Built for clarity, speed, and measurable outcomes.
-              </p>
+              <div className="hero-sub mt-7 max-w-xl text-base font-light leading-relaxed text-black/45 md:mt-8 md:text-lg">
+                <p className="hero-sub-line">
+                  Brand systems, motion, WebGL, and AI-accelerated delivery — one team, one standard.
+                </p>
+                <p className="hero-sub-line mt-3">
+                  Built for clarity, speed, and measurable outcomes.
+                </p>
+                <div className="hero-sub-line mt-8 flex flex-wrap gap-2.5">
+                  {HERO_TIPS.map((tip) => (
+                    <span
+                      key={tip.text}
+                      className="inline-flex items-center rounded-full px-3.5 py-1.5 text-[10px] sm:text-xs font-bold uppercase tracking-widest shadow-sm transition-transform hover:scale-[1.03]"
+                      style={{ background: tip.bg, color: tip.color }}
+                    >
+                      {tip.text}
+                    </span>
+                  ))}
+                </div>
+              </div>
             </div>
 
             {/* ── RIGHT column (side card) ── */}
             <aside className="hero-right-col hero-side-card lg:col-span-6 lg:self-center">
-              <div className="hero-why-card relative overflow-visible rounded-[2.5rem] border border-black/[0.05] bg-gradient-to-br from-white via-white/80 to-black/[0.02] p-8 pl-10 shadow-[0_30px_60px_rgba(0,0,0,0.05)] backdrop-blur-xl sm:p-10 sm:pl-12 md:p-14 md:pl-16 lg:p-16 lg:pl-20">
-                <div className="hero-why-glow pointer-events-none absolute -right-12 -top-12 h-56 w-56 rounded-full bg-accent/12 blur-[90px]" />
+              <div className="hero-why-card relative overflow-visible rounded-[2.5rem] border border-black/[0.06] bg-gradient-to-br from-white via-white to-black/[0.02] px-8 pt-10 pb-10 pr-8 shadow-[0_24px_48px_rgba(0,0,0,0.04)] sm:px-10 sm:pt-12 sm:pb-12 md:px-12 md:pt-14 md:pb-14 lg:px-14 lg:pt-16 lg:pb-16 lg:pl-[4.25rem] lg:pr-10">
+                <div className="hero-why-glow pointer-events-none absolute -right-12 -top-12 h-56 w-56 rounded-full bg-accent/10 opacity-90" />
 
                 <header className="hero-why-header mb-10 flex items-center gap-6 md:mb-12">
                   <p className="text-[12px] md:text-[13px] font-black uppercase tracking-[0.3em] text-accent whitespace-nowrap">Why Wincore</p>
@@ -761,17 +816,17 @@ export default function Hero() {
                   {FOCUS.map((item, idx) => (
                     <li
                       key={item.label}
-                      className="hero-why-row hero-side-row group/row relative rounded-2xl border border-white/0 p-5 md:p-6 transition-all duration-500 hover:border-accent/30 hover:bg-accent/5"
+                      className="hero-why-row hero-side-row group/row relative rounded-2xl border border-transparent px-6 py-7 md:px-7 md:py-8 transition-all duration-500 hover:border-accent/30 hover:bg-accent/5"
                       data-index={idx}
                     >
                       <div className="flex items-start gap-5 py-1">
-                        <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-black/[0.03] transition-all duration-500 group-hover/row:scale-115 group-hover/row:bg-accent/15">
+                        <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-black/[0.03] transition-all duration-500 group-hover/row:scale-110 group-hover/row:bg-accent group-hover/row:shadow-[0_8px_16px_rgba(0,191,255,0.25)]">
                           <item.icon
-                            className="text-black/30 transition-colors duration-500 group-hover/row:text-accent"
+                            className="text-black/30 transition-colors duration-500 group-hover/row:text-white"
                             size={22}
                             strokeWidth={1.3}
                           />
-                          <div className="absolute inset-0 rounded-xl bg-accent/25 opacity-0 blur-lg transition-opacity duration-500 group-hover/row:opacity-100" />
+
                         </div>
                         <div className="flex flex-col gap-2 pr-1 pb-0 min-w-0 flex-1">
                           <div className="mb-1 flex flex-wrap items-center gap-3">
@@ -792,7 +847,7 @@ export default function Hero() {
                 <div className="hero-side-cta mt-10 border-t border-black/[0.08] pt-8.5 md:mt-11 md:pt-9">
                   <Link
                     href="/about"
-                    className="hero-approach-btn cursor-hover group/btn relative flex w-full items-center justify-between gap-5 overflow-hidden rounded-2xl border border-black/[0.11] bg-gradient-to-r from-black/[0.07] via-black/[0.03] to-transparent px-5 py-4 transition-all duration-500 hover:border-accent/45 hover:shadow-[0_16px_40px_rgba(0,191,255,0.14)] md:px-6 md:py-[1.125rem]"
+                    className={`hero-approach-btn cursor-hover group/btn relative flex w-full items-center justify-between gap-5 overflow-hidden rounded-2xl border border-black/[0.11] bg-gradient-to-r from-black/[0.07] via-black/[0.03] to-transparent px-5 py-4 transition-all duration-300 hover:border-accent/45 hover:shadow-[0_16px_40px_rgba(0,191,255,0.14)] md:px-6 md:py-[1.125rem] ${ctaHover}`}
                   >
                     <div className="hero-approach-glint pointer-events-none absolute inset-y-0 left-[-35%] w-[28%] -skew-x-12 bg-gradient-to-r from-transparent via-accent/30 to-transparent" />
                     <div className="absolute inset-x-0 bottom-0 h-[1px] w-0 bg-gradient-to-r from-transparent via-accent/60 to-transparent transition-all duration-700 group-hover/btn:w-full" />
@@ -801,14 +856,14 @@ export default function Hero() {
                       <span className="hero-approach-chip shrink-0 rounded-full border border-accent/35 bg-accent/10 px-2.5 py-1 text-[8px] font-black uppercase tracking-[0.28em] text-accent/90">
                         Process
                       </span>
-                      <span className="hero-approach-title text-[11px] font-black uppercase tracking-[0.3em] text-white/90 pb-0.5 transition-colors group-hover/btn:text-accent">
+                      <span className="hero-approach-title text-[11px] font-black uppercase tracking-[0.3em] text-foreground pb-0.5 transition-colors group-hover/btn:text-accent">
                         Our approach
                       </span>
                     </div>
 
-                    <span className="hero-approach-arrow-wrap relative z-10 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/15 bg-white/[0.03] transition-all duration-500 group-hover/btn:border-accent/45 group-hover/btn:bg-accent/10">
+                    <span className="hero-approach-arrow-wrap relative z-10 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-black/12 bg-black/[0.03] transition-all duration-500 group-hover/btn:border-accent/45 group-hover/btn:bg-accent/10">
                       <ArrowRight
-                        className="text-white/40 transition-all duration-500 group-hover/btn:translate-x-0.5 group-hover/btn:text-accent"
+                        className="text-foreground/45 transition-all duration-500 group-hover/btn:translate-x-0.5 group-hover/btn:text-accent"
                         size={16}
                         strokeWidth={2.5}
                       />
@@ -819,9 +874,9 @@ export default function Hero() {
             </aside>
           </div>
 
-          <div className="hero-kpi-strip mt-14 md:mt-[4.5rem] lg:mt-20">
+          <div className="hero-kpi-strip mt-10 md:mt-12 lg:mt-16">
             <div className="grid grid-cols-1 gap-5 md:gap-6 lg:grid-cols-12 lg:gap-6">
-              <article className="hero-kpi-card group relative overflow-visible rounded-3xl border border-black/5 bg-gradient-to-b from-black/[0.04] to-black/[0.01] p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] md:p-8 lg:p-9 lg:col-span-4 [transform-style:preserve-3d]">
+              <article className="hero-kpi-card group relative overflow-visible rounded-3xl border border-black/[0.08] bg-white/70 backdrop-blur-xl px-7 py-9 shadow-[0_30px_60px_rgba(0,0,0,0.03),inset_0_1px_0_rgba(255,255,255,0.8)] transition-shadow duration-500 hover:shadow-[0_45px_100px_rgba(0,191,255,0.08)] md:px-9 md:py-10 lg:px-10 lg:py-11 lg:col-span-4 [transform-style:preserve-3d]">
                 <div className="hero-metric-sweep pointer-events-none absolute inset-y-0 left-[-34%] w-[24%] -skew-x-12 bg-gradient-to-r from-transparent via-accent/15 to-transparent" />
                 <div className="mb-6 md:mb-7 flex items-center justify-between">
                   <p className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] text-black/35">Outcomes</p>
@@ -831,7 +886,7 @@ export default function Hero() {
                   {OUTCOMES.map((p) => (
                     <span
                       key={p}
-                      className="hero-outcome-chip inline-flex min-h-12 items-center justify-center rounded-xl border border-black/10 bg-black/[0.03] px-4 py-3 text-center text-[10px] md:text-[11px] font-black uppercase tracking-[0.12em] leading-tight text-foreground/70"
+                      className="hero-outcome-chip inline-flex min-h-12 items-center justify-center rounded-xl border border-black/10 bg-black/[0.03] px-5 py-4 text-center text-[10px] md:text-[11px] font-black uppercase tracking-[0.12em] leading-tight text-foreground/70"
                     >
                       {p}
                     </span>
@@ -839,7 +894,7 @@ export default function Hero() {
                 </div>
               </article>
 
-              <article className="hero-kpi-card group relative overflow-visible rounded-3xl border border-black/5 bg-gradient-to-b from-black/[0.04] to-black/[0.01] p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] md:p-8 lg:p-9 lg:col-span-4 [transform-style:preserve-3d]">
+              <article className="hero-kpi-card group relative overflow-visible rounded-3xl border border-black/[0.08] bg-white/70 backdrop-blur-xl px-7 py-9 shadow-[0_30px_60px_rgba(0,0,0,0.03),inset_0_1px_0_rgba(255,255,255,0.8)] transition-shadow duration-500 hover:shadow-[0_45px_100px_rgba(0,191,255,0.08)] md:px-9 md:py-10 lg:px-10 lg:py-11 lg:col-span-4 [transform-style:preserve-3d]">
                 <div className="hero-metric-sweep pointer-events-none absolute inset-y-0 left-[-34%] w-[24%] -skew-x-12 bg-gradient-to-r from-transparent via-secondary/20 to-transparent" />
                 <div className="mb-6 md:mb-7 flex flex-col gap-3">
                   <div className="min-w-0 flex-1">
@@ -851,7 +906,7 @@ export default function Hero() {
                 <div className="grid grid-cols-1 gap-3.5">
                   <Link
                     href="/contact"
-                    className="hero-action-btn cursor-hover inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-accent/45 bg-accent px-5 py-3.5 text-[10px] md:text-[11px] font-black uppercase tracking-[0.12em] text-white transition-transform hover:scale-[1.01] active:scale-[0.98]"
+                    className={`hero-action-btn cursor-hover inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-accent/45 bg-accent px-5 py-3.5 text-[10px] md:text-[11px] font-black uppercase tracking-[0.12em] text-white shadow-[0_8px_20px_rgba(0,191,255,0.35)] ${ctaHover}`}
                   >
                     Start a project
                     <ArrowRight size={14} strokeWidth={2.5} />
@@ -859,13 +914,13 @@ export default function Hero() {
                   <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     <Link
                       href="/works"
-                      className="hero-action-btn cursor-hover inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-black/10 bg-black/[0.04] px-4 py-3.5 text-[10px] md:text-[11px] font-black uppercase tracking-[0.12em] text-foreground transition-colors hover:border-accent/50 hover:text-accent"
+                      className={`hero-action-btn cursor-hover inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-black/10 bg-black/[0.04] px-4 py-3.5 text-[10px] md:text-[11px] font-black uppercase tracking-[0.12em] text-foreground transition-colors hover:border-accent/50 hover:text-accent ${ctaHover}`}
                     >
                       View work
                     </Link>
                     <Link
                       href="/services"
-                      className="hero-action-btn cursor-hover inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-black/5 bg-transparent px-4 py-3.5 text-[10px] md:text-[11px] font-black uppercase tracking-[0.12em] text-black/60 transition-colors hover:border-black/20 hover:text-black/90"
+                      className={`hero-action-btn cursor-hover inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-black/5 bg-transparent px-4 py-3.5 text-[10px] md:text-[11px] font-black uppercase tracking-[0.12em] text-black/60 transition-colors hover:border-black/20 hover:text-black/90 ${ctaHover}`}
                     >
                       Services
                     </Link>
@@ -873,12 +928,12 @@ export default function Hero() {
                 </div>
               </article>
 
-              <article className="hero-kpi-card group relative overflow-visible rounded-3xl border border-black/5 bg-gradient-to-b from-black/[0.04] to-black/[0.01] p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] md:p-8 lg:p-9 lg:col-span-4 [transform-style:preserve-3d]">
+              <article className="hero-kpi-card group relative overflow-visible rounded-3xl border border-black/[0.08] bg-white/70 backdrop-blur-xl px-7 py-9 shadow-[0_30px_60px_rgba(0,0,0,0.03),inset_0_1px_0_rgba(255,255,255,0.8)] transition-shadow duration-500 hover:shadow-[0_45px_100px_rgba(0,191,255,0.08)] md:px-9 md:py-10 lg:px-10 lg:py-11 lg:col-span-4 [transform-style:preserve-3d]">
                 <div className="hero-metric-sweep pointer-events-none absolute inset-y-0 left-[-34%] w-[24%] -skew-x-12 bg-gradient-to-r from-transparent via-accent/20 to-transparent" />
                 <p className="mb-6 md:mb-7 text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] text-black/35">Performance Snapshot</p>
                 <dl className="space-y-3.5">
                   {KPI_STATS.map((stat, i) => (
-                    <div key={stat.label} className="hero-stat relative flex items-center justify-between rounded-xl border border-black/10 bg-black/[0.02] px-4 py-3.5 transition-colors duration-500 group-hover:border-black/20">
+                    <div key={stat.label} className="hero-stat relative flex items-center justify-between rounded-xl border border-black/10 bg-black/[0.02] px-5 py-5 transition-colors duration-500 group-hover:border-black/20">
                       <div className="flex items-center gap-3 min-w-0 flex-1">
                         <span className="text-[9px] font-black uppercase tracking-[0.16em] text-black/20 shrink-0">{String(i + 1).padStart(2, "0")}</span>
                         <stat.icon className={`${stat.color} opacity-70 shrink-0`} size={16} />
@@ -908,40 +963,40 @@ export default function Hero() {
       {/* ── Reel section ── */}
       <section
         ref={reelRef}
-        className="hero-reel-block relative border-t border-white/5 bg-background px-4 py-14 md:px-[5vw] md:py-20"
+        className="hero-reel-block relative border-t border-black/5 bg-background px-5 py-12 sm:px-6 md:px-[5vw] md:py-16"
       >
         <div className="_container mx-auto mb-8 flex flex-col gap-3 text-center md:flex-row md:items-end md:justify-between md:text-left">
           <div>
             <p className="reel-kicker text-[10px] font-black uppercase tracking-[0.45em] text-accent">Showreel</p>
-            <h2 className="reel-title mt-2 text-2xl font-black uppercase tracking-tight text-white md:text-3xl">
-              Motion <span className="text-white/25 italic">&amp;</span> craft
+            <h2 className="reel-title mt-2 text-2xl font-black uppercase tracking-tight text-foreground md:text-3xl">
+              Motion <span className="text-foreground/30 italic">&amp;</span> craft
             </h2>
           </div>
-          <p className="reel-copy max-w-md text-sm text-white/40 md:text-base">
+          <p className="reel-copy max-w-md text-sm text-foreground/50 md:text-base">
             A short reel — hover for colour, tap to expand on desktop.
           </p>
         </div>
 
-        <div className="reel-video-shell group relative mx-auto max-w-6xl overflow-hidden rounded-2xl border border-white/[0.08] bg-black/50 md:rounded-3xl">
+        <div className="reel-video-shell group relative mx-auto max-w-6xl overflow-hidden rounded-2xl border border-black/10 bg-muted md:rounded-3xl">
           <div className="pointer-events-none absolute inset-0 z-10 grid grid-cols-4 grid-rows-2 opacity-30">
             {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="border-[0.5px] border-white/[0.06]" />
+              <div key={i} className="border-[0.5px] border-black/[0.08]" />
             ))}
           </div>
 
           <div className="relative aspect-video w-full md:aspect-[21/9] md:min-h-[320px]">
             <video
               autoPlay loop muted playsInline preload="metadata"
-              className={`h-full w-full object-cover transition-all duration-[2s] group-hover:grayscale-0 ${expanded ? "scale-100" : "scale-[1.02] grayscale"
+              className={`h-full w-full object-cover transition-transform duration-[2s] ${expanded ? "scale-100" : "scale-[1.02]"
                 }`}
             >
               <source src="https://thefirstthelast.agency/assets/video/reel_small.mp4" type="video/mp4" />
             </video>
-            <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-black/20" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/10" />
             <button
               type="button"
               onClick={() => setExpanded((v) => !v)}
-              className="absolute bottom-5 right-5 z-20 flex min-h-[44px] min-w-[44px] flex-col items-center justify-center gap-1 rounded-full border border-white/25 bg-black/50 px-5 py-3 text-[9px] font-black uppercase tracking-widest backdrop-blur-md transition-all hover:border-accent hover:bg-accent/20 md:bottom-8 md:right-8"
+              className="absolute bottom-5 right-5 z-20 flex min-h-[44px] min-w-[44px] flex-col items-center justify-center gap-1 rounded-full border border-black/15 bg-white/90 px-5 py-3 text-[9px] font-black uppercase tracking-widest text-foreground shadow-sm backdrop-blur-md transition-all hover:border-accent hover:bg-accent/10 md:bottom-8 md:right-8"
               aria-label={expanded ? "Minimize video" : "Expand video"}
             >
               {expanded ? "Minimize" : "Expand"}

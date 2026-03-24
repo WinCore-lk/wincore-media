@@ -194,7 +194,7 @@ export default function FeaturedWorks() {
         {projects.map((project) => (
           <div
             key={project.id}
-            className="project-card group relative flex h-[55vh] w-[75vw] flex-shrink-0 cursor-pointer overflow-hidden rounded-[32px] border border-black/[0.06] bg-white/40 backdrop-blur-sm md:w-[520px] shadow-[0_30px_60px_rgba(0,0,0,0.05)]"
+            className="project-card group relative flex h-[55vh] w-[75vw] flex-shrink-0 cursor-pointer overflow-hidden rounded-[32px] border border-black/[0.06] bg-white/90 md:w-[520px] shadow-[0_30px_60px_rgba(0,0,0,0.05)]"
           >
             <div className="project-image absolute inset-0 h-full w-full transition-transform duration-700">
               <Image
@@ -206,7 +206,7 @@ export default function FeaturedWorks() {
               />
             </div>
 
-            <div className="project-overlay pointer-events-none absolute inset-0 flex flex-col justify-between bg-gradient-to-t from-black/80 via-black/40 to-transparent p-7 opacity-0">
+            <div className="project-overlay pointer-events-none absolute inset-0 flex flex-col justify-between bg-gradient-to-t from-black/80 via-black/40 to-transparent p-8 sm:p-10 opacity-0">
               <div className="flex items-start justify-between">
                 <span className="text-xs font-bold uppercase tracking-[0.3em] text-white/80">
                   {project.year}
@@ -227,7 +227,7 @@ export default function FeaturedWorks() {
             </div>
 
             {/* Bottom info for when not hovered */}
-            <div className="absolute -bottom-1 left-0 z-20 w-full p-8 text-foreground transition-opacity duration-300 group-hover:opacity-0 bg-gradient-to-t from-white via-white/80 to-transparent">
+            <div className="absolute -bottom-1 left-0 z-20 w-full p-9 sm:p-10 text-foreground transition-opacity duration-300 group-hover:opacity-0 bg-gradient-to-t from-white via-white/80 to-transparent">
               <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.3em] text-black/40">
                 {project.category}
               </p>

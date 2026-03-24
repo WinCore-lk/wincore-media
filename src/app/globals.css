@@ -49,6 +49,28 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* tftl-agency reference — text selection + slim scrollbar */
+::selection {
+  background: color-mix(in srgb, var(--accent) 28%, transparent);
+  color: var(--foreground);
+}
+
+::-webkit-scrollbar {
+  width: 3px;
+}
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--foreground) 22%, transparent);
+  border-radius: 99px;
+}
+
+.line-wrap {
+  overflow: hidden;
+  display: block;
+}
+
 h1, h2, h3, h4, h5, h6 {
   font-family: 'Neue Haas Grotesk', sans-serif;
   font-weight: 700;
@@ -68,19 +90,27 @@ h1, h2, h3, h4, h5, h6 {
   mix-blend-mode: soft-light;
 }
 
+/* Horizontal rhythm: keep type and cards off the viewport edge */
 ._container {
   width: 100%;
   max-width: 1240px;
   margin-left: auto;
   margin-right: auto;
-  padding-left: 1.5rem;
-  padding-right: 1.5rem;
+  padding-left: 1.75rem;
+  padding-right: 1.75rem;
 }
 
 @media (min-width: 768px) {
   ._container {
-    padding-left: 3rem;
-    padding-right: 3rem;
+    padding-left: 3.5rem;
+    padding-right: 3.5rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  ._container {
+    padding-left: 4rem;
+    padding-right: 4rem;
   }
 }
 

@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import Image from "next/image";
 import dynamic from "next/dynamic";
 import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import SplitType from "split-type";
 import {
   registerGsapPlugins,
@@ -11,6 +12,10 @@ import {
   scheduleScrollTriggerRefresh,
   prefersReducedMotion,
 } from "@/lib/motion";
+import { useLenis } from "@/context/LenisContext";
+import { usePreloaderDone } from "@/context/PreloaderContext";
+
+gsap.registerPlugin(ScrollTrigger);
 
 const AboutScene = dynamic(() => import("@/components/about/AboutScene"), {
   ssr: false,
@@ -51,20 +56,30 @@ const stats = [
 
 export default function AboutTeaser() {
   const sectionRef = useRef<HTMLElement>(null);
+  const lenis = useLenis();
+  const preloaderDone = usePreloaderDone();
 
   useEffect(() => {
+    if (!sectionRef.current || !lenis || !preloaderDone) return;
+
     registerGsapPlugins();
     const scroller = getScroller();
     const reduced = prefersReducedMotion();
     const splits: SplitType[] = [];
 
     const ctx = gsap.context(() => {
+      const section = sectionRef.current;
+      if (!section) return;
+
       // ── Heading char reveal ──
-      const headingEl = sectionRef.current?.querySelector(".abt-heading") as HTMLElement | null;
+      const headingEl = section.querySelector(".abt-heading") as HTMLElement | null;
       if (headingEl) {
         const split = new SplitType(headingEl, { types: "chars" });
         splits.push(split);
         if (split.chars) {
+          if (!reduced) {
+            gsap.set(split.chars, { yPercent: 110, opacity: 0 });
+          }
           gsap.from(split.chars, {
             yPercent: reduced ? 0 : 110,
             opacity: reduced ? 1 : 0,
@@ -83,22 +98,40 @@ export default function AboutTeaser() {
       }
 
       // ── Kicker ──
+      if (!reduced) {
+        gsap.set(".abt-kicker", { y: 20, opacity: 0 });
+      }
       gsap.from(".abt-kicker", {
-        y: reduced ? 0 : 20, opacity: reduced ? 1 : 0, duration: reduced ? 0 : 0.8, ease: "expo.out",
+        y: reduced ? 0 : 20,
+        opacity: reduced ? 1 : 0,
+        duration: reduced ? 0 : 0.8,
+        ease: "expo.out",
         immediateRender: false,
         scrollTrigger: { trigger: ".abt-kicker", scroller, start: "top 90%", once: true },
       });
 
       // ── Lead paragraph ──
+      if (!reduced) {
+        gsap.set(".abt-lead", { y: 28, opacity: 0 });
+      }
       gsap.from(".abt-lead", {
-        y: reduced ? 0 : 28, opacity: reduced ? 1 : 0, filter: reduced ? "blur(0px)" : "blur(8px)", duration: reduced ? 0 : 1, ease: "expo.out",
+        y: reduced ? 0 : 28,
+        opacity: reduced ? 1 : 0,
+        duration: reduced ? 0 : 1,
+        ease: "expo.out",
         immediateRender: false,
         scrollTrigger: { trigger: ".abt-lead", scroller, start: "top 88%", once: true },
       });
 
       // ── Rule ──
+      if (!reduced) {
+        gsap.set(".abt-rule", { scaleX: 0, transformOrigin: "left" });
+      }
       gsap.from(".abt-rule", {
-        scaleX: reduced ? 1 : 0, transformOrigin: "left", duration: reduced ? 0 : 1.1, ease: "expo.out",
+        scaleX: reduced ? 1 : 0,
+        transformOrigin: "left",
+        duration: reduced ? 0 : 1.1,
+        ease: "expo.out",
         immediateRender: false,
         scrollTrigger: { trigger: ".abt-rule", scroller, start: "top 90%", once: true },
       });
@@ -106,19 +139,28 @@ export default function AboutTeaser() {
       // ── Stat cards ──
       const statCards = gsap.utils.toArray<HTMLElement>(".abt-stat-card");
       statCards.forEach((card, i) => {
+        if (!reduced) {
+          gsap.set(card, { y: 40, opacity: 0, scale: 0.97 });
+        }
         gsap.from(card, {
-          y: reduced ? 0 : 40, opacity: reduced ? 1 : 0, scale: reduced ? 1 : 0.97, duration: reduced ? 0 : 0.9, delay: i * 0.08, ease: "expo.out",
+          y: reduced ? 0 : 40,
+          opacity: reduced ? 1 : 0,
+          scale: reduced ? 1 : 0.97,
+          duration: reduced ? 0 : 0.9,
+          delay: i * 0.08,
+          ease: "expo.out",
           immediateRender: false,
           scrollTrigger: { trigger: card, scroller, start: "top 90%", once: true },
         });
 
-        // Count-up
         const numEl = card.querySelector<HTMLElement>(".abt-counter");
         if (numEl) {
           const target = Number(numEl.dataset.target ?? 0);
           const proxy = { val: 0 };
           gsap.to(proxy, {
-            val: target, duration: reduced ? 0 : 1.8, ease: "power2.out",
+            val: target,
+            duration: reduced ? 0 : 1.8,
+            ease: "power2.out",
             immediateRender: false,
             scrollTrigger: { trigger: card, scroller, start: "top 85%", once: true },
             onUpdate() { numEl.textContent = Math.round(proxy.val).toString(); },
@@ -129,22 +171,35 @@ export default function AboutTeaser() {
       // ── Photo cards — each triggered independently ──
       const photoCards = gsap.utils.toArray<HTMLElement>(".abt-photo-card");
       photoCards.forEach((card, i) => {
+        if (!reduced) {
+          gsap.set(card, {
+            y: 50,
+            opacity: 0,
+            clipPath: "inset(16% 0 0 0 round 1.25rem)",
+          });
+        }
         gsap.from(card, {
-          y: reduced ? 0 : 50, opacity: reduced ? 1 : 0,
+          y: reduced ? 0 : 50,
+          opacity: reduced ? 1 : 0,
           clipPath: reduced ? "inset(0% 0 0 0 round 1.25rem)" : "inset(16% 0 0 0 round 1.25rem)",
-          duration: reduced ? 0 : 1.1, delay: i * 0.07, ease: "expo.out",
+          duration: reduced ? 0 : 1.1,
+          delay: i * 0.07,
+          ease: "expo.out",
           immediateRender: false,
           scrollTrigger: { trigger: card, scroller, start: "top 88%", once: true },
         });
       });
 
       // ── Gallery subtle parallax ──
+      if (!reduced) {
+        gsap.set("[data-about-shift]", { yPercent: 0, scale: 1 });
+      }
       gsap.to("[data-about-shift]", {
         yPercent: reduced ? 0 : -8,
         scale: reduced ? 1 : 1.03,
         ease: "none",
         scrollTrigger: {
-          trigger: sectionRef.current,
+          trigger: section,
           scroller,
           start: "top bottom",
           end: "bottom top",
@@ -153,14 +208,16 @@ export default function AboutTeaser() {
       });
 
       // ── Watermark drift (cinematic depth) ──
+      if (!reduced) {
+        gsap.set("[data-watermark]", { yPercent: 0, xPercent: 0, opacity: 1 });
+      }
       gsap.to("[data-watermark]", {
         yPercent: reduced ? 0 : 8,
         xPercent: reduced ? 0 : 6,
-        opacity: 0.55,
-        filter: reduced ? "blur(0px)" : "blur(0.5px)",
+        opacity: reduced ? 1 : 0.55,
         ease: "none",
         scrollTrigger: {
-          trigger: sectionRef.current,
+          trigger: section,
           scroller,
           start: "top top",
           end: "bottom top",
@@ -169,13 +226,16 @@ export default function AboutTeaser() {
       });
 
       // ── Ambient glow pulse with scroll ──
+      if (!reduced) {
+        gsap.set(".abt-scene-glow", { scale: 1, opacity: 0.8, yPercent: 0 });
+      }
       gsap.to(".abt-scene-glow", {
         scale: reduced ? 1 : 1.18,
         opacity: 0.95,
         yPercent: reduced ? 0 : -5,
         ease: "none",
         scrollTrigger: {
-          trigger: sectionRef.current,
+          trigger: section,
           scroller,
           start: "top bottom",
           end: "bottom top",
@@ -190,14 +250,14 @@ export default function AboutTeaser() {
       splits.forEach((s) => s.revert());
       ctx.revert();
     };
-  }, []);
+  }, [lenis, preloaderDone]);
 
   return (
     <section
       id="about"
       ref={sectionRef}
       data-chapter="custom"
-      className="relative overflow-hidden border-t border-white/5 bg-background pb-[18vw] pt-[15vw]"
+      className="relative overflow-hidden border-t border-black/5 bg-background pb-[min(14rem,20vw)] pt-[min(12rem,18vw)]"
       aria-label="About"
     >
       <div className="pointer-events-none absolute inset-0 z-0">
@@ -237,7 +297,7 @@ export default function AboutTeaser() {
               {stats.map((item) => (
                 <article
                   key={item.label}
-                  className="abt-stat-card rounded-2xl border border-black/[0.08] bg-black/[0.01] p-5"
+                  className="abt-stat-card rounded-2xl border border-black/[0.08] bg-black/[0.01] px-6 py-8 sm:px-7 sm:py-9"
                 >
                   <p className="mb-3 text-[10px] font-black uppercase tracking-[0.35em] text-black/35">
                     {item.label}
@@ -257,7 +317,7 @@ export default function AboutTeaser() {
             {team.map((member, index) => (
               <article
                 key={member.name}
-                className={`abt-photo-card group relative overflow-hidden border border-white/10 bg-muted/40 ${
+                className={`abt-photo-card group relative overflow-hidden border border-black/10 bg-muted/40 ${
                   index === 0
                     ? "col-span-2 h-[250px] rounded-[1.5rem] md:h-[300px]"
                     : "h-[215px] rounded-[1.3rem] md:h-[250px]"
@@ -267,8 +327,10 @@ export default function AboutTeaser() {
                   src={member.image}
                   alt={member.name}
                   fill
-                  className="object-cover grayscale transition-all duration-[1200ms] group-hover:scale-[1.06] group-hover:grayscale-0"
                   sizes="(max-width: 768px) 100vw, 600px"
+                  quality={90}
+                  loading="lazy"
+                  className="object-cover transition-all duration-[1200ms] group-hover:scale-[1.03]"
                 />
 
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent" />
