@@ -116,19 +116,19 @@ export default function WorksHero() {
       
       <div className="relative z-10 w-full max-w-[1240px] text-center">
         <div ref={titleRef} className="flex flex-col items-center">
-          <span className="hero-sub mb-8 inline-flex items-center gap-4 px-6 py-2.5 rounded-full border border-black/5 bg-black/[0.04]">
+          <span className="hero-sub mb-8 inline-flex items-center gap-4 rounded-full bg-black/[0.04] px-6 py-2.5">
             <span className="w-2.5 h-2.5 rounded-full bg-accent shadow-[0_0_15px_rgba(0,136,204,0.5)] animate-pulse" />
-            <span className="text-[11px] font-black uppercase tracking-[0.5em] text-black/40">Selected Archive 2024</span>
+            <span className="text-[11px] font-black uppercase leading-[1.4] tracking-[0.42em] text-black/40">Selected Archive 2024</span>
           </span>
           
-          <h1 className="font-heading text-[16vw] sm:text-[14vw] md:text-[10vw] lg:text-[9vw] font-black uppercase leading-[0.9] tracking-tighter text-foreground">
+          <h1 className="font-heading text-[16vw] sm:text-[14vw] md:text-[10vw] lg:text-[9vw] font-black uppercase leading-[0.96] tracking-tighter text-foreground">
             World-class <br />
             <span className="text-black/15 italic font-light tracking-[-0.08em] hover:text-black transition-colors duration-1000 cursor-default">creativity</span>
           </h1>
           
-          <p className="hero-sub mx-auto mt-16 max-w-3xl text-lg font-light leading-relaxed text-black/40 md:text-xl md:leading-relaxed">
-            Crafting cinematic digital experiences that blend <br />
-            <span className="text-black/80 font-medium italic underline decoration-accent/30 underline-offset-8">strategic logic with creative wonder.</span>
+          <p className="hero-sub mx-auto mt-16 max-w-3xl text-lg font-light leading-relaxed text-black/50 md:text-xl md:leading-relaxed">
+            Crafting cinematic digital experiences that blend
+            <span className="text-black/80 font-medium italic underline decoration-accent/30 underline-offset-8"> strategic logic with creative wonder.</span>
           </p>
 
           {/* Mouse hint icon logic is handled via GSAP entrance */}

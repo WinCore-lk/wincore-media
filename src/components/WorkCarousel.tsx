@@ -2,14 +2,11 @@
 
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Image from "next/image";
 import ProjectModal, { type Project } from "@/components/ProjectModal";
-import { ArrowRight } from "lucide-react";
 import {
   registerGsapPlugins,
   getScroller,
-  scheduleScrollTriggerRefresh,
   prefersReducedMotion,
 } from "@/lib/motion";
 
@@ -212,15 +209,15 @@ export default function WorkCarousel() {
       <div className="wc-heading-block _container relative z-10 py-16">
         <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
           <div className="max-w-2xl">
-            <span className="mb-4 inline-block text-[10px] font-black uppercase tracking-[0.5em] text-accent">Selected Archives</span>
-            <h2 className="font-heading text-4xl md:text-5xl lg:text-6xl font-black uppercase leading-[0.95] tracking-tighter text-foreground">
+            <span className="mb-4 inline-block text-[10px] font-black uppercase leading-[1.35] tracking-[0.42em] text-accent">Selected Archives</span>
+            <h2 className="font-heading text-4xl md:text-5xl lg:text-6xl font-black uppercase leading-[1.02] tracking-tighter text-foreground">
               Works that <br />
               <span className="text-black/30 italic">rewrite the rules</span>
             </h2>
           </div>
           <div className="flex items-center gap-4">
              <div className={`h-px w-32 bg-gradient-to-r from-accent/50 to-transparent ${useHorizontal ? "opacity-100" : "opacity-0"}`} />
-             <span className="text-[10px] font-black uppercase tracking-[0.3em] text-black/30">
+             <span className="text-[10px] font-black uppercase leading-[1.35] tracking-[0.24em] text-black/35">
                {useHorizontal ? "Scroll Side" : "Scroll Down"}
              </span>
           </div>
@@ -242,7 +239,7 @@ export default function WorkCarousel() {
               <button
                 type="button"
                 onClick={() => setSelectedProject(project)}
-                className="wc-tilt group relative h-[70vh] w-full max-w-7xl overflow-hidden rounded-[2.5rem] border border-black/5 bg-white text-left shadow-xl transition-transform duration-500"
+                className="wc-tilt group relative h-[70vh] w-full max-w-7xl overflow-hidden rounded-[2.5rem] bg-white text-left shadow-xl shadow-black/10 transition-transform duration-500"
               >
                 <Image
                   src={project.image}
@@ -255,18 +252,18 @@ export default function WorkCarousel() {
                   loading={i === 0 ? undefined : "lazy"}
                 />
                 <div className="wc-shine pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500" />
-                <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-white/5 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-white/75 via-white/0 to-transparent" />
                 
                 <div className="absolute bottom-14 left-8 right-8 z-10 sm:bottom-16 sm:left-12 sm:right-12 md:left-14 md:right-14">
-                  <span className="text-accent uppercase tracking-[0.5em] font-black text-[10px] mb-4 block">
+                  <span className="mb-4 block text-[10px] font-black uppercase leading-[1.35] tracking-[0.4em] text-accent">
                     {project.category}
                   </span>
-                  <h3 className="text-3xl md:text-6xl font-black uppercase leading-[0.9] tracking-tighter text-foreground transition-transform group-hover:translate-x-2">
+                  <h3 className="text-3xl md:text-6xl font-black uppercase leading-[0.96] tracking-tighter text-foreground transition-transform group-hover:translate-x-2">
                     {project.title}
                   </h3>
                   <div className="mt-8 flex items-center gap-3">
                     <span className="h-px w-12 bg-black/20" />
-                    <p className="text-[9px] font-black uppercase tracking-[0.4em] text-black/40 transition-colors group-hover:text-accent">View Project</p>
+                    <p className="text-[10px] font-black uppercase leading-[1.35] tracking-[0.3em] text-black/45 transition-colors group-hover:text-accent">View Project</p>
                   </div>
                 </div>
               </button>

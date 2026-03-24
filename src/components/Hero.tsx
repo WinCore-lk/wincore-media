@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -73,24 +73,20 @@ function startCountUp(root: ParentNode, immediate = false) {
 export default function Hero() {
   const introRef = useRef<HTMLElement>(null);
   const reelRef = useRef<HTMLElement>(null);
-  const tipRefs = useRef<(HTMLDivElement | null)[]>([]);
   const hasCountedRef = useRef(false);
   const [expanded, setExpanded] = useState(false);
   const lenis = useLenis();
   const preloaderDone = usePreloaderDone();
   /** Ensures hero runs even if preloader context is slow (fallback matches Preloader safety timeout). */
-  const [entranceUnlocked, setEntranceUnlocked] = useState(false);
+  const [entranceTimeoutReached, setEntranceTimeoutReached] = useState(false);
+  const entranceUnlocked = preloaderDone || entranceTimeoutReached;
 
   useEffect(() => {
     registerGsapPlugins();
   }, []);
 
   useEffect(() => {
-    if (preloaderDone) setEntranceUnlocked(true);
-  }, [preloaderDone]);
-
-  useEffect(() => {
-    const id = window.setTimeout(() => setEntranceUnlocked(true), 7000);
+    const id = window.setTimeout(() => setEntranceTimeoutReached(true), 7000);
     return () => window.clearTimeout(id);
   }, []);
 
@@ -159,7 +155,7 @@ export default function Hero() {
       const wordEls = splits.flatMap((s) => s.words ?? []).filter(Boolean) as HTMLElement[];
       const lineEls = Array.from(root.querySelectorAll<HTMLElement>(".hero-line-split"));
 
-      let useLineFallback = wordEls.length === 0 && lineEls.length > 0;
+      const useLineFallback = wordEls.length === 0 && lineEls.length > 0;
       if (useLineFallback) {
         splits.forEach((s) => s.revert());
         splits.length = 0;

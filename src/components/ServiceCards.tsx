@@ -72,7 +72,7 @@ function ServiceRow({
     <div
       onMouseEnter={onHover}
       onMouseLeave={onLeave}
-      className="sc-service-row group relative border-b border-black/[0.05] py-12 md:py-16"
+      className="sc-service-row group relative py-12 md:py-16"
     >
       {/* Hover background */}
       <div className="absolute inset-0 bg-gradient-to-r from-accent/[0.04] to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
@@ -83,7 +83,7 @@ function ServiceRow({
           <span className="w-10 shrink-0 text-right text-xs font-black italic text-accent/40 transition-colors duration-500 group-hover:text-accent md:w-12">
             {service.num}
           </span>
-          <h3 className="text-[10vw] font-black uppercase leading-[0.9] tracking-tight text-foreground/80 transition-colors duration-500 group-hover:text-foreground sm:text-[8.8vw] md:text-[3.6vw] md:leading-[0.92]">
+          <h3 className="text-[10vw] font-black uppercase leading-[0.96] tracking-tight text-foreground/80 transition-colors duration-500 group-hover:text-foreground sm:text-[8.8vw] md:text-[3.6vw] md:leading-[0.98]">
             {service.title}
           </h3>
         </div>
@@ -94,7 +94,7 @@ function ServiceRow({
             {service.desc}
           </p>
           <div className="flex translate-y-2 items-center gap-2 text-accent opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100">
-            <span className="text-[9px] font-black uppercase tracking-[0.4em]">
+            <span className="text-[10px] font-black uppercase leading-[1.35] tracking-[0.34em]">
               {service.link ? "Open Platform" : "Explore"}
             </span>
             <ArrowUpRight size={13} />
@@ -221,7 +221,7 @@ export default function ServiceCards() {
     <section
       id="services"
       ref={sectionRef}
-      className="relative overflow-hidden border-t border-black/5 bg-background py-16 md:py-24"
+      className="relative overflow-hidden bg-background py-16 md:py-24"
       aria-label="Capabilities"
     >
       {/* Right-side accent glow */}
@@ -236,13 +236,13 @@ export default function ServiceCards() {
           <div>
             <p
               ref={kickerRef}
-              className="sc-header-kicker mb-8 text-[10px] font-black uppercase tracking-[0.55em] text-accent"
+              className="sc-header-kicker mb-8 text-[10px] font-black uppercase leading-[1.4] tracking-[0.5em] text-accent"
             >
               Core Capabilities
             </p>
             <h2
               ref={headingRef}
-              className="pb-1 text-[14vw] font-black uppercase leading-[0.9] tracking-tight text-foreground md:text-[7.4vw]"
+              className="pb-1 text-[14vw] font-black uppercase leading-[0.96] tracking-tight text-foreground md:text-[7.4vw]"
             >
               Building<br />
               <span className="text-black/[0.08] italic">Impact</span>
@@ -297,11 +297,11 @@ export default function ServiceCards() {
             }}
           >
             <Image src={s.image} alt={s.title} fill className="object-cover" sizes="440px" quality={90} />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/72 via-black/14 to-transparent" />
           </div>
         ))}
         {activeIndex !== null && (
-          <div className="absolute bottom-6 left-6 text-[10px] font-black uppercase tracking-[0.4em] text-white/50">
+          <div className="absolute bottom-6 left-6 text-[10px] font-black uppercase leading-[1.35] tracking-[0.36em] text-white/60">
             {SERVICES[activeIndex].num} / {SERVICES.length}
           </div>
         )}

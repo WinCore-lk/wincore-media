@@ -1,27 +1,22 @@
 "use client";
 
-import { useMemo, useRef, Suspense } from "react";
+import { useEffect, useRef, useState, Suspense } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Points, PointMaterial } from "@react-three/drei";
 import * as THREE from "three";
+import { createSpherePoints } from "@/lib/sphere-points";
 
 function Cloud({ count = 3500 }) {
-  const points = useMemo(() => {
-    const p = new Float32Array(count * 3);
-    for (let i = 0; i < count; i++) {
-        const theta = 2 * Math.PI * Math.random();
-        const phi = Math.acos(2 * Math.random() - 1);
-        const r = 3 + Math.random() * 2;
-        p[i * 3] = r * Math.sin(phi) * Math.cos(theta);
-        p[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
-        p[i * 3 + 2] = r * Math.cos(phi);
-    }
-    return p;
+  const [points, setPoints] = useState<Float32Array | null>(null);
+
+  useEffect(() => {
+    setPoints(createSpherePoints(count, 5));
   }, [count]);
 
   const ref = useRef<THREE.Points>(null!);
   
   useFrame((state) => {
+    if (!ref.current) return;
     const time = state.clock.getElapsedTime();
     ref.current.rotation.y = time * 0.08;
     ref.current.rotation.z = time * 0.04;
@@ -31,29 +26,33 @@ function Cloud({ count = 3500 }) {
 
   return (
     <group>
-      <Points ref={ref} positions={points} stride={3} frustumCulled={false}>
-        <PointMaterial
-          transparent
-          color="#00BFFF"
-          size={0.015}
-          sizeAttenuation={true}
-          depthWrite={false}
-          blending={THREE.AdditiveBlending}
-          opacity={0.6}
-        />
-      </Points>
-      {/* Second Colorful Layer */}
-      <Points positions={points.slice(0, 1000 * 3)} stride={3} frustumCulled={false}>
-        <PointMaterial
-          transparent
-          color="#FF00FF"
-          size={0.02}
-          sizeAttenuation={true}
-          depthWrite={false}
-          blending={THREE.AdditiveBlending}
-          opacity={0.3}
-        />
-      </Points>
+      {points && (
+        <>
+          <Points ref={ref} positions={points} stride={3} frustumCulled={false}>
+            <PointMaterial
+              transparent
+              color="#00BFFF"
+              size={0.015}
+              sizeAttenuation={true}
+              depthWrite={false}
+              blending={THREE.AdditiveBlending}
+              opacity={0.6}
+            />
+          </Points>
+          {/* Second Colorful Layer */}
+          <Points positions={points.slice(0, 1000 * 3)} stride={3} frustumCulled={false}>
+            <PointMaterial
+              transparent
+              color="#FF00FF"
+              size={0.02}
+              sizeAttenuation={true}
+              depthWrite={false}
+              blending={THREE.AdditiveBlending}
+              opacity={0.3}
+            />
+          </Points>
+        </>
+      )}
     </group>
   );
 }

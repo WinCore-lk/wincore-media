@@ -132,15 +132,15 @@ export default function ContactFooter() {
     <footer
       ref={footerRef}
       id="contact"
-      className="relative overflow-hidden border-t border-black/5 bg-background pb-16 pt-20 md:pb-24 md:pt-28"
+      className="relative overflow-hidden bg-background pb-16 pt-20 md:pb-24 md:pt-28"
     >
       <div className="_container relative z-10">
         {/* ── Main Contact Section ── */}
         <div className="mb-16 flex flex-col items-center justify-center text-center md:mb-24">
-          <span className="cf-kicker mb-6 text-[11px] font-black uppercase tracking-[0.5em] text-accent">
+          <span className="cf-kicker mb-6 text-[11px] font-black uppercase leading-[1.4] tracking-[0.44em] text-accent">
             Let&apos;s Build Together
           </span>
-          <h2 className="mb-14 pb-1 text-[16vw] font-black uppercase leading-[0.9] tracking-tighter md:text-[14vw]">
+          <h2 className="mb-14 pb-1 text-[16vw] font-black uppercase leading-[0.96] tracking-tighter md:text-[14vw]">
             <span className="block overflow-hidden">
               <span className="cf-title-line block text-foreground">GOT A</span>
             </span>
@@ -154,7 +154,7 @@ export default function ContactFooter() {
           <div className="cf-contact-block relative z-20">
             <a
               href="mailto:hello@wincore.media"
-              className="group relative flex items-center gap-6 overflow-hidden rounded-full border border-black/10 bg-white/60 py-5 pl-10 pr-5 shadow-[0_4px_24px_rgba(0,0,0,0.03)] backdrop-blur-xl transition-all duration-500 hover:border-accent/50 hover:bg-white/80 hover:shadow-[0_8px_32px_rgba(0,191,255,0.15)]"
+              className="group relative flex items-center gap-6 overflow-hidden rounded-full bg-white/70 py-5 pl-10 pr-5 shadow-[0_8px_28px_rgba(0,0,0,0.06)] backdrop-blur-xl transition-all duration-500 hover:bg-white/90 hover:shadow-[0_14px_36px_rgba(0,191,255,0.14)]"
             >
               <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-accent/20 to-transparent transition-transform duration-500 group-hover:translate-x-0" />
               <span className="relative z-10 text-sm font-bold uppercase tracking-widest text-black/90 transition-colors group-hover:text-foreground md:text-xl">
@@ -180,7 +180,7 @@ export default function ContactFooter() {
         </div>
 
         <nav
-          className="cf-reveal mb-12 flex flex-wrap items-center justify-center gap-x-10 gap-y-4 border-b border-black/5 pb-12 md:justify-between"
+          className="cf-reveal mb-12 flex flex-wrap items-center justify-center gap-x-10 gap-y-4 pb-12 md:justify-between"
           aria-label="Footer"
         >
           <Link href="/" className="text-[10px] font-black uppercase tracking-[0.45em] text-black/35 transition-colors hover:text-accent">
@@ -201,7 +201,7 @@ export default function ContactFooter() {
         </nav>
 
         {/* ── Secondary Footer ── */}
-        <div className="cf-reveal border-t border-black/5 pt-12 md:pt-16">
+        <div className="cf-reveal pt-12 md:pt-16">
           <div className="grid grid-cols-1 gap-10 md:grid-cols-12 md:gap-8">
             <div className="md:col-span-7 flex flex-col gap-6">
               <Link href="/" className="cursor-hover flex flex-col items-start">
@@ -221,7 +221,7 @@ export default function ContactFooter() {
               </div>
 
               <div className="cf-company-shell mt-3 overflow-visible">
-                <p className="cf-company-name text-left font-black uppercase leading-[0.9] tracking-tight text-black/90 text-[clamp(2.4rem,10vw,8.5rem)]">
+                <p className="cf-company-name text-left font-black uppercase leading-[0.96] tracking-tight text-black/90 text-[clamp(2.4rem,10vw,8.5rem)]">
                   WINCORE MEDIA
                 </p>
               </div>

@@ -2,7 +2,6 @@
 
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Image from "next/image";
 import { registerGsapPlugins, getScroller, prefersReducedMotion } from "@/lib/motion";
 
@@ -51,7 +50,7 @@ export default function WorksModernStats() {
       const container = containerRef.current;
       if (!container) return;
 
-      const items = gsap.utils.toArray(".stat-panel");
+      const items = gsap.utils.toArray<HTMLElement>(".stat-panel");
       const xPercent = -100 * (items.length - 1);
 
       const scrollTween = gsap.to(items, {
@@ -59,24 +58,28 @@ export default function WorksModernStats() {
         ease: "none",
         scrollTrigger: {
           trigger: sectionRef.current,
+          scroller,
           pin: true,
-          scrub: 1.2,
-          end: () => `+=${container.offsetWidth * 0.5}`,
+          pinSpacing: false,
+          scrub: 0.9,
+          snap: 1 / (items.length - 1),
+          end: () => `+=${window.innerWidth * (items.length - 1) * 0.86}`,
           invalidateOnRefresh: true,
         },
       });
 
       // Parallax text inside panels
-      items.forEach((item: any) => {
+      items.forEach((item) => {
         const text = item.querySelector(".stat-text");
         const img = item.querySelector("img");
         
         gsap.to(text, {
-          x: -100,
-          opacity: 0.5,
+          x: -24,
+          opacity: 0.9,
           ease: "none",
           scrollTrigger: {
             trigger: item,
+            scroller,
             containerAnimation: scrollTween,
             start: "left center",
             end: "right center",
@@ -85,10 +88,11 @@ export default function WorksModernStats() {
         });
 
         gsap.to(img, {
-          scale: 1.2,
+          scale: 1.06,
           ease: "none",
           scrollTrigger: {
             trigger: item,
+            scroller,
             containerAnimation: scrollTween,
             start: "left right",
             end: "right left",
@@ -104,19 +108,20 @@ export default function WorksModernStats() {
   return (
     <section 
       ref={sectionRef} 
-      className="relative h-screen bg-background overflow-hidden"
+      className="relative h-[92vh] bg-background overflow-hidden md:h-screen"
     >
       <div 
         ref={containerRef}
-        className="flex h-full w-[400vw] will-change-transform"
+        className="flex h-full will-change-transform"
+        style={{ width: `${stats.length * 100}vw` }}
       >
         {stats.map((stat, i) => (
           <div 
             key={i} 
-            className="stat-panel relative h-full w-screen flex-shrink-0 flex items-center justify-center"
+            className="stat-panel relative flex h-full w-screen flex-shrink-0 items-center justify-center overflow-hidden"
           >
             {/* Background Image */}
-            <div className="absolute inset-0 z-0 scale-110">
+            <div className="absolute inset-0 z-0">
               <Image 
                 src={stat.image} 
                 alt="" 
@@ -127,20 +132,22 @@ export default function WorksModernStats() {
             </div>
 
             {/* Content */}
-            <div className="stat-text relative z-10 text-center px-4 max-w-4xl">
-              <span className="mb-6 inline-block text-[10px] font-black uppercase tracking-[0.8em] text-accent">
+            <div className="stat-text relative z-10 max-w-4xl px-5 text-center md:px-6">
+              <span className="mb-6 inline-block text-[10px] font-black uppercase leading-[1.35] tracking-[0.62em] text-accent">
                 Metric {i + 1}
               </span>
-              <h2 className="font-heading text-[22vw] md:text-[18vw] font-black uppercase leading-none tracking-tighter text-white">
-                {stat.value}
-                <span className="text-white/50">{stat.suffix}</span>
+              <h2 className="font-heading text-[22vw] md:text-[18vw] font-black uppercase leading-none tracking-tighter text-white whitespace-nowrap">
+                <span className="inline-flex items-end gap-[0.02em]">
+                  <span>{stat.value}</span>
+                  <span className="text-white/60">{stat.suffix}</span>
+                </span>
               </h2>
-              <div className="mt-8 flex flex-col items-center">
+              <div className="mt-9 flex flex-col items-center">
                 <p className="text-xl md:text-3xl font-black uppercase tracking-tight text-white mb-4">
                   {stat.label}
                 </p>
                 <div className="h-px w-24 bg-accent/50 mb-6" />
-                <p className="mx-auto max-w-lg text-base md:text-lg font-medium leading-relaxed text-white/80">
+                <p className="mx-auto max-w-xl text-base font-medium leading-relaxed text-white/88 md:text-lg">
                   {stat.desc}
                 </p>
               </div>
@@ -160,7 +167,7 @@ export default function WorksModernStats() {
       </div>
 
       {/* Intro Overlay */}
-      <div className="pointer-events-none absolute inset-0 z-[5] bg-[radial-gradient(circle_at_center,transparent_0%,white_100%)] opacity-40" />
+      <div className="pointer-events-none absolute inset-0 z-[5] bg-[radial-gradient(circle_at_center,transparent_0%,white_100%)] opacity-14" />
     </section>
   );
 }

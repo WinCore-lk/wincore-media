@@ -257,7 +257,7 @@ export default function AboutTeaser() {
       id="about"
       ref={sectionRef}
       data-chapter="custom"
-      className="relative overflow-hidden border-t border-black/5 bg-background pb-20 pt-20"
+      className="relative overflow-hidden bg-background pb-20 pt-20"
       aria-label="About"
     >
       <div className="pointer-events-none absolute inset-0 z-0">
@@ -277,11 +277,11 @@ export default function AboutTeaser() {
       <div className="chapter-inner _container relative z-10">
         <div className="grid grid-cols-1 items-start gap-14 lg:grid-cols-12 lg:gap-10">
           <div className="lg:col-span-5">
-            <p className="abt-kicker mb-8 text-[11px] font-black uppercase tracking-[0.48em] text-secondary">
+            <p className="abt-kicker mb-8 text-[11px] font-black uppercase leading-[1.4] tracking-[0.44em] text-secondary">
               About
             </p>
 
-            <h2 className="abt-heading mb-7 pb-1 text-[11.5vw] font-black uppercase leading-[0.92] tracking-tighter md:text-[5.4vw]">
+            <h2 className="abt-heading mb-7 pb-1 text-[11.5vw] font-black uppercase leading-[0.98] tracking-tighter md:text-[5.4vw]">
               Colombo-based.<br />
               <span className="text-black/15 italic">Globally delivered.</span>
             </h2>
@@ -297,9 +297,9 @@ export default function AboutTeaser() {
               {stats.map((item) => (
                 <article
                   key={item.label}
-                  className="abt-stat-card rounded-2xl border border-black/[0.08] bg-black/[0.01] px-6 py-8 sm:px-7 sm:py-9"
+                  className="abt-stat-card rounded-2xl bg-white/70 px-6 py-8 shadow-sm shadow-black/5 sm:px-7 sm:py-9"
                 >
-                  <p className="mb-3 text-[10px] font-black uppercase tracking-[0.35em] text-black/35">
+                  <p className="mb-3 text-[10px] font-black uppercase leading-[1.4] tracking-[0.3em] text-black/40">
                     {item.label}
                   </p>
                   <div className="flex items-baseline gap-1">
@@ -317,7 +317,7 @@ export default function AboutTeaser() {
             {team.map((member, index) => (
               <article
                 key={member.name}
-                className={`abt-photo-card group relative overflow-hidden border border-black/10 bg-muted/40 ${
+                className={`abt-photo-card group relative overflow-hidden bg-muted/40 shadow-lg shadow-black/8 ${
                   index === 0
                     ? "col-span-2 h-[250px] rounded-[1.5rem] md:h-[300px]"
                     : "h-[215px] rounded-[1.3rem] md:h-[250px]"
@@ -333,10 +333,10 @@ export default function AboutTeaser() {
                   className="object-cover transition-all duration-[1200ms] group-hover:scale-[1.03]"
                 />
 
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/8 to-transparent" />
                 <div className="absolute inset-0 flex translate-y-4 flex-col justify-end p-5 transition-transform duration-500 group-hover:translate-y-0 md:p-6">
                   <p className="text-lg font-bold text-white md:text-xl">{member.name}</p>
-                  <p className="text-[10px] font-black uppercase tracking-[0.36em] text-accent opacity-0 transition-opacity delay-100 group-hover:opacity-100">
+                  <p className="text-[10px] font-black uppercase leading-[1.35] tracking-[0.3em] text-accent opacity-0 transition-opacity delay-100 group-hover:opacity-100">
                     {member.role}
                   </p>
                 </div>

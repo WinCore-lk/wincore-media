@@ -6,7 +6,6 @@ import { registerGsapPlugins, getScroller, prefersReducedMotion } from "@/lib/mo
 
 const brands = [
   "Nova Bank", "Nexus AI", "Island Pulse", "Vortex Tech", "Midas Luxury", 
-  "Aura Digital", "Zenith Media", "Orbit Systems", "Prime Assets", "Eclipse Global",
   "Aura Digital", "Zenith Media", "Orbit Systems", "Prime Assets", "Eclipse Global"
 ];
 
@@ -25,9 +24,9 @@ export default function BrandWall() {
       // Initial 3D scatter
       items.forEach((item, i) => {
           gsap.set(item, {
-              z: (i % 3) * -200,
-              y: (i % 2 === 0 ? 50 : -50),
-              rotateX: (i % 2 === 0 ? 15 : -15),
+            z: (i % 3) * -90,
+            y: (i % 2 === 0 ? 18 : -18),
+            rotateX: (i % 2 === 0 ? 8 : -8),
               opacity: 0,
           });
       });
@@ -52,10 +51,10 @@ export default function BrandWall() {
 
       // 3D Orbit Flight on scroll
       gsap.to(items, {
-        y: (i) => (i % 2 === 0 ? -120 : 120),
-        z: (i) => (i % 3 === 0 ? 300 : -300),
-        rotateX: (i) => (i % 2 === 0 ? 25 : -25),
-        rotateY: (i) => (i % 5 === 0 ? 30 : -30),
+        y: (i) => (i % 2 === 0 ? -36 : 36),
+        z: (i) => (i % 3 === 0 ? 120 : -120),
+        rotateX: (i) => (i % 2 === 0 ? 12 : -12),
+        rotateY: (i) => (i % 5 === 0 ? 14 : -14),
         ease: "none",
         scrollTrigger: {
           trigger: sectionRef.current,
@@ -91,23 +90,23 @@ export default function BrandWall() {
     >
       <div className="_container relative z-10">
         <div className="mb-16 md:mb-24 text-center max-w-4xl mx-auto">
-          <span className="mb-6 inline-block text-[11px] font-black uppercase tracking-[0.8em] text-accent/60">Legacy Partners</span>
-          <h2 className="pb-1 font-heading text-6xl md:text-8xl lg:text-9xl font-black uppercase leading-[0.92] tracking-tighter text-foreground">
+          <span className="mb-6 inline-block text-[11px] font-black uppercase leading-[1.35] tracking-[0.62em] text-accent/60">Legacy Partners</span>
+          <h2 className="pb-1 font-heading text-6xl md:text-8xl lg:text-9xl font-black uppercase leading-[0.98] tracking-tighter text-foreground">
             Driven by the <br />
             <span className="text-black/15 italic font-light">standard setters</span>
           </h2>
         </div>
 
-        <div className="flex flex-wrap items-center justify-center gap-6 md:gap-14 px-4 perspective-[2000px] transform-style-3d">
+        <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-4 px-4 perspective-[2000px] transform-style-3d md:gap-x-10 md:gap-y-6">
           {brands.map((brand, i) => (
             <div 
               key={i}
-              className="brand-item group relative w-40 h-24 md:w-64 md:h-40 flex items-center justify-center rounded-[2rem] border border-black/5 bg-gradient-to-br from-white/90 to-black/[0.02] transition-all duration-700 hover:border-accent/40 hover:bg-white will-change-transform"
+              className="brand-item group relative flex h-24 w-44 items-center justify-center rounded-[2rem] bg-gradient-to-br from-white to-black/[0.02] shadow-md shadow-black/10 transition-all duration-700 hover:bg-white hover:shadow-lg hover:shadow-black/15 will-change-transform md:h-36 md:w-56"
             >
               <div className="brand-shine absolute inset-0 bg-gradient-to-tr from-accent/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-[2rem]" />
               <div className="absolute inset-0 rounded-[2rem] bg-[radial-gradient(circle_at_center,rgba(0,0,0,0.03),transparent_70%)] opacity-0 group-hover:opacity-100 transition-opacity" />
               
-              <span className="relative z-10 text-xs md:text-lg font-black uppercase tracking-widest text-black/10 group-hover:text-foreground group-hover:scale-110 transition-all duration-700">
+              <span className="relative z-10 px-3 text-center text-[11px] font-black uppercase leading-[1.3] tracking-[0.14em] text-black/60 transition-all duration-700 group-hover:scale-105 group-hover:text-foreground md:text-[15px]">
                 {brand}
               </span>
               

@@ -36,8 +36,7 @@ export default function Preloader() {
 
     document.body.style.overflow = "hidden";
 
-    let exitCtx: ReturnType<typeof gsap.context> | undefined;
-    exitCtx = gsap.context(() => {
+    const exitCtx = gsap.context(() => {
       const tl = gsap.timeline({
         onComplete: () => {
           target.style.display = "none";

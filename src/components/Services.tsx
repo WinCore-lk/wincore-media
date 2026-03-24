@@ -79,16 +79,16 @@ export default function Services() {
   }, []);
 
   return (
-    <section id="services" className="py-32 bg-background border-t border-black/5">
+    <section id="services" className="py-32 bg-background">
       <div className="container mx-auto px-5 sm:px-8 md:px-10 lg:px-12">
         <div className="flex flex-col md:flex-row justify-between items-end mb-20">
           <div className="max-w-xl">
-            <span className="text-accent font-bold uppercase tracking-[0.4em] text-sm mb-4 block">Services</span>
-            <h2 className="text-4xl md:text-7xl font-black text-foreground leading-[0.9]">
+            <span className="text-accent font-bold uppercase tracking-[0.4em] text-sm mb-4 block leading-[1.4]">Services</span>
+            <h2 className="text-4xl md:text-7xl font-black text-foreground leading-[1.1]">
               Capabilities
             </h2>
           </div>
-          <p className="text-foreground/50 text-lg md:text-xl max-w-sm mt-8 md:mt-0 font-medium">
+          <p className="text-foreground/50 text-lg md:text-xl max-w-sm mt-8 md:mt-0 font-medium leading-[1.5]">
             Tailored digital solutions designed for the modern landscape.
           </p>
         </div>
@@ -97,16 +97,16 @@ export default function Services() {
           {services.map((service, index) => (
             <div
               key={index}
-              className="service-card group bg-muted rounded-3xl border border-black/10 px-10 py-12 transition-all duration-500 hover:border-accent/40 flex flex-col justify-between min-h-[400px] sm:px-12 sm:py-14 md:px-14 md:py-16"
+              className="service-card group bg-white rounded-2xl shadow-lg shadow-black/8 px-9 py-12 transition-all duration-500 hover:shadow-2xl hover:shadow-black/15 hover:scale-[1.02] flex flex-col justify-between min-h-[420px] sm:px-11 sm:py-14 md:px-12 md:py-16 overflow-visible isolate"
             >
               <div>
                 <div className="mb-8 transform transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-6 origin-left">
-                  <service.icon size={40} className="text-secondary" />
+                  <service.icon size={44} className="text-secondary" />
                 </div>
-                <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-4 group-hover:text-accent transition-colors">
+                <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-4 group-hover:text-accent transition-colors leading-[1.2]">
                   {service.title}
                 </h3>
-                <p className="text-foreground/55 text-base leading-relaxed">
+                <p className="text-foreground/55 text-base leading-[1.6]">
                   {service.description}
                 </p>
               </div>
@@ -114,7 +114,7 @@ export default function Services() {
               <div className="mt-8 flex items-center gap-4">
                 <div className="h-0.5 w-8 bg-black/10 group-hover:w-16 group-hover:bg-accent transition-all duration-500" />
                 {service.link && (
-                    <a href={service.link} target="_blank" rel="noopener noreferrer" className="text-xs uppercase tracking-widest font-black text-foreground/45 hover:text-foreground">
+                    <a href={service.link} target="_blank" rel="noopener noreferrer" className="text-xs uppercase tracking-widest font-black text-foreground/45 hover:text-foreground leading-[1.3]">
                         Learn More
                     </a>
                 )}
