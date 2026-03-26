@@ -5,8 +5,8 @@ import WorksModernStats from "@/components/WorksModernStats";
 import BrandWall from "@/components/BrandWall";
 
 export const metadata = {
-  title: "Works — Wincore Agency",
-  description: "Selected campaigns and immersive digital experiences by Wincore Agency.",
+  title: "Works — Wincore",
+  description: "Selected campaigns and immersive digital experiences by Wincore.",
 };
 
 export default function WorksPage() {

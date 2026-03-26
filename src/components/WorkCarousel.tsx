@@ -63,6 +63,58 @@ const PROJECTS: Project[] = [
     impact: "+300% Booking",
     link: "https://pulse.travel",
   },
+  {
+    id: 5,
+    title: "Vanguard Mobility",
+    category: "App / Motion",
+    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=1200",
+    tags: ["Mobile", "Prototyping", "UI/UX"],
+    description: "A dark-mode first UI for premium electric mobility. Fluid micro-interactions and high-contrast typography.",
+    stack: "React Native, Reanimated",
+    duration: "14 Weeks",
+    role: "UX & Dev Partner",
+    impact: "4.9 App Store",
+    link: "https://vanguard.eco",
+  },
+  {
+    id: 6,
+    title: "Aura Architecture",
+    category: "Web / Editorial",
+    image: "https://images.unsplash.com/photo-1600607686527-6fb886090705?auto=format&fit=crop&q=80&w=1200",
+    tags: ["Minimal", "Layout", "Typography"],
+    description: "A brutalist yet pristine editorial platform showcasing avant-garde architectural designs.",
+    stack: "Next.js, Sanity, GSAP",
+    duration: "8 Weeks",
+    role: "Full Service",
+    impact: "+150% Engagement",
+    link: "https://aura-arch.com",
+  },
+  {
+    id: 7,
+    title: "Nexus Labs",
+    category: "3D / Brand",
+    image: "https://images.unsplash.com/photo-1614729939124-032f0b56c9ce?auto=format&fit=crop&q=80&w=1200",
+    tags: ["Brand", "3D", "Identity"],
+    description: "Brand identity and immersive 3D landing page for a deep-tech research firm. Metallic materials and dynamic lighting.",
+    stack: "Spline, React",
+    duration: "6 Weeks",
+    role: "Visual Lead",
+    impact: "Seed Funded",
+    link: "https://nexus-labs.ai",
+  },
+  {
+    id: 8,
+    title: "Chroma E-Commerce",
+    category: "Commerce / UX",
+    image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&q=80&w=1200",
+    tags: ["Shopify", "Headless", "UX"],
+    description: "A blazingly fast headless commerce storefront for a high-end streetwear label. Infinite scrolling and 3D product previews.",
+    stack: "Hydrogen, Tailwind",
+    duration: "12 Weeks",
+    role: "Tech Partner",
+    impact: "+35% Conv. Rate",
+    link: "https://chroma.store",
+  },
 ];
 
 export default function WorkCarousel() {
@@ -162,16 +214,16 @@ export default function WorkCarousel() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 gap-8 md:gap-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-x-16 md:gap-y-32">
           {PROJECTS.map((project, i) => (
-            <div key={project.id} className="wc-reveal-item">
+            <div key={project.id} className={`wc-reveal-item ${i % 2 !== 0 ? 'md:mt-32' : ''}`}>
               <button
                 type="button"
                 onClick={() => setSelectedProject(project)}
-                className="wc-card wc-refer-card group relative block w-full text-left"
+                className="wc-card wc-refer-card group relative block w-full text-left outline-none"
               >
-                <div className="wc-refer-inner relative aspect-[16/9] w-full overflow-hidden rounded-[2rem] border border-black/[0.08] bg-white shadow-[0_24px_64px_rgba(0,0,0,0.08)] transition-colors group-hover:border-accent/40">
-                  <div className="wc-media wc-refer-media absolute inset-0">
+                <div className="wc-refer-inner relative aspect-[4/5] md:aspect-[3/4] lg:aspect-[4/5] w-full overflow-hidden rounded-[2rem] bg-black/5 shadow-[0_24px_64px_rgba(0,0,0,0.04)] transition-all duration-700 group-hover:shadow-[0_40px_80px_rgba(0,191,255,0.15)] group-hover:-translate-y-2">
+                  <div className="wc-media wc-refer-media absolute inset-0 transition-transform duration-1000 group-hover:scale-110">
                     <Image
                       src={project.image}
                       alt={project.title}
@@ -185,16 +237,23 @@ export default function WorkCarousel() {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
                   </div>
 
-                  <div className="absolute bottom-0 left-0 right-0 z-10 p-6 md:p-8 lg:p-10">
-                    <span className="mb-3 block text-[10px] font-black uppercase leading-[1.35] tracking-[0.4em] text-accent/95">
-                      {project.category}
-                    </span>
-                    <h3 className="wc-refer-title text-2xl font-black uppercase leading-[0.95] tracking-tight text-white md:text-4xl">
-                      {project.title}
-                    </h3>
-                    <p className="mt-4 text-[11px] font-black uppercase leading-[1.35] tracking-[0.28em] text-white/75">
-                      Open Project
-                    </p>
+                  <div className="absolute inset-x-0 bottom-0 z-10 p-8 md:p-10 translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                    <div className="bg-black/20 backdrop-blur-md rounded-2xl p-6 border border-white/20 shadow-2xl">
+                      <span className="mb-2 block text-[9px] font-black uppercase leading-[1.35] tracking-[0.4em] text-accent">
+                        {project.category}
+                      </span>
+                      <h3 className="wc-refer-title text-2xl font-black uppercase leading-[0.95] tracking-tight text-white md:text-3xl">
+                        {project.title}
+                      </h3>
+                      <div className="mt-5 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">
+                        <p className="text-[10px] font-black uppercase leading-[1.35] tracking-[0.2em] text-white">
+                          View Case Study
+                        </p>
+                        <div className="w-8 h-8 rounded-full bg-accent flex items-center justify-center text-white">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </button>

@@ -754,7 +754,7 @@ export default function Hero() {
             <div className="hero-left-col flex flex-col text-left lg:col-span-6">
 
               <p className="hero-eyebrow mb-5 text-[10px] font-black uppercase tracking-[0.5em] text-black/40">
-                <span className="hero-eyebrow-part inline-block">Wincore Agency · </span>
+                <span className="hero-eyebrow-part inline-block">Wincore · </span>
                 <span className="hero-eyebrow-part inline-block text-accent/90">Colombo &amp; global</span>
               </p>
 
@@ -986,7 +986,7 @@ export default function Hero() {
               className={`h-full w-full object-cover transition-transform duration-[2s] ${expanded ? "scale-100" : "scale-[1.02]"
                 }`}
             >
-              <source src="https://thefirstthelast.agency/assets/video/reel_small.mp4" type="video/mp4" />
+              <source src="https://player.vimeo.com/progressive_redirect/playback/1099987160/rendition/720p/file.mp4?loc=external&signature=ceda14c660b13b7ba561223c92a43810b5248f73298bd2068a52665a249d0e20" type="video/mp4" />
             </video>
             <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/10" />
             <button

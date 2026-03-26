@@ -3,9 +3,9 @@ import ServicesPageContent from "@/components/ServicesPageContent";
 import PageMain from "@/components/PageMain";
 
 export const metadata = {
-  title: "Services — Wincore Agency",
+  title: "Services — Wincore",
   description:
-    "Digital-first branding, motion, AI-powered development, and WebGL experiences by Wincore Agency.",
+    "Digital-first branding, motion, AI-powered development, and WebGL experiences by Wincore.",
 };
 
 export default function ServicesPage() {

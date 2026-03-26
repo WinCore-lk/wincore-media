@@ -3,13 +3,10 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
+import ScrollTrigger from "gsap/ScrollTrigger";
 import SplitType from "split-type";
-import {
-  registerGsapPlugins,
-  getScroller,
-  scheduleScrollTriggerRefresh,
-  prefersReducedMotion,
-} from "@/lib/motion";
+import { ArrowUpRight, Mail, MapPin, Clock } from "lucide-react";
+import { registerGsapPlugins, prefersReducedMotion } from "@/lib/motion";
 
 type SubmitState = "idle" | "loading" | "sent" | "error";
 
@@ -27,11 +24,11 @@ function useColomboTime() {
   const [time, setTime] = useState("");
   useEffect(() => {
     const fmt = () =>
-      new Intl.DateTimeFormat("en-LK", {
+      new Intl.DateTimeFormat("en-US", {
         hour: "2-digit", minute: "2-digit", second: "2-digit",
         hour12: false, timeZone: "Asia/Colombo",
       }).format(new Date());
-    setTime(fmt());
+    window.setTimeout(() => setTime(fmt()), 0);
     const id = window.setInterval(() => setTime(fmt()), 1000);
     return () => window.clearInterval(id);
   }, []);
@@ -54,61 +51,48 @@ export default function ContactPageContent() {
 
   useEffect(() => {
     registerGsapPlugins();
-    const scroller = getScroller();
     const reduced = prefersReducedMotion();
     const splits: SplitType[] = [];
 
     const ctx = gsap.context(() => {
-      if (reduced) {
-        gsap.set(".ct-anim", { opacity: 1, y: 0 });
-        return;
-      }
+      if (reduced) return;
 
-      // Hero title — line by line wipe
-      const titleEl = rootRef.current?.querySelector<HTMLElement>(".ct-title");
+      // Hero
+      const titleEl = rootRef.current?.querySelector(".ct-hero-title");
       if (titleEl) {
-        const split = new SplitType(titleEl, { types: "lines" });
+        const split = new SplitType(titleEl as HTMLElement, { types: "lines,words" });
         splits.push(split);
-        if (split.lines) {
-          split.lines.forEach((line) => {
-            const wrap = document.createElement("div");
-            wrap.style.overflow = "hidden";
-            line.parentNode?.insertBefore(wrap, line);
-            wrap.appendChild(line);
-          });
-          gsap.fromTo(split.lines,
-            { yPercent: 105 },
-            { yPercent: 0, duration: 1.1, stagger: 0.12, ease: "expo.out", delay: 0.1 }
-          );
-        }
+        gsap.fromTo(split.words, 
+          { y: 50, opacity: 0 },
+          { y: 0, opacity: 1, duration: 1.2, stagger: 0.04, ease: "expo.out", delay: 0.1 }
+        );
       }
 
-      // Hero sub-elements fade
-      gsap.fromTo(".ct-hero-sub",
+      gsap.fromTo(".ct-fade-up",
+        { opacity: 0, y: 30 },
+        { opacity: 1, y: 0, duration: 1, stagger: 0.1, ease: "power3.out", delay: 0.4 }
+      );
+
+      // Info Blocks
+      gsap.fromTo(".ct-info-block",
+        { opacity: 0, x: -20 },
+        { 
+          opacity: 1, x: 0, duration: 0.8, stagger: 0.1, ease: "power3.out",
+          scrollTrigger: { trigger: ".ct-info-grid", start: "top 80%", once: true }
+        }
+      );
+
+      // Form 
+      gsap.fromTo(".ct-form-row",
         { opacity: 0, y: 20 },
-        { opacity: 1, y: 0, duration: 0.9, stagger: 0.08, ease: "power3.out", delay: 0.65, clearProps: "transform,opacity" }
-      );
-
-      // Info cards stagger
-      gsap.fromTo(".ct-card",
-        { opacity: 0, y: 30 },
         {
-          opacity: 1, y: 0, duration: 0.75, stagger: 0.1, ease: "power3.out", clearProps: "transform,opacity",
-          scrollTrigger: { trigger: ".ct-cards", scroller, start: "top 85%", once: true },
+          opacity: 1, y: 0, duration: 0.8, stagger: 0.06, ease: "power3.out",
+          scrollTrigger: { trigger: formRef.current, start: "top 80%", once: true }
         }
       );
 
-      // Form fields stagger
-      gsap.fromTo(".ct-field",
-        { opacity: 0, y: 30 },
-        {
-          opacity: 1, y: 0, duration: 0.75, stagger: 0.08, ease: "power3.out", clearProps: "transform,opacity",
-          scrollTrigger: { trigger: formRef.current, scroller, start: "top 85%", once: true },
-        }
-      );
     }, rootRef);
-
-    scheduleScrollTriggerRefresh();
+    
     return () => { splits.forEach((s) => s.revert()); ctx.revert(); };
   }, []);
 
@@ -143,141 +127,98 @@ export default function ContactPageContent() {
       setFeedback("Launching your email client. If nothing opens, write to hello@wincore.media.");
       formRef.current?.reset();
       setSelectedServices([]);
-    }, 420);
+    }, 450);
   }
 
   return (
-    <section ref={rootRef} className="bg-white" aria-label="Contact Wincore">
+    <section ref={rootRef} className="bg-background min-h-[100svh] text-foreground relative overflow-hidden flex flex-col justify-between">
+      {/* Background Ambience */}
+      <div className="absolute top-[-10%] right-[-10%] w-[800px] h-[800px] bg-accent/[0.04] blur-[140px] rounded-full pointer-events-none" />
+      <div className="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] bg-secondary/[0.03] blur-[120px] rounded-full pointer-events-none" />
 
-      {/* ─────────────────────────────────────────────
-          HERO
-      ───────────────────────────────────────────── */}
-      <div className="_container pt-40 pb-16 md:pt-56 md:pb-20">
-
-        {/* breadcrumb */}
-        <p className="ct-hero-sub text-[10px] font-black uppercase tracking-[0.45em] text-black/30 mb-10">
-          contact us
-        </p>
-
-        {/* giant title */}
-        <h1
-          className="ct-title font-heading font-black uppercase text-black"
-          style={{ fontSize: "clamp(2.8rem, 8vw, 7rem)", lineHeight: 0.9 }}
-        >
-          how to reach
-          <br />
-          <span className="font-light text-black/15" style={{ letterSpacing: "0.03em" }}>
-            wincore
-          </span>
-        </h1>
-
-        {/* divider + meta */}
-        <div className="ct-hero-sub mt-10 md:mt-14 pt-8 border-t border-black/[0.08] flex flex-col sm:flex-row sm:items-end gap-6 sm:gap-0 sm:justify-between">
-          <p className="text-base font-light text-black/40 max-w-sm leading-relaxed">
-            New campaign, brand, or product —<br className="hidden md:block" />
-            we&apos;d love to hear what you&apos;re building.
+      <div>
+        {/* HERO SECTION */}
+        <div className="pt-40 pb-16 md:pt-56 md:pb-24 px-6 md:px-12 lg:px-24 max-w-[1400px] mx-auto relative z-10 w-full">
+          <p className="ct-fade-up text-[11px] font-black uppercase tracking-[0.45em] text-accent mb-6 md:mb-10">
+            Contact Wincore
           </p>
-          <div className="flex flex-col items-start sm:items-end gap-1.5">
-            <a
-              href="mailto:hello@wincore.media"
-              className="text-sm font-medium text-black/50 hover:text-black underline underline-offset-4 transition-colors"
-            >
-              hello@wincore.media
-            </a>
-            <span className="text-xs text-black/30 tabular-nums" suppressHydrationWarning>
-              {colomboTime || "—:—:—"} <span className="not-italic">LK time</span>
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* ─────────────────────────────────────────────
-          INFO CARDS (3 col, self-contained)
-      ───────────────────────────────────────────── */}
-      <div className="ct-cards _container pb-16 md:pb-20">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-px bg-black/[0.08]" style={{ border: "1px solid rgba(0,0,0,0.08)" }}>
-
-          {/* card 1 — dark */}
-          <div className="ct-card bg-[#0a0a0a] text-white p-8 md:p-10 flex flex-col gap-6">
-            <p className="text-[9px] font-black uppercase tracking-[0.5em] opacity-30">01</p>
-            <div>
-              <h3 className="text-xl md:text-2xl font-black uppercase tracking-tight mb-1">Colombo</h3>
-              <p className="text-xs font-light text-white/40">Sri Lanka · GMT +5:30</p>
-            </div>
-            <div className="mt-auto pt-6 border-t border-white/10">
-              <a href="mailto:hello@wincore.media"
-                className="text-xs font-medium text-white/50 hover:text-white underline underline-offset-4 transition-colors">
-                hello@wincore.media
-              </a>
-            </div>
-          </div>
-
-          {/* card 2 — light */}
-          <div className="ct-card bg-white p-8 md:p-10 flex flex-col gap-6">
-            <p className="text-[9px] font-black uppercase tracking-[0.5em] text-black/25">02</p>
-            <div>
-              <h3 className="text-xl md:text-2xl font-black uppercase tracking-tight text-black mb-1">Remote</h3>
-              <p className="text-xs font-light text-black/40">Global · Any timezone</p>
-            </div>
-            <div className="mt-auto pt-6 border-t border-black/[0.07]">
-              <a href="https://cal.com/wincore" target="_blank" rel="noopener noreferrer"
-                className="text-xs font-medium text-black/45 hover:text-black underline underline-offset-4 transition-colors">
-                Book a discovery call →
-              </a>
-            </div>
-          </div>
-
-          {/* card 3 — light */}
-          <div className="ct-card bg-white p-8 md:p-10 flex flex-col gap-6">
-            <p className="text-[9px] font-black uppercase tracking-[0.5em] text-black/25">03</p>
-            <div>
-              <h3 className="text-xl md:text-2xl font-black uppercase tracking-tight text-black mb-1">Response</h3>
-              <p className="text-xs font-light text-black/40">We reply, always.</p>
-            </div>
-            <ul className="mt-auto pt-6 border-t border-black/[0.07] space-y-3">
-              {[["2 days", "general enquiries"], ["48 hrs", "project briefs"], ["Same day", "urgent work"]].map(([time, label]) => (
-                <li key={label} className="flex items-center justify-between text-xs">
-                  <span className="font-semibold text-black">{time}</span>
-                  <span className="text-black/35">{label}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      {/* ─────────────────────────────────────────────
-          DARK FORM
-      ───────────────────────────────────────────── */}
-      <div className="ct-form-section bg-[#0a0a0a] text-white">
-        <div className="_container py-20 md:py-32">
-
-          {/* form header */}
-          <div className="mb-14 md:mb-20">
-            <p className="text-[10px] font-light uppercase tracking-[0.4em] opacity-30 mb-5">
-              send us a message
+          <h1 className="ct-hero-title font-heading text-[12vw] md:text-[8vw] lg:text-[7.5rem] font-black uppercase leading-[0.85] tracking-tighter mb-10 md:mb-16">
+            Start the <br />
+            <span className="text-black/20 italic font-light tracking-tight">conversation.</span>
+          </h1>
+          
+          <div className="ct-fade-up flex flex-col md:flex-row justify-between items-start md:items-end gap-10 border-b border-black/10 pb-16">
+            <p className="text-lg md:text-2xl font-light text-black/50 max-w-xl leading-relaxed">
+              Whether building a premium brand, an immersive WebGL site, or executing a global campaign, everything starts with a simple hello.
             </p>
-            <h2
-              className="font-heading font-black uppercase text-white"
-              style={{ fontSize: "clamp(2rem, 5.5vw, 4.5rem)", lineHeight: 0.9 }}
+            <a
+              href="https://cal.com/wincore"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group inline-flex items-center justify-center gap-4 bg-black text-white px-8 py-5 md:px-10 md:py-6 rounded-full shadow-[0_12px_24px_rgba(0,0,0,0.15)] hover:shadow-[0_20px_40px_rgba(0,191,255,0.2)] transition-all duration-300 w-full md:w-auto shrink-0"
             >
-              tell us about
-              <br />
-              <span className="font-light text-white/20" style={{ letterSpacing: "0.03em" }}>
-                your project
-              </span>
-            </h2>
+              <span className="text-[11px] font-black uppercase tracking-[0.2em] whitespace-nowrap">Book a discovery call</span>
+              <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center group-hover:bg-accent transition-colors duration-300 transform group-hover:scale-110">
+                <ArrowUpRight size={16} />
+              </div>
+            </a>
+          </div>
+        </div>
+
+        {/* TWO COL LAYOUT: CONTACT INFO + FORM */}
+        <div className="max-w-[1400px] mx-auto px-6 md:px-12 lg:px-24 pb-32 md:pb-48 grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24 relative z-10">
+          
+          {/* INFO COLUMN */}
+          <div className="ct-info-grid lg:col-span-4 flex flex-col gap-10 md:gap-14 pt-2">
+            <div className="ct-info-block flex gap-5 group">
+              <div className="shrink-0 w-12 h-12 rounded-full border border-black/10 flex items-center justify-center bg-black/[0.02] group-hover:border-accent group-hover:bg-accent/5 transition-all duration-300">
+                <Mail className="text-black/40 group-hover:text-accent transition-colors duration-300" size={20} />
+              </div>
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-black/40 mb-2">Direct email</p>
+                <a href="mailto:hello@wincore.media" className="text-xl md:text-2xl font-bold tracking-tight text-foreground hover:text-accent transition-colors block break-words">
+                  hello@wincore.media
+                </a>
+                <p className="text-sm font-light text-black/50 mt-2">Always available. Replies within 24 hours.</p>
+              </div>
+            </div>
+
+            <div className="ct-info-block flex gap-5 group">
+              <div className="shrink-0 w-12 h-12 rounded-full border border-black/10 flex items-center justify-center bg-black/[0.02] group-hover:border-accent group-hover:bg-accent/5 transition-all duration-300">
+                <MapPin className="text-black/40 group-hover:text-accent transition-colors duration-300" size={20} />
+              </div>
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-black/40 mb-2">Headquarters</p>
+                <p className="text-xl md:text-2xl font-bold tracking-tight text-foreground">
+                  Colombo, LK
+                </p>
+                <p className="text-sm font-light text-black/50 mt-2">Remote-first, operating globally.</p>
+              </div>
+            </div>
+
+            <div className="ct-info-block flex gap-5 group">
+              <div className="shrink-0 w-12 h-12 rounded-full border border-black/10 flex items-center justify-center bg-black/[0.02] group-hover:border-accent group-hover:bg-accent/5 transition-all duration-300">
+                <Clock className="text-black/40 group-hover:text-accent transition-colors duration-300" size={20} />
+              </div>
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-black/40 mb-2">Local Time</p>
+                <p className="text-xl md:text-2xl font-bold tracking-tight text-foreground tabular-nums">
+                  {colomboTime || "—:—:—"}
+                </p>
+                <p className="text-sm font-light text-black/50 mt-2">GMT +5:30</p>
+              </div>
+            </div>
           </div>
 
-          <form ref={formRef} onSubmit={handleSubmit} noValidate>
-            <div className="flex flex-col divide-y divide-white/[0.07]">
-
-              {/* Services */}
-              <div className="ct-field py-10 md:py-12">
-                <p className="text-[10px] font-light uppercase tracking-[0.35em] opacity-40 mb-7">
-                  Which services are you looking for?
+          {/* FORM COLUMN */}
+          <div className="lg:col-span-8 bg-black/[0.015] border border-black/5 shadow-[0_4px_24px_rgba(0,0,0,0.02)] rounded-[2rem] p-8 md:p-12 lg:p-16">
+            <form ref={formRef} onSubmit={handleSubmit} noValidate className="flex flex-col gap-12 md:gap-14">
+              
+              <div className="ct-form-row">
+                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-black/40 mb-6">
+                  What do you need help with?
                 </p>
-                <div className="flex flex-wrap gap-3">
+                <div className="flex flex-wrap gap-3 md:gap-4">
                   {SERVICES.map((svc) => {
                     const active = selectedServices.includes(svc);
                     return (
@@ -285,10 +226,10 @@ export default function ContactPageContent() {
                         key={svc}
                         type="button"
                         onClick={() => toggleService(svc)}
-                        className={`px-5 py-2.5 text-sm font-light border transition-all duration-250 cursor-pointer ${
+                        className={`px-5 py-3 md:px-6 md:py-3.5 rounded-full text-xs md:text-sm font-medium transition-all duration-300 border ${
                           active
-                            ? "bg-accent border-accent text-white"
-                            : "border-white/20 text-white/45 hover:text-white hover:border-white/50"
+                            ? "bg-black border-black text-white shadow-[0_12px_24px_rgba(0,0,0,0.15)] transform -translate-y-1"
+                            : "bg-white border-black/10 text-black/60 hover:border-black/30 hover:text-black hover:bg-black/5"
                         }`}
                       >
                         {svc}
@@ -298,141 +239,103 @@ export default function ContactPageContent() {
                 </div>
               </div>
 
-              {/* Name */}
-              <div className="ct-field py-8 md:py-10">
-                <label htmlFor="ct-name" className="block text-[10px] font-light uppercase tracking-[0.35em] opacity-40 mb-5">
-                  Your name <span className="text-accent">*</span>
-                </label>
-                <input
-                  id="ct-name" name="name" type="text"
-                  placeholder="John Doe"
-                  required disabled={submitState === "loading"}
-                  className="w-full bg-transparent border-b border-white/15 pb-4 text-xl md:text-2xl font-light text-white placeholder:text-white/20 outline-none focus:border-white/40 transition-colors caret-accent"
-                />
-              </div>
-
-              {/* Email */}
-              <div className="ct-field py-8 md:py-10">
-                <label htmlFor="ct-email" className="block text-[10px] font-light uppercase tracking-[0.35em] opacity-40 mb-5">
-                  Email address <span className="text-accent">*</span>
-                </label>
-                <input
-                  id="ct-email" name="email" type="email"
-                  placeholder="john@company.com"
-                  required disabled={submitState === "loading"}
-                  className="w-full bg-transparent border-b border-white/15 pb-4 text-xl md:text-2xl font-light text-white placeholder:text-white/20 outline-none focus:border-white/40 transition-colors caret-accent"
-                />
-              </div>
-
-              {/* Company + Website — 2 col */}
-              <div className="ct-field py-8 md:py-10 grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-12">
-                <div>
-                  <label htmlFor="ct-company" className="block text-[10px] font-light uppercase tracking-[0.35em] opacity-40 mb-5">
-                    Company / Brand
-                  </label>
+              <div className="ct-form-row grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-12 pt-6">
+                <div className="relative group">
                   <input
-                    id="ct-company" name="company" type="text" placeholder="Optional"
-                    disabled={submitState === "loading"}
-                    className="w-full bg-transparent border-b border-white/15 pb-4 text-xl md:text-2xl font-light text-white placeholder:text-white/20 outline-none focus:border-white/40 transition-colors caret-accent"
+                    id="name" name="name" type="text"
+                    required disabled={submitState === "loading"}
+                    className="w-full bg-transparent border-b border-black/15 pb-4 pt-4 text-lg md:text-xl font-medium text-foreground outline-none focus:border-accent transition-colors peer"
+                    placeholder=" "
                   />
-                </div>
-                <div>
-                  <label htmlFor="ct-website" className="block text-[10px] font-light uppercase tracking-[0.35em] opacity-40 mb-5">
-                    Current Website
+                  <label htmlFor="name" className="absolute left-0 top-4 text-black/40 text-lg transition-all duration-300 peer-focus:-top-4 peer-focus:text-[10px] peer-focus:font-black peer-focus:uppercase peer-focus:tracking-[0.2em] peer-focus:text-accent peer-not-placeholder-shown:-top-4 peer-not-placeholder-shown:text-[10px] peer-not-placeholder-shown:font-black peer-not-placeholder-shown:uppercase peer-not-placeholder-shown:tracking-[0.2em] peer-not-placeholder-shown:text-black/60 cursor-text">
+                    Your Name *
                   </label>
+                </div>
+
+                <div className="relative group">
                   <input
-                    id="ct-website" name="website" type="url" placeholder="https://example.com"
-                    disabled={submitState === "loading"}
-                    className="w-full bg-transparent border-b border-white/15 pb-4 text-xl md:text-2xl font-light text-white placeholder:text-white/20 outline-none focus:border-white/40 transition-colors caret-accent"
+                    id="email" name="email" type="email"
+                    required disabled={submitState === "loading"}
+                    className="w-full bg-transparent border-b border-black/15 pb-4 pt-4 text-lg md:text-xl font-medium text-foreground outline-none focus:border-accent transition-colors peer"
+                    placeholder=" "
                   />
+                  <label htmlFor="email" className="absolute left-0 top-4 text-black/40 text-lg transition-all duration-300 peer-focus:-top-4 peer-focus:text-[10px] peer-focus:font-black peer-focus:uppercase peer-focus:tracking-[0.2em] peer-focus:text-accent peer-not-placeholder-shown:-top-4 peer-not-placeholder-shown:text-[10px] peer-not-placeholder-shown:font-black peer-not-placeholder-shown:uppercase peer-not-placeholder-shown:tracking-[0.2em] peer-not-placeholder-shown:text-black/60 cursor-text">
+                    Email Address *
+                  </label>
+                </div>
+
+                <div className="relative group">
+                  <input
+                    id="company" name="company" type="text"
+                    disabled={submitState === "loading"}
+                    className="w-full bg-transparent border-b border-black/15 pb-4 pt-4 text-lg md:text-xl font-medium text-foreground outline-none focus:border-accent transition-colors peer"
+                    placeholder=" "
+                  />
+                  <label htmlFor="company" className="absolute left-0 top-4 text-black/40 text-lg transition-all duration-300 peer-focus:-top-4 peer-focus:text-[10px] peer-focus:font-black peer-focus:uppercase peer-focus:tracking-[0.2em] peer-focus:text-accent peer-not-placeholder-shown:-top-4 peer-not-placeholder-shown:text-[10px] peer-not-placeholder-shown:font-black peer-not-placeholder-shown:uppercase peer-not-placeholder-shown:tracking-[0.2em] peer-not-placeholder-shown:text-black/60 cursor-text">
+                    Company (Optional)
+                  </label>
+                </div>
+
+                <div className="relative group">
+                  <input
+                    id="website" name="website" type="url"
+                    disabled={submitState === "loading"}
+                    className="w-full bg-transparent border-b border-black/15 pb-4 pt-4 text-lg md:text-xl font-medium text-foreground outline-none focus:border-accent transition-colors peer"
+                    placeholder=" "
+                  />
+                  <label htmlFor="website" className="absolute left-0 top-4 text-black/40 text-lg transition-all duration-300 peer-focus:-top-4 peer-focus:text-[10px] peer-focus:font-black peer-focus:uppercase peer-focus:tracking-[0.2em] peer-focus:text-accent peer-not-placeholder-shown:-top-4 peer-not-placeholder-shown:text-[10px] peer-not-placeholder-shown:font-black peer-not-placeholder-shown:uppercase peer-not-placeholder-shown:tracking-[0.2em] peer-not-placeholder-shown:text-black/60 cursor-text">
+                    Website URL (Optional)
+                  </label>
                 </div>
               </div>
 
-              {/* Message */}
-              <div className="ct-field py-8 md:py-10">
-                <label htmlFor="ct-message" className="block text-[10px] font-light uppercase tracking-[0.35em] opacity-40 mb-5">
-                  Your message <span className="text-accent">*</span>
-                </label>
+              <div className="ct-form-row relative group pt-6">
                 <textarea
-                  id="ct-message" name="message" rows={4}
-                  placeholder="Goals, timeline, references, budget..."
+                  id="message" name="message" rows={4}
                   required disabled={submitState === "loading"}
-                  className="w-full bg-transparent border-b border-white/15 pb-4 text-xl md:text-2xl font-light text-white placeholder:text-white/20 outline-none focus:border-white/40 transition-colors resize-none caret-accent leading-relaxed"
+                  className="w-full bg-transparent border-b border-black/15 pb-4 pt-4 text-lg md:text-xl font-medium text-foreground outline-none focus:border-accent transition-colors peer resize-none"
+                  placeholder=" "
                 />
+                <label htmlFor="message" className="absolute left-0 top-4 text-black/40 text-lg transition-all duration-300 peer-focus:-top-4 peer-focus:text-[10px] peer-focus:font-black peer-focus:uppercase peer-focus:tracking-[0.2em] peer-focus:text-accent peer-not-placeholder-shown:-top-4 peer-not-placeholder-shown:text-[10px] peer-not-placeholder-shown:font-black peer-not-placeholder-shown:uppercase peer-not-placeholder-shown:tracking-[0.2em] peer-not-placeholder-shown:text-black/60 cursor-text">
+                  Your Message *
+                </label>
               </div>
 
-              {/* Feedback */}
               {submitState === "error" && feedback && (
-                <div className="ct-field py-6 flex gap-3 items-start">
-                  <div className="mt-1.5 h-1.5 w-1.5 rounded-full bg-red-500 shrink-0" />
-                  <p className="text-sm text-red-400">{feedback}</p>
+                <div className="ct-form-row px-5 py-4 bg-red-50 border border-red-100 rounded-xl flex gap-3 items-center">
+                  <div className="h-2 w-2 rounded-full bg-red-500 shrink-0" />
+                  <p className="text-sm font-medium text-red-600">{feedback}</p>
                 </div>
               )}
               {submitState === "sent" && feedback && (
-                <div className="ct-field py-6 flex gap-3 items-start">
-                  <div className="mt-1.5 h-1.5 w-1.5 rounded-full bg-emerald-500 shrink-0" />
-                  <p className="text-sm text-emerald-400">{feedback}</p>
+                <div className="ct-form-row px-5 py-4 bg-emerald-50 border border-emerald-100 rounded-xl flex gap-3 items-center">
+                  <div className="h-2 w-2 rounded-full bg-emerald-500 shrink-0" />
+                  <p className="text-sm font-medium text-emerald-600">{feedback}</p>
                 </div>
               )}
 
-              {/* Submit */}
-              <div className="ct-field pt-10 md:pt-12 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-8">
-                <p className="text-xs text-white/25 font-light max-w-xs leading-relaxed">
-                  We respond within 2 business days.{" "}
-                  <a href="mailto:hello@wincore.media"
-                    className="text-white/40 underline underline-offset-4 hover:text-white/70 transition-colors">
-                    Direct email
-                  </a>
+              <div className="ct-form-row pt-6 flex flex-col md:flex-row items-center justify-between gap-8 md:gap-6 mt-4 border-t border-black/5">
+                <p className="text-xs font-light text-black/40 text-center md:text-left mx-auto md:mx-0 order-2 md:order-1">
+                  Any files to attach? <br className="hidden md:block" /> Email us directly at <a href="mailto:hello@wincore.media" className="font-semibold text-black hover:text-accent transition-colors">hello@wincore.media</a>
                 </p>
-
+                
                 <button
                   type="submit"
                   disabled={submitState === "loading"}
-                  className="group inline-flex items-center gap-3 disabled:opacity-40 cursor-pointer"
+                  className="group relative flex items-center justify-center gap-3 overflow-hidden rounded-xl bg-accent px-10 py-5 w-full md:w-auto transition-all duration-300 hover:shadow-[0_15px_30px_rgba(0,191,255,0.25)] min-w-[200px] order-1 md:order-2"
                 >
-                  <span className="relative">
-                    <span className="absolute bottom-0 left-0 h-px w-0 bg-accent transition-all duration-500 group-hover:w-full" />
-                    <span className="text-lg md:text-xl font-black uppercase tracking-[0.12em] text-white transition-colors duration-300 group-hover:text-accent">
-                      {submitState === "loading" ? (
-                        <span className="flex items-center gap-2.5">
-                          {[0, 120, 240].map((d) => (
-                            <span key={d} className="inline-block h-1.5 w-1.5 rounded-full bg-white animate-bounce" style={{ animationDelay: `${d}ms` }} />
-                          ))}
-                          Sending
-                        </span>
-                      ) : "Submit enquiry"}
-                    </span>
+                  <span className="relative z-10 text-[11px] font-black uppercase tracking-[0.2em] text-white">
+                    {submitState === "loading" ? "Processing..." : "Submit Enquiry"}
                   </span>
-                  {submitState !== "loading" && (
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-                      className="text-white transition-all duration-400 group-hover:translate-x-1 group-hover:-translate-y-1 group-hover:text-accent">
-                      <path d="M7 17L17 7" /><path d="M7 7h10v10" />
-                    </svg>
-                  )}
+                  <div className="absolute inset-0 bg-black translate-y-[100%] transition-transform duration-500 group-hover:translate-y-0" />
                 </button>
               </div>
 
-            </div>
-          </form>
+            </form>
+          </div>
         </div>
       </div>
 
-      {/* ─────────────────────────────────────────────
-          BOTTOM NAV
-      ───────────────────────────────────────────── */}
-      <nav className="_container flex flex-col sm:flex-row items-center justify-between gap-5 py-10 border-t border-black/[0.07]">
-        <div className="flex flex-wrap justify-center sm:justify-start gap-8">
-          {([["/", "Home"], ["/works", "Works"], ["/services", "Services"], ["/about", "About"]] as [string, string][]).map(([href, label]) => (
-            <Link key={href} href={href}
-              className="text-[10px] font-black uppercase tracking-[0.45em] text-black/25 hover:text-black transition-colors">
-              {label}
-            </Link>
-          ))}
-        </div>
-        <p className="text-[10px] font-black uppercase tracking-[0.45em] text-black/25">
-          © {new Date().getFullYear()} Wincore Media
-        </p>
-      </nav>
     </section>
   );
 }

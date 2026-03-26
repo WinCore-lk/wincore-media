@@ -282,33 +282,90 @@ export default function ServicesPageContent() {
         });
       }
 
-      // --- Process strip ---
-      gsap.from(".svc-process-inner", {
-        opacity: reduced ? 1 : 0,
-        y: reduced ? 0 : 48,
-        duration: reduced ? 0 : 0.9,
-        ease: "power3.out",
-        scrollTrigger: {
-          trigger: ".svc-process",
-          scroller,
-          start: "top 86%",
-          once: true,
-        },
-      });
+      // --- New Process section ---
+      if (!reduced) {
+        gsap.fromTo(
+          ".svc-process-line",
+          { width: "0%" },
+          {
+            width: "100%",
+            ease: "none",
+            scrollTrigger: {
+              trigger: ".svc-process-track",
+              scroller,
+              start: "top 80%",
+              end: "bottom 60%",
+              scrub: true,
+            },
+          }
+        );
 
-      gsap.from(".svc-phase", {
-        opacity: reduced ? 1 : 0,
-        y: reduced ? 0 : 28,
-        duration: reduced ? 0 : 0.65,
-        stagger: reduced ? 0 : 0.12,
-        ease: "power2.out",
-        scrollTrigger: {
-          trigger: ".svc-process",
-          scroller,
-          start: "top 78%",
-          once: true,
-        },
-      });
+        gsap.fromTo(
+          ".svc-process-line-mobile",
+          { height: "0%" },
+          {
+            height: "100%",
+            ease: "none",
+            scrollTrigger: {
+              trigger: ".svc-process-track",
+              scroller,
+              start: "top 80%",
+              end: "bottom 60%",
+              scrub: true,
+            },
+          }
+        );
+
+        const processNodes = gsap.utils.toArray<HTMLElement>(".svc-process-node");
+        processNodes.forEach((node) => {
+          gsap.fromTo(
+            node,
+            { opacity: 0, y: 40 },
+            {
+              opacity: 1,
+              y: 0,
+              duration: 0.8,
+              ease: "back.out(1.2)",
+              scrollTrigger: {
+                trigger: node,
+                scroller,
+                start: "top 85%",
+                once: true,
+              },
+            }
+          );
+
+          const dot = node.querySelector(".svc-process-dot");
+          if (dot) {
+            gsap.to(dot, {
+              boxShadow: "0 0 20px rgba(0, 191, 255, 0.4)",
+              borderColor: "rgba(0, 191, 255, 0.6)",
+              ease: "power2.out",
+              duration: 0.4,
+              scrollTrigger: {
+                trigger: node,
+                scroller,
+                start: "top 60%",
+                toggleActions: "play none none reverse",
+              },
+            });
+            const text = dot.querySelector("span");
+            if (text) {
+              gsap.to(text, {
+                color: "rgba(0, 191, 255, 1)",
+                ease: "power2.out",
+                duration: 0.4,
+                scrollTrigger: {
+                  trigger: node,
+                  scroller,
+                  start: "top 60%",
+                  toggleActions: "play none none reverse",
+                },
+              });
+            }
+          }
+        });
+      }
 
       // --- CTA ---
       gsap.from(".svc-cta-inner", {
@@ -397,7 +454,7 @@ export default function ServicesPageContent() {
                 </span>
               </h1>
               <p className="svc-lead mt-7 max-w-2xl text-sm leading-relaxed text-foreground/55 md:text-base">
-                Wincore Agency delivers digital-first branding, motion, performance, and immersive
+                Wincore delivers digital-first branding, motion, performance, and immersive
                 web. One partner, one bar for quality.
               </p>
               <div className="svc-meta-row mt-11 flex flex-wrap gap-8 pt-11 text-[10px] font-black uppercase leading-[1.5] tracking-[0.35em] text-foreground/40">
@@ -494,28 +551,49 @@ export default function ServicesPageContent() {
           })}
         </div>
 
-        <div className="svc-process relative mb-24 overflow-visible isolate rounded-2xl bg-white px-9 py-12 shadow-xl shadow-black/8 transition-shadow duration-500 hover:shadow-2xl hover:shadow-black/12 md:px-14 md:py-16 lg:px-16 lg:py-[4.75rem]">
-          <div className="svc-process-inner relative">
-            <div className="pointer-events-none absolute right-0 top-0 h-40 w-40 rounded-full bg-secondary/[0.06] blur-3xl" />
-            <div className="relative mb-13 flex flex-col gap-4 pb-11 md:flex-row md:items-end md:justify-between">
-              <h3 className="text-2xl font-black uppercase tracking-tight text-foreground md:text-3xl leading-[1.1]">
-                How we <span className="text-secondary/90 italic">work</span>
-              </h3>
-              <span className="text-[10px] font-black uppercase tracking-[0.4em] text-foreground/35 leading-[1.4]">
-                Discover → Design → Deploy
+        <div className="svc-process-container relative mb-24 md:mb-32 lg:mb-40">
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-16 md:mb-20">
+            <div>
+              <span className="text-[10px] font-black uppercase tracking-[0.4em] text-accent leading-[1.4] mb-4 block">
+                How we work
               </span>
+              <h2 className="text-[2.5rem] md:text-[3.5rem] lg:text-[4rem] font-black uppercase tracking-tighter text-foreground leading-[0.95]">
+                Process &amp; Scope
+              </h2>
             </div>
-            <div className="relative grid grid-cols-1 gap-12 md:grid-cols-3 md:gap-11">
-              {PROCESS.map((phase) => (
-                <article key={phase.step} className="svc-phase">
-                  <p className="mb-3 text-[10px] font-black uppercase tracking-[0.35em] text-accent/90 leading-[1.4]">
+            <p className="max-w-xs text-sm md:text-base text-foreground/50 font-light leading-relaxed">
+              We collapse timelines by focusing only on what matters: discovering the edge, designing the system, and deploying for growth.
+            </p>
+          </div>
+
+          <div className="svc-process-track relative flex flex-col md:flex-row justify-between gap-12 md:gap-0 mt-8">
+            {/* Horizontal Line for Desktop */}
+            <div className="absolute hidden md:block top-[2.25rem] left-0 right-0 h-[1px] bg-black/10 z-0" />
+            <div className="absolute hidden md:block top-[2.25rem] left-0 h-[2px] w-0 bg-accent z-0 svc-process-line shadow-[0_0_10px_rgba(0,191,255,0.4)]" />
+            
+            {/* Vertical Line for Mobile */}
+            <div className="absolute block md:hidden left-[1.1rem] top-0 bottom-0 w-[1px] bg-black/10 z-0" />
+            <div className="absolute block md:hidden left-[1.1rem] top-0 h-0 w-[2px] bg-accent z-0 svc-process-line-mobile shadow-[0_0_10px_rgba(0,191,255,0.4)]" />
+
+            {PROCESS.map((phase) => (
+              <div key={phase.step} className="svc-process-node relative z-10 flex flex-row md:flex-col gap-6 md:gap-8 items-start flex-1 group">
+                {/* Node Dot */}
+                <div className="shrink-0 w-9 h-9 md:w-18 md:h-18 rounded-full bg-background border border-black/10 flex items-center justify-center transition-colors duration-500 shadow-[0_4px_12px_rgba(0,0,0,0.03)] svc-process-dot">
+                  <span className="text-[10px] md:text-sm font-black tracking-widest text-black/30 transition-colors duration-300">
                     {phase.step}
+                  </span>
+                </div>
+                {/* Content */}
+                <div className="pt-1 md:pt-0 pr-6">
+                  <h4 className="text-xl md:text-2xl font-black uppercase tracking-tighter mb-3 transition-colors duration-300 text-foreground group-hover:text-accent">
+                    {phase.title}
+                  </h4>
+                  <p className="text-sm md:text-base text-foreground/50 font-light leading-relaxed max-w-[280px]">
+                    {phase.text}
                   </p>
-                  <h4 className="mb-3 text-lg font-bold text-foreground leading-[1.25]">{phase.title}</h4>
-                  <p className="text-[14px] leading-[1.6] text-foreground/55 md:text-base">{phase.text}</p>
-                </article>
-              ))}
-            </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 

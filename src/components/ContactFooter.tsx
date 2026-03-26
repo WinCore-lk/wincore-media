@@ -225,7 +225,7 @@ export default function ContactFooter() {
               <div className="flex flex-col gap-2 md:items-end">
                 <span className="text-[9px] font-black uppercase tracking-[0.55em] text-black/20">Legal</span>
                 <p className="text-[11px] font-medium leading-[1.8] tracking-[0.08em] text-black/30">
-                  © {new Date().getFullYear()} WINCORE MEDIA (PVT) LTD.<br />
+                  © {new Date().getFullYear()} WINCORE<br />
                   All rights reserved.
                 </p>
               </div>
